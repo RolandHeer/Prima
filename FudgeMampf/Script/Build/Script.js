@@ -43,6 +43,7 @@ var Script;
     let viewport;
     let graph;
     let mrFudge;
+    let fudgeRot;
     let speed = 1 / 20;
     let translation = new ƒ.Vector3(0, 0, 0);
     let corrector = new ƒ.Vector3(0, 0, 0);
@@ -55,6 +56,8 @@ var Script;
         viewport = _event.detail;
         graph = viewport.getBranch();
         mrFudge = graph.getChildrenByName("MrFudge")[0];
+        fudgeRot = mrFudge.getChildrenByName("rotation")[0];
+        console.log("die Rotation ist jene: " + fudgeRot.mtxLocal.getEulerAngles().z);
         setupGrid();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -91,32 +94,36 @@ var Script;
                 if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
                     corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
                     mrFudge.mtxLocal.translation = corrector;
-                    console.log("x: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
+                    fudgeRot.mtxLocal.rotateZ(0 - fudgeRot.mtxLocal.getEulerAngles().z, false);
                     translation.set(speed, 0, 0);
+                    lastKey = ƒ.KEYBOARD_CODE.ESC;
                 }
                 break;
             case ƒ.KEYBOARD_CODE.ARROW_LEFT:
                 if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
                     corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
                     mrFudge.mtxLocal.translation = corrector;
-                    console.log("x: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
+                    fudgeRot.mtxLocal.rotateZ(180 - fudgeRot.mtxLocal.getEulerAngles().z, false);
                     translation.set(-speed, 0, 0);
+                    lastKey = ƒ.KEYBOARD_CODE.ESC;
                 }
                 break;
             case ƒ.KEYBOARD_CODE.ARROW_UP:
                 if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
                     corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
                     mrFudge.mtxLocal.translation = corrector;
-                    console.log("x: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
+                    fudgeRot.mtxLocal.rotateZ(90 - fudgeRot.mtxLocal.getEulerAngles().z, false);
                     translation.set(0, speed, 0);
+                    lastKey = ƒ.KEYBOARD_CODE.ESC;
                 }
                 break;
             case ƒ.KEYBOARD_CODE.ARROW_DOWN:
                 if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
                     corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
                     mrFudge.mtxLocal.translation = corrector;
-                    console.log("x: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
+                    fudgeRot.mtxLocal.rotateZ(270 - fudgeRot.mtxLocal.getEulerAngles().z, false);
                     translation.set(0, -speed, 0);
+                    lastKey = ƒ.KEYBOARD_CODE.ESC;
                 }
                 break;
             default:
