@@ -7,8 +7,10 @@ namespace Script {
   let mrFudge: ƒ.Node;
   let speed: number = 1 / 20;
   let translation: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
-  let corrector: ƒ.Vector3 = new ƒ.Vector3(0,0,0);
+  let corrector: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
   let lastKey: ƒ.KEYBOARD_CODE;
+
+  let threshold: number = 0.1;
 
   //let gridWidth: number = 5;
   //let gridHeight: number = 5;
@@ -18,8 +20,6 @@ namespace Script {
     viewport = _event.detail;
     graph = viewport.getBranch();
     mrFudge = graph.getChildrenByName("MrFudge")[0];
-    mrFudge.mtxLocal.translation.x = 3;
-    console.log("iks: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
     setupGrid();
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -58,29 +58,33 @@ namespace Script {
   function updateTranslation(): void {
     switch (lastKey) {
       case ƒ.KEYBOARD_CODE.ARROW_RIGHT:
-        if (mrFudge.mtxLocal.translation.y % 1 < 0.05) {
-          mrFudge.mtxLocal.translation.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
+        if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
+          corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
+          mrFudge.mtxLocal.translation = corrector;
           console.log("x: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
           translation.set(speed, 0, 0);
         }
         break;
       case ƒ.KEYBOARD_CODE.ARROW_LEFT:
-        if (mrFudge.mtxLocal.translation.y % 1 < 0.05) {
-          mrFudge.mtxLocal.translation.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
+        if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
+          corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
+          mrFudge.mtxLocal.translation = corrector;
           console.log("x: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
           translation.set(-speed, 0, 0);
         }
         break;
       case ƒ.KEYBOARD_CODE.ARROW_UP:
-        if (mrFudge.mtxLocal.translation.x % 1 < 0.05) {
-          mrFudge.mtxLocal.translation.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
+        if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
+          corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
+          mrFudge.mtxLocal.translation = corrector;
           console.log("x: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
           translation.set(0, speed, 0);
         }
         break;
       case ƒ.KEYBOARD_CODE.ARROW_DOWN:
-        if (mrFudge.mtxLocal.translation.x % 1 < 0.05) {
-          mrFudge.mtxLocal.translation.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
+        if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
+          corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
+          mrFudge.mtxLocal.translation = corrector;
           console.log("x: " + mrFudge.mtxLocal.translation.x + " y: " + mrFudge.mtxLocal.translation.y);
           translation.set(0, -speed, 0);
         }

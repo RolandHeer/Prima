@@ -2290,7 +2290,7 @@
                   "ƒ.ComponentMesh": {
                     "idMesh": "MeshSphere|2022-03-22T16:27:51.211Z|65694",
                     "pivot": {
-                      "translation": "[1, 1, 0]",
+                      "translation": "[0, 0, 0]",
                       "rotation": "[0, 0, 0]",
                       "scaling": "[0.800000011920929, 0.800000011920929, 0.800000011920929]"
                     },
@@ -2322,7 +2322,7 @@
                 {
                   "ƒ.ComponentTransform": {
                     "local": {
-                      "translation": "[0, 0, 0]",
+                      "translation": "[2, 3, 0]",
                       "rotation": "[0, 0, 0]",
                       "scaling": "[1, 1, 1]"
                     },
