@@ -21,10 +21,11 @@ namespace Script {
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
     graph = viewport.getBranch();
+    viewport.camera.mtxPivot.translate(new ƒ.Vector3(3,3,13));
+    viewport.camera.mtxPivot.rotateY(180, false);
     grid = graph.getChildrenByName("Grid")[0];
     mrFudge = graph.getChildrenByName("MrFudge")[0];
     fudgeRot = mrFudge.getChildrenByName("rotation")[0];
-    console.log("die Rotation ist jene: " + fudgeRot.mtxLocal.getEulerAngles().z);
     setupGrid();
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -33,14 +34,14 @@ namespace Script {
   function update(_event: Event): void {
     // ƒ.Physics.simulate();  // if physics is included and used
     updateMrFudge();
-
     viewport.draw();
+    
     ƒ.AudioManager.default.update();
   }
 
   function updateMrFudge(): void {
+    updateLastKey();
     updateDirection();
-    updateTranslation();
     if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold && (mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
       if (isPath(Math.round(translation.x / speed), Math.round(translation.y / speed))) {                                                       //schaut ob das kommende Tile eine Wand ist
         mrFudge.mtxLocal.translate(translation);
@@ -53,7 +54,7 @@ namespace Script {
     }
   }
 
-  function updateDirection(): void {
+  function updateLastKey(): void {
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT, ƒ.KEYBOARD_CODE.D])) {
       lastKey = ƒ.KEYBOARD_CODE.ARROW_RIGHT;
     }
@@ -68,7 +69,7 @@ namespace Script {
     }
   }
 
-  function updateTranslation(): void { // Methode funktioniert nicht all zu gut im negativen Bereich... vielleicht mal danach schauen
+  function updateDirection(): void { // Methode funktioniert nicht all zu gut im negativen Bereich... vielleicht mal danach schauen
     switch (lastKey) {
       case ƒ.KEYBOARD_CODE.ARROW_RIGHT:
         if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
