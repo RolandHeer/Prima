@@ -4,6 +4,7 @@ namespace Script {
 
   let viewport: ƒ.Viewport;
   let graph: ƒ.Node;
+  let grid: ƒ.Node;
   let mrFudge: ƒ.Node;
   let fudgeRot: ƒ.Node;
   let speed: number = 1 / 20;
@@ -20,6 +21,7 @@ namespace Script {
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
     graph = viewport.getBranch();
+    grid = graph.getChildrenByName("Grid")[0];
     mrFudge = graph.getChildrenByName("MrFudge")[0];
     fudgeRot = mrFudge.getChildrenByName("rotation")[0];
     console.log("die Rotation ist jene: " + fudgeRot.mtxLocal.getEulerAngles().z);
@@ -39,8 +41,16 @@ namespace Script {
   function updateMrFudge(): void {
     updateDirection();
     updateTranslation();
-    //switch(ƒ.Keyboard.isPressedOne)
-    mrFudge.mtxLocal.translate(translation);
+    if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold && (mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
+      if (isPath(Math.round(translation.x / speed), Math.round(translation.y / speed))) {                                                       //schaut ob das kommende Tile eine Wand ist
+        mrFudge.mtxLocal.translate(translation);
+      } else {
+        corrector.set(Math.round(mrFudge.mtxLocal.translation.x), Math.round(mrFudge.mtxLocal.translation.y), 0);                               //setzt Mr. Fudge auf die Mitte des Tiles
+        mrFudge.mtxLocal.translation = corrector;
+      }
+    } else {
+      mrFudge.mtxLocal.translate(translation);
+    }
   }
 
   function updateDirection(): void {
@@ -58,47 +68,76 @@ namespace Script {
     }
   }
 
-function updateTranslation(): void { // Methode funktioniert nicht all zu gut im negativen Bereich... vielleicht mal danach schauen
+  function updateTranslation(): void { // Methode funktioniert nicht all zu gut im negativen Bereich... vielleicht mal danach schauen
     switch (lastKey) {
       case ƒ.KEYBOARD_CODE.ARROW_RIGHT:
         if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
-          corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
-          mrFudge.mtxLocal.translation = corrector;
-          fudgeRot.mtxLocal.rotateZ(0 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-          translation.set(speed, 0, 0);
-          lastKey = ƒ.KEYBOARD_CODE.ESC;
+          if (isPath(1, 0)) {
+            corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
+            mrFudge.mtxLocal.translation = corrector;
+            fudgeRot.mtxLocal.rotateZ(0 - fudgeRot.mtxLocal.getEulerAngles().z, false);
+            translation.set(speed, 0, 0);
+            lastKey = ƒ.KEYBOARD_CODE.ESC;
+          } else {
+
+          }
         }
         break;
       case ƒ.KEYBOARD_CODE.ARROW_LEFT:
         if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
-          corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
-          mrFudge.mtxLocal.translation = corrector;
-          fudgeRot.mtxLocal.rotateZ(180 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-          translation.set(-speed, 0, 0);
-          lastKey = ƒ.KEYBOARD_CODE.ESC;
+          if (isPath(-1, 0)) {
+            corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
+            mrFudge.mtxLocal.translation = corrector;
+            fudgeRot.mtxLocal.rotateZ(180 - fudgeRot.mtxLocal.getEulerAngles().z, false);
+            translation.set(-speed, 0, 0);
+            lastKey = ƒ.KEYBOARD_CODE.ESC;
+          } else {
+
+          }
         }
         break;
       case ƒ.KEYBOARD_CODE.ARROW_UP:
         if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
-          corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
-          mrFudge.mtxLocal.translation = corrector;
-          fudgeRot.mtxLocal.rotateZ(90 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-          translation.set(0, speed, 0);
-          lastKey = ƒ.KEYBOARD_CODE.ESC;
+          if (isPath(0, 1)) {
+            corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
+            mrFudge.mtxLocal.translation = corrector;
+            fudgeRot.mtxLocal.rotateZ(90 - fudgeRot.mtxLocal.getEulerAngles().z, false);
+            translation.set(0, speed, 0);
+            lastKey = ƒ.KEYBOARD_CODE.ESC;
+          } else {
+
+          }
         }
         break;
       case ƒ.KEYBOARD_CODE.ARROW_DOWN:
         if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
-          corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
-          mrFudge.mtxLocal.translation = corrector;
-          fudgeRot.mtxLocal.rotateZ(270 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-          translation.set(0, -speed, 0);
-          lastKey = ƒ.KEYBOARD_CODE.ESC;
+          if (isPath(0, -1)) {
+            corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
+            mrFudge.mtxLocal.translation = corrector;
+            fudgeRot.mtxLocal.rotateZ(270 - fudgeRot.mtxLocal.getEulerAngles().z, false);
+            translation.set(0, -speed, 0);
+            lastKey = ƒ.KEYBOARD_CODE.ESC;
+          } else {
+
+          }
         }
+        break;
+      case ƒ.KEYBOARD_CODE.ESC:
         break;
       default:
         console.log("bei der Translationszuweisung geschehen seltsame Dinge");
     }
+  }
+
+  function isPath(_dirX: number, _dirY: number): boolean {
+    let nextX: number = Math.round(mrFudge.mtxLocal.translation.x) + _dirX;
+    let nextY: number = Math.round(mrFudge.mtxLocal.translation.y) + _dirY;
+    let tempTile: ƒ.Node = grid.getChildren()[nextY].getChildren()[nextX];
+    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[1]
+    if (tempMat.clrPrimary.r == 0) {
+      return false;
+    }
+    return true;
   }
 
   function setupGrid(): void {

@@ -42,6 +42,7 @@ var Script;
     ƒ.Debug.info("Main Program Template running!");
     let viewport;
     let graph;
+    let grid;
     let mrFudge;
     let fudgeRot;
     let speed = 1 / 20;
@@ -55,6 +56,7 @@ var Script;
     function start(_event) {
         viewport = _event.detail;
         graph = viewport.getBranch();
+        grid = graph.getChildrenByName("Grid")[0];
         mrFudge = graph.getChildrenByName("MrFudge")[0];
         fudgeRot = mrFudge.getChildrenByName("rotation")[0];
         console.log("die Rotation ist jene: " + fudgeRot.mtxLocal.getEulerAngles().z);
@@ -71,8 +73,18 @@ var Script;
     function updateMrFudge() {
         updateDirection();
         updateTranslation();
-        //switch(ƒ.Keyboard.isPressedOne)
-        mrFudge.mtxLocal.translate(translation);
+        if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold && (mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
+            if (isPath(Math.round(translation.x / speed), Math.round(translation.y / speed))) { //schaut ob das kommende Tile eine Wand ist
+                mrFudge.mtxLocal.translate(translation);
+            }
+            else {
+                corrector.set(Math.round(mrFudge.mtxLocal.translation.x), Math.round(mrFudge.mtxLocal.translation.y), 0); //setzt Mr. Fudge auf die Mitte des Tiles
+                mrFudge.mtxLocal.translation = corrector;
+            }
+        }
+        else {
+            mrFudge.mtxLocal.translate(translation);
+        }
     }
     function updateDirection() {
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT, ƒ.KEYBOARD_CODE.D])) {
@@ -92,43 +104,71 @@ var Script;
         switch (lastKey) {
             case ƒ.KEYBOARD_CODE.ARROW_RIGHT:
                 if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
-                    corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
-                    mrFudge.mtxLocal.translation = corrector;
-                    fudgeRot.mtxLocal.rotateZ(0 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-                    translation.set(speed, 0, 0);
-                    lastKey = ƒ.KEYBOARD_CODE.ESC;
+                    if (isPath(1, 0)) {
+                        corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
+                        mrFudge.mtxLocal.translation = corrector;
+                        fudgeRot.mtxLocal.rotateZ(0 - fudgeRot.mtxLocal.getEulerAngles().z, false);
+                        translation.set(speed, 0, 0);
+                        lastKey = ƒ.KEYBOARD_CODE.ESC;
+                    }
+                    else {
+                    }
                 }
                 break;
             case ƒ.KEYBOARD_CODE.ARROW_LEFT:
                 if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
-                    corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
-                    mrFudge.mtxLocal.translation = corrector;
-                    fudgeRot.mtxLocal.rotateZ(180 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-                    translation.set(-speed, 0, 0);
-                    lastKey = ƒ.KEYBOARD_CODE.ESC;
+                    if (isPath(-1, 0)) {
+                        corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
+                        mrFudge.mtxLocal.translation = corrector;
+                        fudgeRot.mtxLocal.rotateZ(180 - fudgeRot.mtxLocal.getEulerAngles().z, false);
+                        translation.set(-speed, 0, 0);
+                        lastKey = ƒ.KEYBOARD_CODE.ESC;
+                    }
+                    else {
+                    }
                 }
                 break;
             case ƒ.KEYBOARD_CODE.ARROW_UP:
                 if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
-                    corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
-                    mrFudge.mtxLocal.translation = corrector;
-                    fudgeRot.mtxLocal.rotateZ(90 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-                    translation.set(0, speed, 0);
-                    lastKey = ƒ.KEYBOARD_CODE.ESC;
+                    if (isPath(0, 1)) {
+                        corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
+                        mrFudge.mtxLocal.translation = corrector;
+                        fudgeRot.mtxLocal.rotateZ(90 - fudgeRot.mtxLocal.getEulerAngles().z, false);
+                        translation.set(0, speed, 0);
+                        lastKey = ƒ.KEYBOARD_CODE.ESC;
+                    }
+                    else {
+                    }
                 }
                 break;
             case ƒ.KEYBOARD_CODE.ARROW_DOWN:
                 if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
-                    corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
-                    mrFudge.mtxLocal.translation = corrector;
-                    fudgeRot.mtxLocal.rotateZ(270 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-                    translation.set(0, -speed, 0);
-                    lastKey = ƒ.KEYBOARD_CODE.ESC;
+                    if (isPath(0, -1)) {
+                        corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
+                        mrFudge.mtxLocal.translation = corrector;
+                        fudgeRot.mtxLocal.rotateZ(270 - fudgeRot.mtxLocal.getEulerAngles().z, false);
+                        translation.set(0, -speed, 0);
+                        lastKey = ƒ.KEYBOARD_CODE.ESC;
+                    }
+                    else {
+                    }
                 }
+                break;
+            case ƒ.KEYBOARD_CODE.ESC:
                 break;
             default:
                 console.log("bei der Translationszuweisung geschehen seltsame Dinge");
         }
+    }
+    function isPath(_dirX, _dirY) {
+        let nextX = Math.round(mrFudge.mtxLocal.translation.x) + _dirX;
+        let nextY = Math.round(mrFudge.mtxLocal.translation.y) + _dirY;
+        let tempTile = grid.getChildren()[nextY].getChildren()[nextX];
+        let tempMat = tempTile.getAllComponents()[1];
+        if (tempMat.clrPrimary.r == 0) {
+            return false;
+        }
+        return true;
     }
     function setupGrid() {
         /*
