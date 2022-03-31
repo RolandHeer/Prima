@@ -46,6 +46,22 @@
       "type": "MeshPyramid"
     }
   },
+  "Audio|2022-03-31T12:46:39.026Z|47234": {
+    "ƒ.Audio": {
+      "url": "Sound\\pacman_beginning.wav",
+      "idResource": "Audio|2022-03-31T12:46:39.026Z|47234",
+      "name": "introMusic.wav",
+      "type": "Audio"
+    }
+  },
+  "Audio|2022-03-31T12:46:46.638Z|89244": {
+    "ƒ.Audio": {
+      "url": "Sound\\pacman_chomp.wav",
+      "idResource": "Audio|2022-03-31T12:46:46.638Z|89244",
+      "name": "wakka.wav",
+      "type": "Audio"
+    }
+  },
   "Graph|2022-03-22T16:28:13.976Z|87928": {
     "ƒ.Graph": {
       "name": "FudgeMampfGraph",
@@ -2408,6 +2424,42 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "ƒ.Node": {
+            "name": "Sound",
+            "active": true,
+            "components": {
+              "ComponentAudioListener": [
+                {
+                  "ƒ.ComponentAudioListener": {
+                    "active": true
+                  }
+                }
+              ],
+              "ComponentAudio": [
+                {
+                  "ƒ.ComponentAudio": {
+                    "active": true,
+                    "idResource": "Audio|2022-03-31T12:46:39.026Z|47234",
+                    "playing": false,
+                    "loop": false,
+                    "volume": 1
+                  }
+                },
+                {
+                  "ƒ.ComponentAudio": {
+                    "active": true,
+                    "idResource": "Audio|2022-03-31T12:46:46.638Z|89244",
+                    "playing": true,
+                    "loop": true,
+                    "volume": 1
+                  }
+                }
+              ]
+            },
+            "children": []
           }
         }
       ],

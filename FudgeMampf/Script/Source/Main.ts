@@ -11,22 +11,67 @@ namespace Script {
   let translation: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
   let corrector: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
   let lastKey: ƒ.KEYBOARD_CODE;
+  let wakkaSound: ƒ.ComponentAudio;
 
   let threshold: number = 0.1;
 
   //let gridWidth: number = 5;
   //let gridHeight: number = 5;
 
+
+  window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
+  // show dialog for startup
+  let dialog: HTMLDialogElement;
+
+  function init(_event: Event): void {
+    dialog = document.querySelector("dialog");
+    dialog.querySelector("h1").textContent = document.title;
+    dialog.addEventListener("click", function (_event) {
+      // @ts-ignore until HTMLDialog is implemented by all browsers and available in dom.d.ts
+      dialog.close();
+      startInteractiveViewport();
+    });
+    //@ts-ignore
+    dialog.showModal();
+  }
+  // setup and start interactive viewport
+  async function startInteractiveViewport(): Promise<void> {
+    // load resources referenced in the link-tag
+    await FudgeCore.Project.loadResourcesFromHTML();
+    FudgeCore.Debug.log("Project:", FudgeCore.Project.resources);
+    // pick the graph to show
+    let graph: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2022-03-22T16:28:13.976Z|87928"];
+    FudgeCore.Debug.log("Graph:", graph);
+    if (!graph) {
+      alert("Nothing to render. Create a graph with at least a mesh, material and probably some light");
+      return;
+    }
+    // setup the viewport
+    let cmpCamera: ƒ.ComponentCamera = new FudgeCore.ComponentCamera();
+    let canvas: HTMLCanvasElement = document.querySelector("canvas");
+    let viewport: ƒ.Viewport = new FudgeCore.Viewport();
+    viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
+    FudgeCore.Debug.log("Viewport:", viewport);
+    viewport.draw();
+    canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
+  }
+  //})(document.head.querySelector("meta[autoView]").getAttribute("autoView"));
+
+
+
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
     graph = viewport.getBranch();
-    viewport.camera.mtxPivot.translate(new ƒ.Vector3(3,3,13));
+    viewport.camera.mtxPivot.translate(new ƒ.Vector3(3, 3, 13));
     viewport.camera.mtxPivot.rotateY(180, false);
     grid = graph.getChildrenByName("Grid")[0];
     mrFudge = graph.getChildrenByName("MrFudge")[0];
     fudgeRot = mrFudge.getChildrenByName("rotation")[0];
+    let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
+    wakkaSound = <ƒ.ComponentAudio>audioNode.getAllComponents()[2];
     setupGrid();
+    ƒ.AudioManager.default.listenTo(graph);
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
@@ -35,19 +80,25 @@ namespace Script {
     // ƒ.Physics.simulate();  // if physics is included and used
     updateMrFudge();
     viewport.draw();
-    
+
     ƒ.AudioManager.default.update();
   }
 
   function updateMrFudge(): void {
     updateLastKey();
     updateDirection();
+    if (translation.x == 0 && translation.y == 0) {
+      wakkaSound.volume = 0;
+    } else {
+      wakkaSound.volume = 1;
+    }
     if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold && (mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
       if (isPath(Math.round(translation.x / speed), Math.round(translation.y / speed))) {                                                       //schaut ob das kommende Tile eine Wand ist
         mrFudge.mtxLocal.translate(translation);
       } else {
         corrector.set(Math.round(mrFudge.mtxLocal.translation.x), Math.round(mrFudge.mtxLocal.translation.y), 0);                               //setzt Mr. Fudge auf die Mitte des Tiles
         mrFudge.mtxLocal.translation = corrector;
+        translation.set(0, 0, 0);
       }
     } else {
       mrFudge.mtxLocal.translate(translation);
