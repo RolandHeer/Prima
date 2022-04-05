@@ -12,6 +12,7 @@ namespace Script {
   let corrector: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
   let lastKey: ƒ.KEYBOARD_CODE;
   let wakkaSound: ƒ.ComponentAudio;
+  let foodCount: number = 0;
 
   let threshold: number = 0.1;
 
@@ -90,9 +91,14 @@ namespace Script {
     if (translation.x == 0 && translation.y == 0) {
       wakkaSound.volume = 0;
     } else {
-      wakkaSound.volume = 1;
+      wakkaSound.volume = 0.3;
     }
+
     if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold && (mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
+      let fudgeTilePos: ƒ.Vector2 = new ƒ.Vector2(Math.round(mrFudge.mtxLocal.translation.x), Math.round(mrFudge.mtxLocal.translation.y));
+      if (!isEaten(fudgeTilePos.x, fudgeTilePos.y)) {
+        eatTile(fudgeTilePos);
+      }
       if (isPath(Math.round(translation.x / speed), Math.round(translation.y / speed))) {                                                       //schaut ob das kommende Tile eine Wand ist
         mrFudge.mtxLocal.translate(translation);
       } else {
@@ -181,15 +187,32 @@ namespace Script {
     }
   }
 
+  function eatTile(_pos: ƒ.Vector2): void {
+    let tempTile: ƒ.Node = grid.getChildren()[_pos.y].getChildren()[_pos.x];
+    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[1];
+    tempMat.clrPrimary.setHex("000000");
+    foodCount++;
+    console.log(foodCount);
+  }
+
   function isPath(_dirX: number, _dirY: number): boolean {
     let nextX: number = Math.round(mrFudge.mtxLocal.translation.x) + _dirX;
     let nextY: number = Math.round(mrFudge.mtxLocal.translation.y) + _dirY;
     let tempTile: ƒ.Node = grid.getChildren()[nextY].getChildren()[nextX];
-    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[1]
-    if (tempMat.clrPrimary.r == 0) {
+    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[1];
+    if (tempMat.clrPrimary.g != 0 && tempMat.clrPrimary.g != 1) {
       return false;
     }
     return true;
+  }
+
+  function isEaten(_x: number, _y: number): boolean {
+    let tempTile: ƒ.Node = grid.getChildren()[_y].getChildren()[_x];
+    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[1];
+    if (tempMat.clrPrimary.b == 0) {
+      return true;
+    }
+    return false;
   }
 
   function setupGrid(): void {

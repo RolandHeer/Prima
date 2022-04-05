@@ -50,6 +50,7 @@ var Script;
     let corrector = new ƒ.Vector3(0, 0, 0);
     let lastKey;
     let wakkaSound;
+    let foodCount = 0;
     let threshold = 0.1;
     //let gridWidth: number = 5;
     //let gridHeight: number = 5;
@@ -118,9 +119,13 @@ var Script;
             wakkaSound.volume = 0;
         }
         else {
-            wakkaSound.volume = 1;
+            wakkaSound.volume = 0.3;
         }
         if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold && (mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
+            let fudgeTilePos = new ƒ.Vector2(Math.round(mrFudge.mtxLocal.translation.x), Math.round(mrFudge.mtxLocal.translation.y));
+            if (!isEaten(fudgeTilePos.x, fudgeTilePos.y)) {
+                eatTile(fudgeTilePos);
+            }
             if (isPath(Math.round(translation.x / speed), Math.round(translation.y / speed))) { //schaut ob das kommende Tile eine Wand ist
                 mrFudge.mtxLocal.translate(translation);
             }
@@ -208,15 +213,30 @@ var Script;
                 console.log("bei der Translationszuweisung geschehen seltsame Dinge");
         }
     }
+    function eatTile(_pos) {
+        let tempTile = grid.getChildren()[_pos.y].getChildren()[_pos.x];
+        let tempMat = tempTile.getAllComponents()[1];
+        tempMat.clrPrimary.setHex("000000");
+        foodCount++;
+        console.log(foodCount);
+    }
     function isPath(_dirX, _dirY) {
         let nextX = Math.round(mrFudge.mtxLocal.translation.x) + _dirX;
         let nextY = Math.round(mrFudge.mtxLocal.translation.y) + _dirY;
         let tempTile = grid.getChildren()[nextY].getChildren()[nextX];
         let tempMat = tempTile.getAllComponents()[1];
-        if (tempMat.clrPrimary.r == 0) {
+        if (tempMat.clrPrimary.g != 0 && tempMat.clrPrimary.g != 1) {
             return false;
         }
         return true;
+    }
+    function isEaten(_x, _y) {
+        let tempTile = grid.getChildren()[_y].getChildren()[_x];
+        let tempMat = tempTile.getAllComponents()[1];
+        if (tempMat.clrPrimary.b == 0) {
+            return true;
+        }
+        return false;
     }
     function setupGrid() {
         /*
