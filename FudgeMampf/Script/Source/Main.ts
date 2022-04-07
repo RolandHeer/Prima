@@ -5,29 +5,20 @@ namespace Script {
 
   let viewport: ƒ.Viewport;
   let graph: ƒ.Node;
-  let grid: ƒ.Node;
-  let mrFudge: ƒ.Node;
-  let fudgeRot: ƒ.Node;
-  let spriteReverse: boolean = false;
-  let speed: number = 1 / 20;
-  let translation: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
-  let corrector: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
   let lastKey: ƒ.KEYBOARD_CODE = ƒ.KEYBOARD_CODE.ESC;                             //Default Value
+  let introSound: ƒ.ComponentAudio;
   let wakkaSound: ƒ.ComponentAudio;
-  let foodCount: number = 0;
-  let threshold: number = 0.1;
 
   let ghosts: Ghost[] = []
+  let mrFudge: MrFudge;
 
   let animations: ƒAid.SpriteSheetAnimations;
-  let sprite: ƒAid.NodeSprite;
 
-  //let gridWidth: number = 5;
-  //let gridHeight: number = 5;
+  let gridWidth: number = 7;
+  let gridHeight: number = 7;
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
-  // show dialog for startup
   let dialog: HTMLDialogElement;
 
   function init(_event: Event): void {
@@ -66,58 +57,26 @@ namespace Script {
   }
 
   function start(_event: CustomEvent): void {
-    viewport = _event.detail;
+    setupViewport(_event);
     graph = viewport.getBranch();
-    viewport.camera.mtxPivot.translate(new ƒ.Vector3(3, 3, 13));
-    viewport.camera.mtxPivot.rotateY(180, false);
-    grid = graph.getChildrenByName("Grid")[0];
-    mrFudge = graph.getChildrenByName("MrFudge")[0];
-    fudgeRot = mrFudge.getChildrenByName("rotation")[0];
+    setupAudio();
 
+    setupGrid();
+    //createSprite();
+    mrFudge = new MrFudge(graph, animations, wakkaSound);
     createGhosts(1);
 
-    let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
-    wakkaSound = <ƒ.ComponentAudio>audioNode.getAllComponents()[2];
-    setupGrid();
-    createSprite();
-    ƒ.AudioManager.default.listenTo(graph);
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
 
   function update(_event: Event): void {
     // ƒ.Physics.simulate();  // if physics is included and used
-    updateMrFudge();
+    updateLastKey();
+    lastKey = mrFudge.update(lastKey);
     viewport.draw();
 
     ƒ.AudioManager.default.update();
-  }
-
-  function updateMrFudge(): void {
-    updateLastKey();
-    updateDirection();
-    updateSprite();
-    if (translation.x == 0 && translation.y == 0) {
-      wakkaSound.volume = 0;
-    } else {
-      wakkaSound.volume = 0.3;
-    }
-
-    if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold && (mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
-      let fudgeTilePos: ƒ.Vector2 = new ƒ.Vector2(Math.round(mrFudge.mtxLocal.translation.x), Math.round(mrFudge.mtxLocal.translation.y));
-      if (!isEaten(fudgeTilePos.x, fudgeTilePos.y)) {
-        eatTile(fudgeTilePos);
-      }
-      if (isPath(Math.round(translation.x / speed), Math.round(translation.y / speed))) {                                                       //schaut ob das kommende Tile eine Wand ist
-        mrFudge.mtxLocal.translate(translation);
-      } else {
-        corrector.set(Math.round(mrFudge.mtxLocal.translation.x), Math.round(mrFudge.mtxLocal.translation.y), 0);                               //setzt Mr. Fudge auf die Mitte des Tiles
-        mrFudge.mtxLocal.translation = corrector;
-        translation.set(0, 0, 0);
-      }
-    } else {
-      mrFudge.mtxLocal.translate(translation);
-    }
   }
 
   function updateLastKey(): void {
@@ -133,88 +92,6 @@ namespace Script {
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_DOWN, ƒ.KEYBOARD_CODE.S])) {
       lastKey = ƒ.KEYBOARD_CODE.ARROW_DOWN;
     }
-  }
-
-  function updateDirection(): void { // Methode funktioniert nicht all zu gut im negativen Bereich... vielleicht mal danach schauen
-
-    switch (lastKey) {
-      case ƒ.KEYBOARD_CODE.ARROW_RIGHT:
-        if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
-          if (isPath(1, 0)) {
-            corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
-            mrFudge.mtxLocal.translation = corrector;
-            fudgeRot.mtxLocal.rotateZ(0 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-            translation.set(speed, 0, 0);
-            lastKey = ƒ.KEYBOARD_CODE.ESC;
-          }
-        }
-        break;
-      case ƒ.KEYBOARD_CODE.ARROW_LEFT:
-        if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
-          if (isPath(-1, 0)) {
-            corrector.set(mrFudge.mtxLocal.translation.x, Math.round(mrFudge.mtxLocal.translation.y), 0);
-            mrFudge.mtxLocal.translation = corrector;
-            fudgeRot.mtxLocal.rotateZ(180 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-            translation.set(-speed, 0, 0);
-            lastKey = ƒ.KEYBOARD_CODE.ESC;
-          }
-        }
-        break;
-      case ƒ.KEYBOARD_CODE.ARROW_UP:
-        if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
-          if (isPath(0, 1)) {
-            corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
-            mrFudge.mtxLocal.translation = corrector;
-            fudgeRot.mtxLocal.rotateZ(90 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-            translation.set(0, speed, 0);
-            lastKey = ƒ.KEYBOARD_CODE.ESC;
-          }
-        }
-        break;
-      case ƒ.KEYBOARD_CODE.ARROW_DOWN:
-        if ((mrFudge.mtxLocal.translation.x % 1) + threshold / 2 < threshold) {
-          if (isPath(0, -1)) {
-            corrector.set(Math.round(mrFudge.mtxLocal.translation.x), mrFudge.mtxLocal.translation.y, 0);
-            mrFudge.mtxLocal.translation = corrector;
-            fudgeRot.mtxLocal.rotateZ(270 - fudgeRot.mtxLocal.getEulerAngles().z, false);
-            translation.set(0, -speed, 0);
-            lastKey = ƒ.KEYBOARD_CODE.ESC;
-          }
-        }
-        break;
-      case ƒ.KEYBOARD_CODE.ESC:
-        break;
-      default:
-        console.log("bei der Translationszuweisung geschehen seltsame Dinge");
-    }
-
-    if (translation.x < 0) {
-      if (fudgeRot.mtxLocal.scaling.y > 0) {
-        fudgeRot.mtxLocal.scaleY(-1);
-      }
-    } else {
-      if (fudgeRot.mtxLocal.scaling.y < 0) {
-        fudgeRot.mtxLocal.scaleY(-1);
-      }
-    }
-  }
-
-  function updateSprite(): void {
-    if (sprite.getCurrentFrame == 7 && !spriteReverse) {
-      sprite.setFrameDirection(-1);
-      spriteReverse = true;
-    } else if (sprite.getCurrentFrame == 0 && spriteReverse) {
-      sprite.setFrameDirection(1);
-      spriteReverse = false;
-    }
-  }
-
-  function eatTile(_pos: ƒ.Vector2): void {
-    let tempTile: ƒ.Node = grid.getChildren()[_pos.y].getChildren()[_pos.x];
-    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[0];
-    tempMat.clrPrimary.setHex("000000");
-    foodCount++;
-    console.log(foodCount);
   }
 
   async function loadSprite(): Promise<void> {
@@ -233,47 +110,27 @@ namespace Script {
     animations[spriteName] = tempSprite;
   }
 
-  function createSprite(): void {
-    sprite = new ƒAid.NodeSprite("Sprite");
-    sprite.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
-    sprite.setAnimation(<ƒAid.SpriteSheetAnimation>animations["mrFudge"]);
-    sprite.setFrameDirection(1);
-
-    sprite.mtxLocal.translateZ(0.5);
-    sprite.framerate = 60;
-
-    fudgeRot.addChild(sprite);
-    fudgeRot.getComponent(ƒ.ComponentMaterial).clrPrimary = new ƒ.Color(0, 0, 0, 0);
-
-  }
-
-  function isPath(_dirX: number, _dirY: number): boolean {
-    let nextX: number = Math.round(mrFudge.mtxLocal.translation.x) + _dirX;
-    let nextY: number = Math.round(mrFudge.mtxLocal.translation.y) + _dirY;
-    let tempTile: ƒ.Node = grid.getChildren()[nextY].getChildren()[nextX];
-    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[0];
-    if (tempMat.clrPrimary.g != 0 && tempMat.clrPrimary.g != 1) {
-      return false;
-    }
-    return true;
-  }
-
-  function isEaten(_x: number, _y: number): boolean {
-    let tempTile: ƒ.Node = grid.getChildren()[_y].getChildren()[_x];
-    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[0];
-    if (tempMat.clrPrimary.b == 0) {
-      return true;
-    }
-    return false;
-  }
-
   function createGhosts(_count: number): void {
     for (let i: number = 0; i < _count; i++) {
       let tempNode: ƒ.Node = new ƒ.Node("ghostNr" + i);
       graph.addChild(tempNode);
-      let tempGhost: Ghost = new Ghost(tempNode);
+      let tempGhost: Ghost = new Ghost(tempNode, mrFudge);
       ghosts.push(tempGhost);
     }
+  }
+
+  function setupViewport(_event: CustomEvent): void {
+    viewport = _event.detail;
+    viewport.camera.mtxPivot.translate(new ƒ.Vector3(Math.floor(gridWidth / 2), Math.floor(gridHeight / 2), gridHeight * 1.7));
+    viewport.camera.mtxPivot.rotateY(180, false);
+  }
+
+  function setupAudio(): void {
+    let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
+    introSound = <ƒ.ComponentAudio>audioNode.getAllComponents()[1];
+    introSound.play(true);
+    wakkaSound = <ƒ.ComponentAudio>audioNode.getAllComponents()[2];
+    ƒ.AudioManager.default.listenTo(graph);
   }
 
   function setupGrid(): void {
