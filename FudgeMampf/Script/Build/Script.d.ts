@@ -8,6 +8,12 @@ declare namespace Script {
     }
 }
 declare namespace Script {
+    class Ghost {
+        constructor(_node: ƒ.Node);
+        private setup;
+    }
+}
+declare namespace Script {
 }
 declare namespace Script {
     class MrFudge {

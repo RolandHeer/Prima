@@ -38,6 +38,28 @@ var Script;
 })(Script || (Script = {}));
 var Script;
 (function (Script) {
+    class Ghost {
+        constructor(_node) {
+            this.setup(_node);
+        }
+        setup(_node) {
+            let tempMaterial = new ƒ.Material("ghostMat", ƒ.ShaderLit);
+            let tempMesh = new ƒ.MeshSphere("ghostSphere", 6, 6);
+            let tempMaterialComp = new ƒ.ComponentMaterial(tempMaterial);
+            tempMaterialComp.clrPrimary = ƒ.Color.CSS("#000");
+            let tempMeshComp = new ƒ.ComponentMesh(tempMesh);
+            tempMeshComp.mtxPivot.scale(new ƒ.Vector3(0.8, 0.8, 0.8));
+            let tempTransformComp = new ƒ.ComponentTransform();
+            _node.addComponent(tempTransformComp);
+            _node.addComponent(tempMaterialComp);
+            _node.addComponent(tempMeshComp);
+            _node.mtxLocal.translation = new ƒ.Vector3(5, 5, 0);
+        }
+    }
+    Script.Ghost = Ghost;
+})(Script || (Script = {}));
+var Script;
+(function (Script) {
     var ƒ = FudgeCore;
     var ƒAid = FudgeAid;
     ƒ.Debug.info("Main Program Template running!");
@@ -54,6 +76,7 @@ var Script;
     let wakkaSound;
     let foodCount = 0;
     let threshold = 0.1;
+    let ghosts = [];
     let animations;
     let sprite;
     //let gridWidth: number = 5;
@@ -79,7 +102,7 @@ var Script;
         await FudgeCore.Project.loadResourcesFromHTML();
         FudgeCore.Debug.log("Project:", FudgeCore.Project.resources);
         // pick the graph to show
-        let graph = FudgeCore.Project.resources["Graph|2022-03-22T16:28:13.976Z|87928"];
+        let graph = FudgeCore.Project.resources["Graph|2022-04-07T17:26:03.173Z|68881"];
         FudgeCore.Debug.log("Graph:", graph);
         if (!graph) {
             alert("Nothing to render. Create a graph with at least a mesh, material and probably some light");
@@ -102,6 +125,7 @@ var Script;
         grid = graph.getChildrenByName("Grid")[0];
         mrFudge = graph.getChildrenByName("MrFudge")[0];
         fudgeRot = mrFudge.getChildrenByName("rotation")[0];
+        createGhosts(1);
         let audioNode = graph.getChildrenByName("Sound")[0];
         wakkaSound = audioNode.getAllComponents()[2];
         setupGrid();
@@ -117,7 +141,6 @@ var Script;
         ƒ.AudioManager.default.update();
     }
     function updateMrFudge() {
-        console.log("scaling: " + fudgeRot.mtxLocal.scaling.y);
         updateLastKey();
         updateDirection();
         updateSprite();
@@ -233,7 +256,7 @@ var Script;
     }
     function eatTile(_pos) {
         let tempTile = grid.getChildren()[_pos.y].getChildren()[_pos.x];
-        let tempMat = tempTile.getAllComponents()[1];
+        let tempMat = tempTile.getAllComponents()[0];
         tempMat.clrPrimary.setHex("000000");
         foodCount++;
         console.log(foodCount);
@@ -265,7 +288,7 @@ var Script;
         let nextX = Math.round(mrFudge.mtxLocal.translation.x) + _dirX;
         let nextY = Math.round(mrFudge.mtxLocal.translation.y) + _dirY;
         let tempTile = grid.getChildren()[nextY].getChildren()[nextX];
-        let tempMat = tempTile.getAllComponents()[1];
+        let tempMat = tempTile.getAllComponents()[0];
         if (tempMat.clrPrimary.g != 0 && tempMat.clrPrimary.g != 1) {
             return false;
         }
@@ -273,11 +296,19 @@ var Script;
     }
     function isEaten(_x, _y) {
         let tempTile = grid.getChildren()[_y].getChildren()[_x];
-        let tempMat = tempTile.getAllComponents()[1];
+        let tempMat = tempTile.getAllComponents()[0];
         if (tempMat.clrPrimary.b == 0) {
             return true;
         }
         return false;
+    }
+    function createGhosts(_count) {
+        for (let i = 0; i < _count; i++) {
+            let tempNode = new ƒ.Node("ghostNr" + i);
+            graph.addChild(tempNode);
+            let tempGhost = new Script.Ghost(tempNode);
+            ghosts.push(tempGhost);
+        }
     }
     function setupGrid() {
         /*

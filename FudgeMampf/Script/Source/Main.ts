@@ -17,6 +17,8 @@ namespace Script {
   let foodCount: number = 0;
   let threshold: number = 0.1;
 
+  let ghosts: Ghost[] = []
+
   let animations: ƒAid.SpriteSheetAnimations;
   let sprite: ƒAid.NodeSprite;
 
@@ -45,7 +47,7 @@ namespace Script {
     await FudgeCore.Project.loadResourcesFromHTML();
     FudgeCore.Debug.log("Project:", FudgeCore.Project.resources);
     // pick the graph to show
-    let graph: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2022-03-22T16:28:13.976Z|87928"];
+    let graph: ƒ.Graph = <ƒ.Graph>FudgeCore.Project.resources["Graph|2022-04-07T17:26:03.173Z|68881"];
     FudgeCore.Debug.log("Graph:", graph);
     if (!graph) {
       alert("Nothing to render. Create a graph with at least a mesh, material and probably some light");
@@ -71,6 +73,9 @@ namespace Script {
     grid = graph.getChildrenByName("Grid")[0];
     mrFudge = graph.getChildrenByName("MrFudge")[0];
     fudgeRot = mrFudge.getChildrenByName("rotation")[0];
+
+    createGhosts(1);
+
     let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
     wakkaSound = <ƒ.ComponentAudio>audioNode.getAllComponents()[2];
     setupGrid();
@@ -89,7 +94,6 @@ namespace Script {
   }
 
   function updateMrFudge(): void {
-    console.log("scaling: " + fudgeRot.mtxLocal.scaling.y);
     updateLastKey();
     updateDirection();
     updateSprite();
@@ -132,6 +136,7 @@ namespace Script {
   }
 
   function updateDirection(): void { // Methode funktioniert nicht all zu gut im negativen Bereich... vielleicht mal danach schauen
+
     switch (lastKey) {
       case ƒ.KEYBOARD_CODE.ARROW_RIGHT:
         if ((mrFudge.mtxLocal.translation.y % 1) + threshold / 2 < threshold) {
@@ -182,14 +187,14 @@ namespace Script {
       default:
         console.log("bei der Translationszuweisung geschehen seltsame Dinge");
     }
-    
+
     if (translation.x < 0) {
       if (fudgeRot.mtxLocal.scaling.y > 0) {
         fudgeRot.mtxLocal.scaleY(-1);
       }
     } else {
       if (fudgeRot.mtxLocal.scaling.y < 0) {
-         fudgeRot.mtxLocal.scaleY(-1);
+        fudgeRot.mtxLocal.scaleY(-1);
       }
     }
   }
@@ -206,7 +211,7 @@ namespace Script {
 
   function eatTile(_pos: ƒ.Vector2): void {
     let tempTile: ƒ.Node = grid.getChildren()[_pos.y].getChildren()[_pos.x];
-    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[1];
+    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[0];
     tempMat.clrPrimary.setHex("000000");
     foodCount++;
     console.log(foodCount);
@@ -246,7 +251,7 @@ namespace Script {
     let nextX: number = Math.round(mrFudge.mtxLocal.translation.x) + _dirX;
     let nextY: number = Math.round(mrFudge.mtxLocal.translation.y) + _dirY;
     let tempTile: ƒ.Node = grid.getChildren()[nextY].getChildren()[nextX];
-    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[1];
+    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[0];
     if (tempMat.clrPrimary.g != 0 && tempMat.clrPrimary.g != 1) {
       return false;
     }
@@ -255,11 +260,20 @@ namespace Script {
 
   function isEaten(_x: number, _y: number): boolean {
     let tempTile: ƒ.Node = grid.getChildren()[_y].getChildren()[_x];
-    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[1];
+    let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[0];
     if (tempMat.clrPrimary.b == 0) {
       return true;
     }
     return false;
+  }
+
+  function createGhosts(_count: number): void {
+    for (let i: number = 0; i < _count; i++) {
+      let tempNode: ƒ.Node = new ƒ.Node("ghostNr" + i);
+      graph.addChild(tempNode);
+      let tempGhost: Ghost = new Ghost(tempNode);
+      ghosts.push(tempGhost);
+    }
   }
 
   function setupGrid(): void {
