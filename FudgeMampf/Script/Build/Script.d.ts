@@ -9,3 +9,8 @@ declare namespace Script {
 }
 declare namespace Script {
 }
+declare namespace Script {
+    class MrFudge {
+        constructor();
+    }
+}

@@ -1,5 +1,6 @@
 namespace Script {
   import ƒ = FudgeCore;
+  import ƒAid = FudgeAid;
   ƒ.Debug.info("Main Program Template running!");
 
   let viewport: ƒ.Viewport;
@@ -7,18 +8,20 @@ namespace Script {
   let grid: ƒ.Node;
   let mrFudge: ƒ.Node;
   let fudgeRot: ƒ.Node;
+  let spriteReverse: boolean = false;
   let speed: number = 1 / 20;
   let translation: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
   let corrector: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
-  let lastKey: ƒ.KEYBOARD_CODE;
+  let lastKey: ƒ.KEYBOARD_CODE = ƒ.KEYBOARD_CODE.ESC;                             //Default Value
   let wakkaSound: ƒ.ComponentAudio;
   let foodCount: number = 0;
-
   let threshold: number = 0.1;
+
+  let animations: ƒAid.SpriteSheetAnimations;
+  let sprite: ƒAid.NodeSprite;
 
   //let gridWidth: number = 5;
   //let gridHeight: number = 5;
-
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
@@ -53,13 +56,12 @@ namespace Script {
     let canvas: HTMLCanvasElement = document.querySelector("canvas");
     let viewport: ƒ.Viewport = new FudgeCore.Viewport();
     viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
-    FudgeCore.Debug.log("Viewport:", viewport);
+
+    await loadSprite();
+
     viewport.draw();
     canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
   }
-  //})(document.head.querySelector("meta[autoView]").getAttribute("autoView"));
-
-
 
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
@@ -72,6 +74,7 @@ namespace Script {
     let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
     wakkaSound = <ƒ.ComponentAudio>audioNode.getAllComponents()[2];
     setupGrid();
+    createSprite();
     ƒ.AudioManager.default.listenTo(graph);
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -86,8 +89,10 @@ namespace Script {
   }
 
   function updateMrFudge(): void {
+    console.log("scaling: " + fudgeRot.mtxLocal.scaling.y);
     updateLastKey();
     updateDirection();
+    updateSprite();
     if (translation.x == 0 && translation.y == 0) {
       wakkaSound.volume = 0;
     } else {
@@ -136,8 +141,6 @@ namespace Script {
             fudgeRot.mtxLocal.rotateZ(0 - fudgeRot.mtxLocal.getEulerAngles().z, false);
             translation.set(speed, 0, 0);
             lastKey = ƒ.KEYBOARD_CODE.ESC;
-          } else {
-
           }
         }
         break;
@@ -149,8 +152,6 @@ namespace Script {
             fudgeRot.mtxLocal.rotateZ(180 - fudgeRot.mtxLocal.getEulerAngles().z, false);
             translation.set(-speed, 0, 0);
             lastKey = ƒ.KEYBOARD_CODE.ESC;
-          } else {
-
           }
         }
         break;
@@ -162,8 +163,6 @@ namespace Script {
             fudgeRot.mtxLocal.rotateZ(90 - fudgeRot.mtxLocal.getEulerAngles().z, false);
             translation.set(0, speed, 0);
             lastKey = ƒ.KEYBOARD_CODE.ESC;
-          } else {
-
           }
         }
         break;
@@ -175,8 +174,6 @@ namespace Script {
             fudgeRot.mtxLocal.rotateZ(270 - fudgeRot.mtxLocal.getEulerAngles().z, false);
             translation.set(0, -speed, 0);
             lastKey = ƒ.KEYBOARD_CODE.ESC;
-          } else {
-
           }
         }
         break;
@@ -184,6 +181,26 @@ namespace Script {
         break;
       default:
         console.log("bei der Translationszuweisung geschehen seltsame Dinge");
+    }
+    
+    if (translation.x < 0) {
+      if (fudgeRot.mtxLocal.scaling.y > 0) {
+        fudgeRot.mtxLocal.scaleY(-1);
+      }
+    } else {
+      if (fudgeRot.mtxLocal.scaling.y < 0) {
+         fudgeRot.mtxLocal.scaleY(-1);
+      }
+    }
+  }
+
+  function updateSprite(): void {
+    if (sprite.getCurrentFrame == 7 && !spriteReverse) {
+      sprite.setFrameDirection(-1);
+      spriteReverse = true;
+    } else if (sprite.getCurrentFrame == 0 && spriteReverse) {
+      sprite.setFrameDirection(1);
+      spriteReverse = false;
     }
   }
 
@@ -193,6 +210,36 @@ namespace Script {
     tempMat.clrPrimary.setHex("000000");
     foodCount++;
     console.log(foodCount);
+  }
+
+  async function loadSprite(): Promise<void> {
+    let imgSpriteSheet: ƒ.TextureImage = new ƒ.TextureImage();
+    await imgSpriteSheet.load("img/sprite.png");
+
+    let spriteSheet: ƒ.CoatTextured = new ƒ.CoatTextured(undefined, imgSpriteSheet)
+    generateSprite(spriteSheet)
+  }
+
+  function generateSprite(_spritesheet: ƒ.CoatTextured): void {
+    animations = {};
+    let spriteName: string = "mrFudge";
+    let tempSprite: ƒAid.SpriteSheetAnimation = new ƒAid.SpriteSheetAnimation(spriteName, _spritesheet);
+    tempSprite.generateByGrid(ƒ.Rectangle.GET(0, 0, 64, 64), 8, 70, ƒ.ORIGIN2D.CENTER, ƒ.Vector2.X(64));
+    animations[spriteName] = tempSprite;
+  }
+
+  function createSprite(): void {
+    sprite = new ƒAid.NodeSprite("Sprite");
+    sprite.addComponent(new ƒ.ComponentTransform(new ƒ.Matrix4x4()));
+    sprite.setAnimation(<ƒAid.SpriteSheetAnimation>animations["mrFudge"]);
+    sprite.setFrameDirection(1);
+
+    sprite.mtxLocal.translateZ(0.5);
+    sprite.framerate = 60;
+
+    fudgeRot.addChild(sprite);
+    fudgeRot.getComponent(ƒ.ComponentMaterial).clrPrimary = new ƒ.Color(0, 0, 0, 0);
+
   }
 
   function isPath(_dirX: number, _dirY: number): boolean {

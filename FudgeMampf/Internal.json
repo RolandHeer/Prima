@@ -39,13 +39,6 @@
       }
     }
   },
-  "MeshPyramid|2022-03-28T17:17:33.452Z|09181": {
-    "ƒ.MeshPyramid": {
-      "idResource": "MeshPyramid|2022-03-28T17:17:33.452Z|09181",
-      "name": "EyeTemp",
-      "type": "MeshPyramid"
-    }
-  },
   "Audio|2022-03-31T12:46:39.026Z|47234": {
     "ƒ.Audio": {
       "url": "Sound\\pacman_beginning.wav",
@@ -2377,50 +2370,7 @@
                       }
                     ]
                   },
-                  "children": [
-                    {
-                      "ƒ.Node": {
-                        "name": "Eye",
-                        "active": true,
-                        "components": {
-                          "ComponentMesh": [
-                            {
-                              "ƒ.ComponentMesh": {
-                                "idMesh": "MeshPyramid|2022-03-28T17:17:33.452Z|09181",
-                                "pivot": {
-                                  "translation": "[0.3500000238418579, 0, 0]",
-                                  "rotation": "[0, 0, -90]",
-                                  "scaling": "[0.20000000298023224, 0.10000000149011612, 0.10100000351667404]"
-                                },
-                                "Component": {
-                                  "active": true
-                                }
-                              }
-                            }
-                          ],
-                          "ComponentMaterial": [
-                            {
-                              "ƒ.ComponentMaterial": {
-                                "sortForAlpha": false,
-                                "clrPrimary": "[0, 0, 0, 1]",
-                                "clrSecondary": "[1, 1, 1, 1]",
-                                "pivot": {
-                                  "translation": "[0, 0]",
-                                  "rotation": 0,
-                                  "scaling": "[1, 1]"
-                                },
-                                "Component": {
-                                  "active": true
-                                },
-                                "idMaterial": "Material|2022-03-22T16:28:03.864Z|74586"
-                              }
-                            }
-                          ]
-                        },
-                        "children": []
-                      }
-                    }
-                  ]
+                  "children": []
                 }
               }
             ]
