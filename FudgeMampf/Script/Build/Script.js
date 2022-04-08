@@ -39,23 +39,97 @@ var Script;
 var Script;
 (function (Script) {
     class Ghost {
-        //private mrFudge: MrFudge;
-        constructor(_node, _mrFudge) {
+        grid;
+        mrFudge;
+        translator;
+        materialComp;
+        speed = 1 / 22;
+        velocity = new ƒ.Vector3(0, 0, 0);
+        threshold = 0.1;
+        constructor(_graph, _node, _mrFudge) {
             this.setup(_node);
-            //this.mrFudge = _mrFudge;
+            this.grid = _graph.getChildrenByName("Grid")[0];
+            this.mrFudge = _mrFudge;
+            this.translator = _node;
         }
         setup(_node) {
             let tempMaterial = new ƒ.Material("ghostMat", ƒ.ShaderLit);
             let tempMesh = new ƒ.MeshSphere("ghostSphere", 6, 6);
-            let tempMaterialComp = new ƒ.ComponentMaterial(tempMaterial);
-            tempMaterialComp.clrPrimary = ƒ.Color.CSS("#ed0043");
+            this.materialComp = new ƒ.ComponentMaterial(tempMaterial);
+            this.materialComp.clrPrimary = ƒ.Color.CSS("#ed0043");
             let tempMeshComp = new ƒ.ComponentMesh(tempMesh);
             tempMeshComp.mtxPivot.scale(new ƒ.Vector3(0.8, 0.8, 0.8));
             let tempTransformComp = new ƒ.ComponentTransform();
             _node.addComponent(tempTransformComp);
-            _node.addComponent(tempMaterialComp);
+            _node.addComponent(this.materialComp);
             _node.addComponent(tempMeshComp);
-            _node.mtxLocal.translation = new ƒ.Vector3(5, 5, 0);
+            _node.mtxLocal.translation = new ƒ.Vector3(5, 5, 0.2);
+        }
+        update() {
+            this.move();
+        }
+        move() {
+            let tempPos = this.translator.mtxLocal.translation;
+            let t = this.threshold;
+            if ((tempPos.y % 1) + t / 2 < t && (tempPos.x % 1) + t / 2 < t) {
+                this.setDir();
+            }
+            this.translator.mtxLocal.translate(this.velocity);
+            if (this.translator.mtxLocal.translation.getDistance(new ƒ.Vector3(this.mrFudge.getPos().x, this.mrFudge.getPos().y, 0)) < 0.6) {
+                this.materialComp.clrPrimary = ƒ.Color.CSS("#fff");
+                this.mrFudge.stop();
+            }
+        }
+        setDir() {
+            let previousDir = new ƒ.Vector3(this.velocity.x, this.velocity.y, 0);
+            let xG = this.translator.mtxLocal.translation.x;
+            let yG = this.translator.mtxLocal.translation.y;
+            let xF = this.mrFudge.getPos().x;
+            let yF = this.mrFudge.getPos().y;
+            if (Math.abs(xG - xF) < Math.abs(yG - yF)) {
+                if (yG > yF) {
+                    this.velocity.set(0, -this.speed, 0);
+                }
+                else {
+                    this.velocity.set(0, this.speed, 0);
+                }
+            }
+            else {
+                if (xG > xF) {
+                    this.velocity.set(-this.speed, 0, 0);
+                }
+                else {
+                    this.velocity.set(this.speed, 0, 0);
+                }
+            }
+            if (!this.isPath(Math.round(this.velocity.x / this.speed), Math.round(this.velocity.y / this.speed))) {
+                this.velocity.set(this.velocity.y, this.velocity.x);
+                if (Math.round(this.velocity.x / this.speed) != this.mrFudge.getDir().x || Math.round(this.velocity.y / this.speed) != this.mrFudge.getDir().y) {
+                    this.velocity.set(-this.velocity.x, -this.velocity.y, 0);
+                }
+            }
+            else {
+                return;
+            }
+            if (!this.isPath(Math.round(this.velocity.x / this.speed), Math.round(this.velocity.y / this.speed))) {
+                this.velocity.set(-this.velocity.x, -this.velocity.y, 0);
+            }
+            else {
+                return;
+            }
+            if (!this.isPath(Math.round(this.velocity.x / this.speed), Math.round(this.velocity.y / this.speed))) {
+                this.velocity.set(-previousDir.x, -previousDir.y, 0);
+            }
+        }
+        isPath(_dirX, _dirY) {
+            let nextX = Math.round(this.translator.mtxLocal.translation.x) + _dirX;
+            let nextY = Math.round(this.translator.mtxLocal.translation.y) + _dirY;
+            let tempTile = this.grid.getChildren()[nextY].getChildren()[nextX];
+            let tempMat = tempTile.getAllComponents()[0];
+            if (tempMat.clrPrimary.b == 0) {
+                return true;
+            }
+            return false;
         }
     }
     Script.Ghost = Ghost;
@@ -73,6 +147,7 @@ var Script;
     let ghosts = [];
     let mrFudge;
     let animations;
+    let started = false;
     let gridWidth = 7;
     let gridHeight = 7;
     window.addEventListener("load", init);
@@ -125,21 +200,30 @@ var Script;
         // ƒ.Physics.simulate();  // if physics is included and used
         updateLastKey();
         lastKey = mrFudge.update(lastKey);
+        if (started) {
+            for (let i = 0; i < ghosts.length; i++) {
+                ghosts[i].update();
+            }
+        }
         viewport.draw();
         ƒ.AudioManager.default.update();
     }
     function updateLastKey() {
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT, ƒ.KEYBOARD_CODE.D])) {
             lastKey = ƒ.KEYBOARD_CODE.ARROW_RIGHT;
+            started = true;
         }
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_LEFT, ƒ.KEYBOARD_CODE.A])) {
             lastKey = ƒ.KEYBOARD_CODE.ARROW_LEFT;
+            started = true;
         }
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_UP, ƒ.KEYBOARD_CODE.W])) {
             lastKey = ƒ.KEYBOARD_CODE.ARROW_UP;
+            started = true;
         }
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_DOWN, ƒ.KEYBOARD_CODE.S])) {
             lastKey = ƒ.KEYBOARD_CODE.ARROW_DOWN;
+            started = true;
         }
     }
     async function loadSprite() {
@@ -159,7 +243,7 @@ var Script;
         for (let i = 0; i < _count; i++) {
             let tempNode = new ƒ.Node("ghostNr" + i);
             graph.addChild(tempNode);
-            let tempGhost = new Script.Ghost(tempNode, mrFudge);
+            let tempGhost = new Script.Ghost(graph, tempNode, mrFudge);
             ghosts.push(tempGhost);
         }
     }
@@ -205,6 +289,7 @@ var Script;
         spriteReverse = false;
         wakka;
         score = 0;
+        running = true;
         constructor(_graph, _animations, _wakka) {
             this.grid = _graph.getChildrenByName("Grid")[0];
             this.translator = _graph.getChildrenByName("MrFudge")[0];
@@ -214,18 +299,27 @@ var Script;
         }
         update(_key) {
             let tempKey;
-            tempKey = this.updateDirection(_key);
-            this.updateSprite();
-            this.updateSound();
-            this.move();
+            if (this.running) {
+                tempKey = this.updateTurn(_key);
+                this.updateSprite();
+                this.updateSound();
+                this.move();
+            }
             return tempKey;
+        }
+        getPos() {
+            return new ƒ.Vector2(this.translator.mtxLocal.translation.x, this.translator.mtxLocal.translation.y);
+        }
+        getDir() {
+            return new ƒ.Vector2(Math.round(this.velocity.x / this.speed), Math.round(this.velocity.y / this.speed));
         }
         move() {
             let tempPos = this.translator.mtxLocal.translation;
-            if ((tempPos.y % 1) + this.threshold / 2 < this.threshold && (tempPos.x % 1) + this.threshold / 2 < this.threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
+            let t = this.threshold;
+            if ((tempPos.y % 1) + t / 2 < t && (tempPos.x % 1) + t / 2 < t) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
                 let fudgeTilePos = new ƒ.Vector2(Math.round(tempPos.x), Math.round(tempPos.y));
                 if (!this.isEaten(fudgeTilePos)) {
-                    this.eatTile(fudgeTilePos);
+                    this.eat(fudgeTilePos);
                 }
                 if (this.isPath(Math.round(this.velocity.x / this.speed), Math.round(this.velocity.y / this.speed))) { //schaut ob das kommende Tile eine Wand ist
                     this.translator.mtxLocal.translate(this.velocity);
@@ -239,14 +333,10 @@ var Script;
                 this.translator.mtxLocal.translate(this.velocity);
             }
         }
-        eatTile(_pos) {
-            let tempTile = this.grid.getChildren()[_pos.y].getChildren()[_pos.x];
-            let tempMat = tempTile.getAllComponents()[0];
-            tempMat.clrPrimary.setHex("000000");
-            this.score++;
-            console.log(this.score);
+        stop() {
+            this.running = false;
         }
-        updateDirection(_key) {
+        updateTurn(_key) {
             let tempKey = _key;
             switch (tempKey) {
                 case ƒ.KEYBOARD_CODE.ARROW_RIGHT:
@@ -296,6 +386,13 @@ var Script;
                 }
             }
             return _tempKey;
+        }
+        eat(_pos) {
+            let tempTile = this.grid.getChildren()[_pos.y].getChildren()[_pos.x];
+            let tempMat = tempTile.getAllComponents()[0];
+            tempMat.clrPrimary.setHex("000000");
+            this.score++;
+            console.log(this.score);
         }
         updateSprite() {
             if (this.sprite.getCurrentFrame == 7 && !this.spriteReverse) {

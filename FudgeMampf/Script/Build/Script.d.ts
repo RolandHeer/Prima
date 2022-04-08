@@ -9,8 +9,19 @@ declare namespace Script {
 }
 declare namespace Script {
     class Ghost {
-        constructor(_node: ƒ.Node, _mrFudge: MrFudge);
+        private grid;
+        private mrFudge;
+        private translator;
+        private materialComp;
+        private speed;
+        private velocity;
+        private threshold;
+        constructor(_graph: ƒ.Node, _node: ƒ.Node, _mrFudge: MrFudge);
         private setup;
+        update(): void;
+        private move;
+        private setDir;
+        private isPath;
     }
 }
 declare namespace Script {
@@ -29,12 +40,16 @@ declare namespace Script {
         private spriteReverse;
         private wakka;
         private score;
+        private running;
         constructor(_graph: ƒ.Node, _animations: ƒAid.SpriteSheetAnimations, _wakka: ƒ.ComponentAudio);
         update(_key: ƒ.KEYBOARD_CODE): ƒ.KEYBOARD_CODE;
+        getPos(): ƒ.Vector2;
+        getDir(): ƒ.Vector2;
         private move;
-        private eatTile;
-        private updateDirection;
+        stop(): void;
+        private updateTurn;
         private turnIfPossible;
+        private eat;
         private updateSprite;
         private updateSound;
         private isPath;

@@ -1,22 +1,23 @@
 namespace Script {
+
     import ƒ = FudgeCore;
     import ƒAid = FudgeAid;
+
     export class MrFudge {
+
         private grid: ƒ.Node;
         private translator: ƒ.Node;
         private rotator: ƒ.Node;
 
         private speed: number = 1 / 20;
         private velocity: ƒ.Vector3 = new ƒ.Vector3(0, 0, 0);
-
-
         private threshold: number = 0.1;
         private sprite: ƒAid.NodeSprite
         private spriteReverse: boolean = false;
-
         private wakka: ƒ.ComponentAudio;
 
         private score: number = 0;
+        private running: boolean = true;
 
 
         constructor(_graph: ƒ.Node, _animations: ƒAid.SpriteSheetAnimations, _wakka: ƒ.ComponentAudio) {
@@ -29,19 +30,29 @@ namespace Script {
 
         public update(_key: ƒ.KEYBOARD_CODE): ƒ.KEYBOARD_CODE {
             let tempKey: ƒ.KEYBOARD_CODE;
-            tempKey = this.updateDirection(_key);
-            this.updateSprite();
-            this.updateSound();
-            this.move();
+            if (this.running) {
+                tempKey = this.updateTurn(_key);
+                this.updateSprite();
+                this.updateSound();
+                this.move();
+            }
             return tempKey;
+        }
+
+        public getPos(): ƒ.Vector2 {
+            return new ƒ.Vector2(this.translator.mtxLocal.translation.x, this.translator.mtxLocal.translation.y);
+        }
+        public getDir(): ƒ.Vector2 {
+            return new ƒ.Vector2(Math.round(this.velocity.x / this.speed), Math.round(this.velocity.y / this.speed));
         }
 
         private move(): void {
             let tempPos: ƒ.Vector3 = this.translator.mtxLocal.translation;
-            if ((tempPos.y % 1) + this.threshold / 2 < this.threshold && (tempPos.x % 1) + this.threshold / 2 < this.threshold) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
+            let t: number = this.threshold;
+            if ((tempPos.y % 1) + t / 2 < t && (tempPos.x % 1) + t / 2 < t) { //schaut ob sich Mr.Fudge auf einem Knotenpunkt befindet
                 let fudgeTilePos: ƒ.Vector2 = new ƒ.Vector2(Math.round(tempPos.x), Math.round(tempPos.y));
                 if (!this.isEaten(fudgeTilePos)) {
-                    this.eatTile(fudgeTilePos);
+                    this.eat(fudgeTilePos);
                 }
                 if (this.isPath(Math.round(this.velocity.x / this.speed), Math.round(this.velocity.y / this.speed))) {                                                       //schaut ob das kommende Tile eine Wand ist
                     this.translator.mtxLocal.translate(this.velocity);
@@ -54,15 +65,11 @@ namespace Script {
             }
         }
 
-        private eatTile(_pos: ƒ.Vector2): void {
-            let tempTile: ƒ.Node = this.grid.getChildren()[_pos.y].getChildren()[_pos.x];
-            let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[0];
-            tempMat.clrPrimary.setHex("000000");
-            this.score++;
-            console.log(this.score);
+        public stop(): void {
+            this.running = false;
         }
 
-        private updateDirection(_key: ƒ.KEYBOARD_CODE): ƒ.KEYBOARD_CODE { // Methode funktioniert nicht all zu gut im negativen Bereich... vielleicht mal danach schauen
+        private updateTurn(_key: ƒ.KEYBOARD_CODE): ƒ.KEYBOARD_CODE { // Methode funktioniert nicht all zu gut im negativen Bereich... vielleicht mal danach schauen
             let tempKey: ƒ.KEYBOARD_CODE = _key
             switch (tempKey) {
                 case ƒ.KEYBOARD_CODE.ARROW_RIGHT:
@@ -96,7 +103,7 @@ namespace Script {
             }
             return tempKey;
         }
-        
+
         private turnIfPossible(_tempKey: ƒ.KEYBOARD_CODE, _x: number, _y: number): ƒ.KEYBOARD_CODE {
             let tempPos: ƒ.Vector3 = this.translator.mtxLocal.translation;
             let t: number = this.threshold;
@@ -112,6 +119,14 @@ namespace Script {
                 }
             }
             return _tempKey
+        }
+
+        private eat(_pos: ƒ.Vector2): void {
+            let tempTile: ƒ.Node = this.grid.getChildren()[_pos.y].getChildren()[_pos.x];
+            let tempMat: ƒ.ComponentMaterial = <ƒ.ComponentMaterial>tempTile.getAllComponents()[0];
+            tempMat.clrPrimary.setHex("000000");
+            this.score++;
+            console.log(this.score);
         }
 
         private updateSprite(): void {

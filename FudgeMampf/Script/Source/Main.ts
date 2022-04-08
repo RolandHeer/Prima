@@ -11,9 +11,9 @@ namespace Script {
 
   let ghosts: Ghost[] = []
   let mrFudge: MrFudge;
-
   let animations: ƒAid.SpriteSheetAnimations;
 
+  let started: boolean = false;
   let gridWidth: number = 7;
   let gridHeight: number = 7;
 
@@ -74,6 +74,11 @@ namespace Script {
     // ƒ.Physics.simulate();  // if physics is included and used
     updateLastKey();
     lastKey = mrFudge.update(lastKey);
+    if(started){
+      for(let i: number = 0; i < ghosts.length; i++){
+        ghosts[i].update();
+      }
+    }
     viewport.draw();
 
     ƒ.AudioManager.default.update();
@@ -82,15 +87,19 @@ namespace Script {
   function updateLastKey(): void {
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_RIGHT, ƒ.KEYBOARD_CODE.D])) {
       lastKey = ƒ.KEYBOARD_CODE.ARROW_RIGHT;
+      started = true;
     }
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_LEFT, ƒ.KEYBOARD_CODE.A])) {
       lastKey = ƒ.KEYBOARD_CODE.ARROW_LEFT;
+      started = true;
     }
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_UP, ƒ.KEYBOARD_CODE.W])) {
       lastKey = ƒ.KEYBOARD_CODE.ARROW_UP;
+      started = true;
     }
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.ARROW_DOWN, ƒ.KEYBOARD_CODE.S])) {
       lastKey = ƒ.KEYBOARD_CODE.ARROW_DOWN;
+      started = true;
     }
   }
 
@@ -114,7 +123,7 @@ namespace Script {
     for (let i: number = 0; i < _count; i++) {
       let tempNode: ƒ.Node = new ƒ.Node("ghostNr" + i);
       graph.addChild(tempNode);
-      let tempGhost: Ghost = new Ghost(tempNode, mrFudge);
+      let tempGhost: Ghost = new Ghost(graph, tempNode, mrFudge);
       ghosts.push(tempGhost);
     }
   }
