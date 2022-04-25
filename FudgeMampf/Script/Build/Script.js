@@ -298,7 +298,7 @@ var Script;
             this.wakka = _wakka;
         }
         update(_key) {
-            let tempKey;
+            let tempKey = _key;
             if (this.running) {
                 tempKey = this.updateTurn(_key);
                 this.updateSprite();
@@ -382,6 +382,7 @@ var Script;
                         tempPos = new ƒ.Vector3(Math.round(tempPos.x), tempPos.y, 0);
                     }
                     this.velocity.set(this.speed * _x, this.speed * _y, 0);
+                    this.rotator.mtxLocal.reset();
                     _tempKey = ƒ.KEYBOARD_CODE.ESC;
                 }
             }

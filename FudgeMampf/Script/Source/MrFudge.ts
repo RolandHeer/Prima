@@ -29,7 +29,7 @@ namespace Script {
         }
 
         public update(_key: ƒ.KEYBOARD_CODE): ƒ.KEYBOARD_CODE {
-            let tempKey: ƒ.KEYBOARD_CODE;
+            let tempKey: ƒ.KEYBOARD_CODE = _key;
             if (this.running) {
                 tempKey = this.updateTurn(_key);
                 this.updateSprite();
@@ -115,6 +115,7 @@ namespace Script {
                         tempPos = new ƒ.Vector3(Math.round(tempPos.x), tempPos.y, 0);
                     }
                     this.velocity.set(this.speed * _x, this.speed * _y, 0);
+                    this.rotator.mtxLocal.reset();
                     _tempKey = ƒ.KEYBOARD_CODE.ESC;
                 }
             }
