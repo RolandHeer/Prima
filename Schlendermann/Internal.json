@@ -46,7 +46,7 @@
               },
               "light": {
                 "ƒ.LightAmbient": {
-                  "color": "[0.2901960784313726, 0.43529411764705883, 0.47058823529411764, 1]"
+                  "color": "[0.16470588235294117, 0.23137254901960785, 0.2549019607843137, 1]"
                 }
               },
               "Component": {
@@ -110,7 +110,50 @@
                   "name": "Trees",
                   "active": true,
                   "components": {},
-                  "children": []
+                  "children": [
+                    {
+                      "ƒ.Node": {
+                        "name": "Tree",
+                        "active": true,
+                        "components": {
+                          "ComponentMesh": [
+                            {
+                              "ƒ.ComponentMesh": {
+                                "idMesh": "MeshObj|2022-04-26T01:24:30.203Z|82293",
+                                "pivot": {
+                                  "translation": "[0, 0, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMaterial": [
+                            {
+                              "ƒ.ComponentMaterial": {
+                                "sortForAlpha": false,
+                                "clrPrimary": "[1, 1, 1, 1]",
+                                "clrSecondary": "[1, 1, 1, 1]",
+                                "pivot": {
+                                  "translation": "[0, 0]",
+                                  "rotation": 0,
+                                  "scaling": "[1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                },
+                                "idMaterial": "Material|2022-04-26T01:25:59.602Z|64821"
+                              }
+                            }
+                          ]
+                        },
+                        "children": []
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -236,50 +279,49 @@
                       }
                     ]
                   },
-                  "children": [
-                    {
-                      "ƒ.Node": {
-                        "name": "Torch",
-                        "active": true,
-                        "components": {
-                          "ComponentTransform": [
-                            {
-                              "ƒ.ComponentTransform": {
-                                "local": {
-                                  "translation": "[0, 0, 0]",
-                                  "rotation": "[0, 0, 0]",
-                                  "scaling": "[1, 1, 1]"
-                                },
-                                "Component": {
-                                  "active": true
-                                }
-                              }
-                            }
-                          ],
-                          "ComponentLight": [
-                            {
-                              "ƒ.ComponentLight": {
-                                "pivot": {
-                                  "translation": "[0, 0, 0]",
-                                  "rotation": "[0, 0, 0]",
-                                  "scaling": "[1, 1, 1]"
-                                },
-                                "light": {
-                                  "ƒ.LightPoint": {
-                                    "color": "[1, 1, 1, 1]"
-                                  }
-                                },
-                                "Component": {
-                                  "active": true
-                                }
-                              }
-                            }
-                          ]
-                        },
-                        "children": []
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "Torch",
+                  "active": true,
+                  "components": {
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0, 0.10000000149011612, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
                       }
-                    }
-                  ]
+                    ],
+                    "ComponentLight": [
+                      {
+                        "ƒ.ComponentLight": {
+                          "pivot": {
+                            "translation": "[0, 0, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "light": {
+                            "ƒ.LightSpot": {
+                              "color": "[1, 1, 1, 1]"
+                            }
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
                 }
               }
             ]
@@ -298,6 +340,38 @@
         "idResource": "TextureImage|2022-04-21T12:16:54.995Z|40807",
         "name": "PathMap",
         "mipmap": "CRISP"
+      }
+    }
+  },
+  "MeshObj|2022-04-26T01:24:30.203Z|82293": {
+    "ƒ.MeshObj": {
+      "idResource": "MeshObj|2022-04-26T01:24:30.203Z|82293",
+      "name": "obj\\tree.obj",
+      "type": "MeshObj",
+      "url": "obj\\tree.obj"
+    }
+  },
+  "TextureImage|2022-04-26T01:25:06.577Z|15782": {
+    "ƒ.TextureImage": {
+      "url": "img\\texTree.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-04-26T01:25:06.577Z|15782",
+        "name": "img\\texTree.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "Material|2022-04-26T01:25:59.602Z|64821": {
+    "ƒ.Material": {
+      "name": "ShaderLitTextured",
+      "idResource": "Material|2022-04-26T01:25:59.602Z|64821",
+      "shader": "ShaderLitTextured",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2022-04-26T01:25:06.577Z|15782"
+        }
       }
     }
   }

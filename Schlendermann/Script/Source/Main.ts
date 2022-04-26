@@ -18,7 +18,6 @@ namespace Script {
   ctrlStrafe.setDelay(200);
   let rotX: number = 0;
   let rotY: number = 0;
-  let walkingBackwards: boolean = false;
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
@@ -65,6 +64,42 @@ namespace Script {
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
 
+  function update(_event: Event): void {
+    // ƒ.Physics.simulate();  // if physics is included and used
+    walkController();
+    viewport.draw();
+    ƒ.AudioManager.default.update();
+  }
+
+  function walkController(): void {
+    let inputWalk: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
+    ctrlWalk.setInput(inputWalk);
+    let inputStrafe: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])
+    ctrlStrafe.setInput(inputStrafe);
+    let speedMultiplier: number = 1;
+    if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT])) {
+      speedMultiplier = 1.7;
+    }
+
+    if (inputWalk > 0) {
+      ctrlStrafe.setFactor(strafeSpeed * 0.75 * speedMultiplier);
+    } else if (inputWalk < 0) {
+      ctrlStrafe.setFactor(strafeSpeed * 0.3 * speedMultiplier);
+    } else {
+      ctrlStrafe.setFactor(strafeSpeed * speedMultiplier);
+    }
+    if (inputStrafe != 0) {
+      ctrlWalk.setFactor(walkSpeed * 0.75 * speedMultiplier);
+    } else {
+      ctrlWalk.setFactor(walkSpeed * speedMultiplier);
+    }
+    if (inputWalk < 0) {
+      ctrlWalk.setFactor(walkSpeed * 0.4 * speedMultiplier);
+    }
+    avatar.mtxLocal.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
+    avatar.mtxLocal.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
+  }
+
   function setupAvatar(_event: CustomEvent): void {
     viewport = _event.detail;
     graph = viewport.getBranch();
@@ -74,54 +109,16 @@ namespace Script {
     viewport.getCanvas().addEventListener("pointermove", hndPointerMove);
   }
 
-  function setupAudio(): void {
-    //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
-    ƒ.AudioManager.default.listenTo(graph);
-  }
-
-  function update(_event: Event): void {
-    // ƒ.Physics.simulate();  // if physics is included and used
-    walkController();
-    strafeController();
-    viewport.draw();
-    ƒ.AudioManager.default.update();
-  }
-
-  function walkController(): void {
-    let input: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
-    ctrlWalk.setInput(input);
-
-    if (input > 0) {
-      walkingBackwards = false;
-      ctrlStrafe.setFactor(strafeSpeed * 0.75);
-    } else if (input < 0) {
-      walkingBackwards = true;
-      ctrlStrafe.setFactor(strafeSpeed * 0.3);
-    } else {
-      ctrlStrafe.setFactor(strafeSpeed);
-    }
-    avatar.mtxLocal.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
-  }
-
-  function strafeController(): void {
-    let input: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])
-    ctrlStrafe.setInput(input);
-    if (input != 0) {
-      ctrlWalk.setFactor(walkSpeed * 0.75);
-    } else {
-      ctrlWalk.setFactor(walkSpeed);
-    }
-    if (walkingBackwards) {
-      ctrlWalk.setFactor(walkSpeed * 0.4);
-    }
-    avatar.mtxLocal.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
-  }
-
   function hndPointerMove(_event: PointerEvent): void {
     rotY += _event.movementX * speedRotY;
     avatar.mtxLocal.rotation = ƒ.Vector3.Y(rotY);
     rotX += _event.movementY * speedRotX;
     rotX = Math.min(60, Math.max(-60, rotX));
     cmpCamera.mtxPivot.rotation = ƒ.Vector3.X(rotX);
+  }
+
+  function setupAudio(): void {
+    //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
+    ƒ.AudioManager.default.listenTo(graph);
   }
 }
