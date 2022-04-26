@@ -7,7 +7,7 @@
   },
   "Material|2022-04-14T13:02:48.164Z|38618": {
     "ƒ.Material": {
-      "name": "Ground",
+      "name": "GroundMat",
       "idResource": "Material|2022-04-14T13:02:48.164Z|38618",
       "shader": "ShaderGouraudTextured",
       "coat": {
@@ -31,9 +31,53 @@
       }
     }
   },
+  "Material|2022-04-26T14:21:01.316Z|29324": {
+    "ƒ.Material": {
+      "name": "TreeMat",
+      "idResource": "Material|2022-04-26T14:21:01.316Z|29324",
+      "shader": "ShaderGouraudTextured",
+      "coat": {
+        "ƒ.CoatRemissiveTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2022-04-26T14:20:46.416Z|13685",
+          "diffuse": 1,
+          "specular": 0
+        }
+      }
+    }
+  },
+  "TextureImage|2022-04-26T14:20:46.416Z|13685": {
+    "ƒ.TextureImage": {
+      "url": "img\\tex\\texTree.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-04-26T14:20:46.416Z|13685",
+        "name": "TreeTex",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "MeshTerrain|2022-04-26T14:41:54.446Z|87419": {
+    "ƒ.MeshTerrain": {
+      "idResource": "MeshTerrain|2022-04-26T14:41:54.446Z|87419",
+      "name": "MeshTerrain",
+      "type": "MeshTerrain",
+      "seed": 0,
+      "scale": "[10, 10]",
+      "resolution": "[100, 100]"
+    }
+  },
+  "MeshObj|2022-04-26T14:58:37.130Z|73182": {
+    "ƒ.MeshObj": {
+      "idResource": "MeshObj|2022-04-26T14:58:37.130Z|73182",
+      "name": "Treetrunk",
+      "type": "MeshObj",
+      "url": "obj\\Treetrunk.obj"
+    }
+  },
   "Graph|2022-04-14T12:56:54.125Z|64295": {
     "ƒ.Graph": {
-      "name": "Graph",
+      "name": "Game",
       "active": true,
       "components": {
         "ComponentLight": [
@@ -46,7 +90,24 @@
               },
               "light": {
                 "ƒ.LightAmbient": {
-                  "color": "[0.16470588235294117, 0.23137254901960785, 0.2549019607843137, 1]"
+                  "color": "[0.12941176470588237, 0.1803921568627451, 0.20784313725490197, 1]"
+                }
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          },
+          {
+            "ƒ.ComponentLight": {
+              "pivot": {
+                "translation": "[0, 0, 0]",
+                "rotation": "[45, 110, 0]",
+                "scaling": "[1, 1, 1]"
+              },
+              "light": {
+                "ƒ.LightDirectional": {
+                  "color": "[0.3607843137254902, 0.47058823529411764, 0.4980392156862745, 1]"
                 }
               },
               "Component": {
@@ -71,11 +132,11 @@
                     "ComponentMesh": [
                       {
                         "ƒ.ComponentMesh": {
-                          "idMesh": "MeshQuad|2022-04-14T12:57:19.763Z|16675",
+                          "idMesh": "MeshTerrain|2022-04-26T14:41:54.446Z|87419",
                           "pivot": {
                             "translation": "[0, 0, 0]",
-                            "rotation": "[-90, 0, 0]",
-                            "scaling": "[60, 60, 60]"
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[60, 0.4000000059604645, 60]"
                           },
                           "Component": {
                             "active": true
@@ -116,12 +177,11 @@
                         "name": "Tree",
                         "active": true,
                         "components": {
-                          "ComponentMesh": [
+                          "ComponentTransform": [
                             {
-                              "ƒ.ComponentMesh": {
-                                "idMesh": "MeshObj|2022-04-26T01:24:30.203Z|82293",
-                                "pivot": {
-                                  "translation": "[0, 0, 0]",
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[5, 0, 0]",
                                   "rotation": "[0, 0, 0]",
                                   "scaling": "[1, 1, 1]"
                                 },
@@ -131,26 +191,141 @@
                               }
                             }
                           ],
-                          "ComponentMaterial": [
+                          "CustomComponentScript": [
                             {
-                              "ƒ.ComponentMaterial": {
-                                "sortForAlpha": false,
-                                "clrPrimary": "[1, 1, 1, 1]",
-                                "clrSecondary": "[1, 1, 1, 1]",
-                                "pivot": {
-                                  "translation": "[0, 0]",
-                                  "rotation": 0,
-                                  "scaling": "[1, 1]"
-                                },
-                                "Component": {
-                                  "active": true
-                                },
-                                "idMaterial": "Material|2022-04-26T01:25:59.602Z|64821"
+                              "Script.CustomComponentScript": {
+                                "active": true,
+                                "message": "CustomComponentScript added to "
                               }
                             }
                           ]
                         },
-                        "children": []
+                        "children": [
+                          {
+                            "ƒ.GraphInstance": {
+                              "deserializeFromSource": true,
+                              "name": "TreeGeo",
+                              "idSource": "Graph|2022-04-26T15:21:44.885Z|98189"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "ƒ.Node": {
+                        "name": "Tree",
+                        "active": true,
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[1, 0, 7]",
+                                  "rotation": "[0, 90, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "CustomComponentScript": [
+                            {
+                              "Script.CustomComponentScript": {
+                                "active": true,
+                                "message": "CustomComponentScript added to "
+                              }
+                            }
+                          ]
+                        },
+                        "children": [
+                          {
+                            "ƒ.GraphInstance": {
+                              "deserializeFromSource": true,
+                              "name": "TreeGeo",
+                              "idSource": "Graph|2022-04-26T15:21:44.885Z|98189"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "ƒ.Node": {
+                        "name": "Tree",
+                        "active": true,
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[5, 0, 4]",
+                                  "rotation": "[-4, 270, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "CustomComponentScript": [
+                            {
+                              "Script.CustomComponentScript": {
+                                "active": true,
+                                "message": "CustomComponentScript added to "
+                              }
+                            }
+                          ]
+                        },
+                        "children": [
+                          {
+                            "ƒ.GraphInstance": {
+                              "deserializeFromSource": true,
+                              "name": "TreeGeo",
+                              "idSource": "Graph|2022-04-26T15:21:44.885Z|98189"
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "ƒ.Node": {
+                        "name": "Tree",
+                        "active": true,
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[9, 0, -2]",
+                                  "rotation": "[8, 110.5, 5.5]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "CustomComponentScript": [
+                            {
+                              "Script.CustomComponentScript": {
+                                "active": true,
+                                "message": "CustomComponentScript added to "
+                              }
+                            }
+                          ]
+                        },
+                        "children": [
+                          {
+                            "ƒ.GraphInstance": {
+                              "deserializeFromSource": true,
+                              "name": "TreeGeo",
+                              "idSource": "Graph|2022-04-26T15:21:44.885Z|98189"
+                            }
+                          }
+                        ]
                       }
                     }
                   ]
@@ -305,13 +480,13 @@
                       {
                         "ƒ.ComponentLight": {
                           "pivot": {
-                            "translation": "[0, 0, 0]",
-                            "rotation": "[0, 0, 0]",
+                            "translation": "[0, 0.5, 0]",
+                            "rotation": "[90, 0, 0]",
                             "scaling": "[1, 1, 1]"
                           },
                           "light": {
                             "ƒ.LightSpot": {
-                              "color": "[1, 1, 1, 1]"
+                              "color": "[1, 0.9254901960784314, 0.4392156862745098, 1]"
                             }
                           },
                           "Component": {
@@ -343,36 +518,48 @@
       }
     }
   },
-  "MeshObj|2022-04-26T01:24:30.203Z|82293": {
-    "ƒ.MeshObj": {
-      "idResource": "MeshObj|2022-04-26T01:24:30.203Z|82293",
-      "name": "obj\\tree.obj",
-      "type": "MeshObj",
-      "url": "obj\\tree.obj"
-    }
-  },
-  "TextureImage|2022-04-26T01:25:06.577Z|15782": {
-    "ƒ.TextureImage": {
-      "url": "img\\texTree.png",
-      "type": "TextureImage",
-      "Texture": {
-        "idResource": "TextureImage|2022-04-26T01:25:06.577Z|15782",
-        "name": "img\\texTree.png",
-        "mipmap": "CRISP"
-      }
-    }
-  },
-  "Material|2022-04-26T01:25:59.602Z|64821": {
-    "ƒ.Material": {
-      "name": "ShaderLitTextured",
-      "idResource": "Material|2022-04-26T01:25:59.602Z|64821",
-      "shader": "ShaderLitTextured",
-      "coat": {
-        "ƒ.CoatTextured": {
-          "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2022-04-26T01:25:06.577Z|15782"
-        }
-      }
+  "Graph|2022-04-26T15:21:44.885Z|98189": {
+    "ƒ.Graph": {
+      "name": "TreeGeo",
+      "active": true,
+      "components": {
+        "ComponentMesh": [
+          {
+            "ƒ.ComponentMesh": {
+              "idMesh": "MeshObj|2022-04-26T14:58:37.130Z|73182",
+              "pivot": {
+                "translation": "[0, 0, 0]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[1, 1, 1]"
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          }
+        ],
+        "ComponentMaterial": [
+          {
+            "ƒ.ComponentMaterial": {
+              "sortForAlpha": false,
+              "clrPrimary": "[1, 1, 1, 1]",
+              "clrSecondary": "[1, 1, 1, 1]",
+              "pivot": {
+                "translation": "[0, 0]",
+                "rotation": 0,
+                "scaling": "[1, 1]"
+              },
+              "Component": {
+                "active": true
+              },
+              "idMaterial": "Material|2022-04-26T14:21:01.316Z|29324"
+            }
+          }
+        ]
+      },
+      "children": [],
+      "idResource": "Graph|2022-04-26T15:21:44.885Z|98189",
+      "type": "Graph"
     }
   }
 }
