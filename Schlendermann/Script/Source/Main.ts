@@ -27,6 +27,13 @@ namespace Script {
   let lockMode: boolean = false;
   let torchOn: boolean = true;
 
+  ///      VALUES      \\\
+  let terrainX: number = 60;                      //Size of Terrain in meter
+  let terrainZ: number = 60;
+  let gridRows: number = 16;                      //Number of Rows
+  let gridColumns: number = 10;                   //Number of Columns
+  let maxGridOffset: number = 5;                  //Offset of Trees in meter
+
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
   let dialog: HTMLDialogElement;
@@ -156,20 +163,32 @@ namespace Script {
     let trees: ƒ.Node = graph.getChildren()[0].getChildrenByName("Trees")[0];
     //let terrainMesh: ƒ.MeshTerrain = <ƒ.MeshTerrain>graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
 
-    for (let i: number = 0; i < 30; i++) {
-      let tempX: number = (Math.random() - 0.5) * 60;
-      let tempZ: number = (Math.random() - 0.5) * 60;
-      let rot: number = Math.random() * 360;
-      let scale: number = Math.random() * 0.3 + 0.6;
-      let tempTreeNode: ƒ.Node = new ƒ.Node("Tree" + i);
-      let comptransform: ƒ.ComponentTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
-      tempTreeNode.addComponent(comptransform);
-      addGraphToNode(tempTreeNode, "Graph|2022-04-26T15:21:44.885Z|98189");
-      tempTreeNode.mtxLocal.translation = new ƒ.Vector3(tempX, 0, tempZ);
-      tempTreeNode.mtxLocal.rotateY(rot);
-      tempTreeNode.mtxLocal.scale(new ƒ.Vector3(scale, scale, scale));
-      trees.addChild(tempTreeNode);
+    for (let k: number = 0; k < 2; k++) {
+      for (let j: number = 0; j < gridRows / 2; j++) {
+        for (let i: number = 0; i < gridColumns; i++) {
+          let tempPos: ƒ.Vector3 = getRandomHexPosition(k, j, i, 0);
+          let rot: number = Math.random() * 360;
+          let scale: number = Math.random() * 0.4 + 0.6;
+          let tempTreeNode: ƒ.Node = new ƒ.Node("Tree" + i);
+          let comptransform: ƒ.ComponentTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
+          tempTreeNode.addComponent(comptransform);
+          addGraphToNode(tempTreeNode, "Graph|2022-04-26T15:21:44.885Z|98189");
+          tempTreeNode.mtxLocal.translation = tempPos;
+          tempTreeNode.mtxLocal.rotateY(rot);
+          tempTreeNode.mtxLocal.scale(new ƒ.Vector3(scale, scale, scale));
+          trees.addChild(tempTreeNode);
+        }
+      }
     }
+  }
+
+
+  function getRandomHexPosition(_k: number, _x: number, _z: number, _heightOffset: number): ƒ.Vector3 {
+    let offset: ƒ.Vector2 = new ƒ.Vector2((terrainX / gridRows) * _k, (-terrainZ / (gridColumns * 2)) * _k);
+    let random: ƒ.Vector2 = new ƒ.Vector2(Math.random() * maxGridOffset, Math.random() * maxGridOffset);
+    let raster: ƒ.Vector2 = new ƒ.Vector2(((terrainX / (gridRows / 2)) * _x), ((terrainZ / gridColumns) * _z));
+    let tempLoc: ƒ.Vector3 = new ƒ.Vector3(raster.x + offset.x + random.x - terrainX / 2, _heightOffset, raster.y + offset.y + random.y - terrainZ / 2);
+    return tempLoc;
   }
 
   async function addGraphToNode(_node: ƒ.Node, _id: string) {
