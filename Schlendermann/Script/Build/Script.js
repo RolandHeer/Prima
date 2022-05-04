@@ -48,6 +48,8 @@ var Script;
     let avatar;
     let camera;
     let cmpCamera;
+    let cmpTerrain;
+    let terrain;
     let torch;
     /// AVATAR CONTROLS \\\
     let speedRotX = 0.3;
@@ -68,7 +70,7 @@ var Script;
     let terrainZ = 60;
     let gridRows = 16; //Number of Rows
     let gridColumns = 10; //Number of Columns
-    let maxGridOffset = 5; //Offset of Trees in meter
+    let maxGridOffset = 4; //Offset of Trees in meter
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
     let dialog;
@@ -96,6 +98,8 @@ var Script;
         }
         // setup the viewport
         let cmpCamera = new FudgeCore.ComponentCamera();
+        cmpTerrain = graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh);
+        terrain = cmpTerrain.mesh;
         canvas = document.querySelector("canvas");
         let viewport = new FudgeCore.Viewport();
         viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
@@ -145,11 +149,13 @@ var Script;
         if (inputWalk < 0) {
             ctrlWalk.setFactor(walkSpeed * 0.4 * speedMultiplier);
         }
-        avatar.mtxLocal.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
-        avatar.mtxLocal.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
+        let mtxL = avatar.mtxLocal;
+        let mtxG = avatar.mtxWorld;
+        mtxL.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
+        mtxL.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
+        mtxL.translateY(-getDistanceToTerrain(new ƒ.Vector3(mtxG.translation.x, mtxG.translation.y, mtxG.translation.z)));
     }
     function initValues() {
-        //enterPointerLock();
     }
     function setupAvatar(_event) {
         viewport = _event.detail;
@@ -187,13 +193,12 @@ var Script;
     }
     function createForest() {
         let trees = graph.getChildren()[0].getChildrenByName("Trees")[0];
-        //let terrainMesh: ƒ.MeshTerrain = <ƒ.MeshTerrain>graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
         for (let k = 0; k < 2; k++) {
             for (let j = 0; j < gridRows / 2; j++) {
                 for (let i = 0; i < gridColumns; i++) {
-                    let tempPos = getRandomHexPosition(k, j, i, 0);
+                    let tempPos = getRandomHexPosOnTerrain(k, j, i);
                     let rot = Math.random() * 360;
-                    let scale = Math.random() * 0.4 + 0.6;
+                    let scale = (Math.random() * 0.5) + 0.5;
                     let tempTreeNode = new ƒ.Node("Tree" + i);
                     let comptransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
                     tempTreeNode.addComponent(comptransform);
@@ -206,12 +211,20 @@ var Script;
             }
         }
     }
-    function getRandomHexPosition(_k, _x, _z, _heightOffset) {
+    function getRandomHexPosOnTerrain(_k, _x, _z) {
         let offset = new ƒ.Vector2((terrainX / gridRows) * _k, (-terrainZ / (gridColumns * 2)) * _k);
         let random = new ƒ.Vector2(Math.random() * maxGridOffset, Math.random() * maxGridOffset);
         let raster = new ƒ.Vector2(((terrainX / (gridRows / 2)) * _x), ((terrainZ / gridColumns) * _z));
-        let tempLoc = new ƒ.Vector3(raster.x + offset.x + random.x - terrainX / 2, _heightOffset, raster.y + offset.y + random.y - terrainZ / 2);
+        let tempLoc = new ƒ.Vector3(raster.x + offset.x + random.x - terrainX / 2, 0, raster.y + offset.y + random.y - terrainZ / 2);
+        tempLoc.y = -getDistanceToTerrain(tempLoc);
         return tempLoc;
+    }
+    function getDistanceToTerrain(_loc) {
+        let tempDist = terrain.getTerrainInfo(_loc, cmpTerrain.mtxWorld)?.distance;
+        if (tempDist) {
+            return tempDist;
+        }
+        return 0;
     }
     async function addGraphToNode(_node, _id) {
         const treeGraph = await ƒ.Project.createGraphInstance(ƒ.Project.resources[_id]);

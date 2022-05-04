@@ -9,6 +9,8 @@ namespace Script {
   let avatar: ƒ.Node;
   let camera: ƒ.Node;
   let cmpCamera: ƒ.ComponentCamera;
+  let cmpTerrain: ƒ.ComponentMesh;
+  let terrain: ƒ.MeshTerrain;
   let torch: ƒ.Node;
 
   /// AVATAR CONTROLS \\\
@@ -32,7 +34,7 @@ namespace Script {
   let terrainZ: number = 60;
   let gridRows: number = 16;                      //Number of Rows
   let gridColumns: number = 10;                   //Number of Columns
-  let maxGridOffset: number = 5;                  //Offset of Trees in meter
+  let maxGridOffset: number = 4;                  //Offset of Trees in meter
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
@@ -63,6 +65,8 @@ namespace Script {
     }
     // setup the viewport
     let cmpCamera: ƒ.ComponentCamera = new FudgeCore.ComponentCamera();
+    cmpTerrain = graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh);
+    terrain = <ƒ.MeshTerrain>cmpTerrain.mesh;
     canvas = document.querySelector("canvas");
     let viewport: ƒ.Viewport = new FudgeCore.Viewport();
     viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
@@ -113,12 +117,15 @@ namespace Script {
     if (inputWalk < 0) {
       ctrlWalk.setFactor(walkSpeed * 0.4 * speedMultiplier);
     }
-    avatar.mtxLocal.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
-    avatar.mtxLocal.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
+    let mtxL: ƒ.Matrix4x4 = avatar.mtxLocal;
+    let mtxG: ƒ.Matrix4x4 = avatar.mtxWorld;
+    mtxL.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
+    mtxL.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
+    mtxL.translateY(-getDistanceToTerrain(new ƒ.Vector3(mtxG.translation.x, mtxG.translation.y, mtxG.translation.z)));
   }
 
   function initValues(): void {
-    //enterPointerLock();
+
   }
 
   function setupAvatar(_event: CustomEvent): void {
@@ -161,14 +168,13 @@ namespace Script {
 
   function createForest(): void {
     let trees: ƒ.Node = graph.getChildren()[0].getChildrenByName("Trees")[0];
-    //let terrainMesh: ƒ.MeshTerrain = <ƒ.MeshTerrain>graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
 
     for (let k: number = 0; k < 2; k++) {
       for (let j: number = 0; j < gridRows / 2; j++) {
         for (let i: number = 0; i < gridColumns; i++) {
-          let tempPos: ƒ.Vector3 = getRandomHexPosition(k, j, i, 0);
+          let tempPos: ƒ.Vector3 = getRandomHexPosOnTerrain(k, j, i);
           let rot: number = Math.random() * 360;
-          let scale: number = Math.random() * 0.4 + 0.6;
+          let scale: number = (Math.random() * 0.5) + 0.5;
           let tempTreeNode: ƒ.Node = new ƒ.Node("Tree" + i);
           let comptransform: ƒ.ComponentTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
           tempTreeNode.addComponent(comptransform);
@@ -183,12 +189,21 @@ namespace Script {
   }
 
 
-  function getRandomHexPosition(_k: number, _x: number, _z: number, _heightOffset: number): ƒ.Vector3 {
+  function getRandomHexPosOnTerrain(_k: number, _x: number, _z: number): ƒ.Vector3 {
     let offset: ƒ.Vector2 = new ƒ.Vector2((terrainX / gridRows) * _k, (-terrainZ / (gridColumns * 2)) * _k);
     let random: ƒ.Vector2 = new ƒ.Vector2(Math.random() * maxGridOffset, Math.random() * maxGridOffset);
     let raster: ƒ.Vector2 = new ƒ.Vector2(((terrainX / (gridRows / 2)) * _x), ((terrainZ / gridColumns) * _z));
-    let tempLoc: ƒ.Vector3 = new ƒ.Vector3(raster.x + offset.x + random.x - terrainX / 2, _heightOffset, raster.y + offset.y + random.y - terrainZ / 2);
+    let tempLoc: ƒ.Vector3 = new ƒ.Vector3(raster.x + offset.x + random.x - terrainX / 2, 0, raster.y + offset.y + random.y - terrainZ / 2);
+    tempLoc.y = -getDistanceToTerrain(tempLoc);
     return tempLoc;
+  }
+
+  function getDistanceToTerrain(_loc: ƒ.Vector3): number {
+    let tempDist: number = terrain.getTerrainInfo(_loc, cmpTerrain.mtxWorld)?.distance;
+    if (tempDist) {
+      return tempDist;
+    }
+    return 0;
   }
 
   async function addGraphToNode(_node: ƒ.Node, _id: string) {

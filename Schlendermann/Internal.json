@@ -63,7 +63,7 @@
       "name": "Terrain",
       "type": "MeshTerrain",
       "seed": 0,
-      "scale": "[6, 6]",
+      "scale": "[3, 3]",
       "resolution": "[250, 250]"
     }
   },
@@ -136,7 +136,7 @@
                           "pivot": {
                             "translation": "[0, 0, 0]",
                             "rotation": "[0, 0, 0]",
-                            "scaling": "[60, 0.30000001192092896, 60]"
+                            "scaling": "[60, 1.5, 60]"
                           },
                           "Component": {
                             "active": true
@@ -171,47 +171,7 @@
                   "name": "Trees",
                   "active": true,
                   "components": {},
-                  "children": [
-                    {
-                      "ƒ.Node": {
-                        "name": "Tree",
-                        "active": true,
-                        "components": {
-                          "ComponentTransform": [
-                            {
-                              "ƒ.ComponentTransform": {
-                                "local": {
-                                  "translation": "[5, 0, 0]",
-                                  "rotation": "[0, 0, 0]",
-                                  "scaling": "[1, 1, 1]"
-                                },
-                                "Component": {
-                                  "active": true
-                                }
-                              }
-                            }
-                          ],
-                          "CustomComponentScript": [
-                            {
-                              "Script.CustomComponentScript": {
-                                "active": true,
-                                "message": "CustomComponentScript added to "
-                              }
-                            }
-                          ]
-                        },
-                        "children": [
-                          {
-                            "ƒ.GraphInstance": {
-                              "deserializeFromSource": true,
-                              "name": "TreeGeo",
-                              "idSource": "Graph|2022-04-26T15:21:44.885Z|98189"
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ]
+                  "children": []
                 }
               },
               {
@@ -363,7 +323,7 @@
                                 "pivot": {
                                   "translation": "[0, -0.10000000149011612, 0]",
                                   "rotation": "[0, 0, 0]",
-                                  "scaling": "[7, 7, 150]"
+                                  "scaling": "[8, 8, 100]"
                                 },
                                 "light": {
                                   "ƒ.LightSpot": {
