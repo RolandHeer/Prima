@@ -2,14 +2,18 @@ namespace Script {
   import ƒ = FudgeCore;
   ƒ.Debug.info("Main Program Template running!");
 
+  /// GAME HIRARCHIE \\\
+  let canvas: HTMLCanvasElement;
   let graph: ƒ.Node;
   let viewport: ƒ.Viewport;
   let avatar: ƒ.Node;
   let camera: ƒ.Node;
   let cmpCamera: ƒ.ComponentCamera;
+  let torch: ƒ.Node;
 
-  let speedRotX: number = 0.1;
-  let speedRotY: number = -0.1;
+  /// AVATAR CONTROLS \\\
+  let speedRotX: number = 0.3;
+  let speedRotY: number = -0.3;
   let walkSpeed: number = 6;
   let ctrlWalk: ƒ.Control = new ƒ.Control("cntrlWalk", walkSpeed, ƒ.CONTROL_TYPE.PROPORTIONAL);
   ctrlWalk.setDelay(200);
@@ -18,6 +22,10 @@ namespace Script {
   ctrlStrafe.setDelay(200);
   let rotX: number = 0;
   let rotY: number = 0;
+
+  ///     BOOLEAN     \\\
+  let lockMode: boolean = false;
+  let torchOn: boolean = true;
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
@@ -48,17 +56,19 @@ namespace Script {
     }
     // setup the viewport
     let cmpCamera: ƒ.ComponentCamera = new FudgeCore.ComponentCamera();
-    let canvas: HTMLCanvasElement = document.querySelector("canvas");
+    canvas = document.querySelector("canvas");
     let viewport: ƒ.Viewport = new FudgeCore.Viewport();
     viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
-    canvas.addEventListener("mousedown", canvas.requestPointerLock);
-    canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
+    canvas.addEventListener("mousedown", enterPointerLock);
+    window.addEventListener("keydown", hndKeydown);
     viewport.draw();
     canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
   }
 
   function start(_event: CustomEvent): void {
+    initValues();
     setupAvatar(_event);
+    createForest();
     setupAudio();
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -100,21 +110,76 @@ namespace Script {
     avatar.mtxLocal.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
   }
 
+  function initValues(): void {
+    //enterPointerLock();
+  }
+
   function setupAvatar(_event: CustomEvent): void {
     viewport = _event.detail;
     graph = viewport.getBranch();
     avatar = viewport.getBranch().getChildrenByName("Avatar")[0];
     camera = avatar.getChild(0);
     viewport.camera = cmpCamera = camera.getComponent(ƒ.ComponentCamera);
+    torch = camera.getChild(0);
     viewport.getCanvas().addEventListener("pointermove", hndPointerMove);
   }
 
   function hndPointerMove(_event: PointerEvent): void {
-    rotY += _event.movementX * speedRotY;
-    avatar.mtxLocal.rotation = ƒ.Vector3.Y(rotY);
-    rotX += _event.movementY * speedRotX;
-    rotX = Math.min(60, Math.max(-60, rotX));
-    cmpCamera.mtxPivot.rotation = ƒ.Vector3.X(rotX);
+    if (lockMode) {
+      rotY += _event.movementX * speedRotY;
+      avatar.mtxLocal.rotation = ƒ.Vector3.Y(rotY);
+      rotX += _event.movementY * speedRotX;
+      rotX = Math.min(90, Math.max(-90, rotX));
+      cmpCamera.mtxPivot.rotation = ƒ.Vector3.X(rotX);
+      torch.mtxLocal.rotation = ƒ.Vector3.X(rotX);
+    }
+  }
+
+  function enterPointerLock(): void {
+    canvas.requestPointerLock();
+    lockMode = true;
+  }
+
+  function hndKeydown(_key: KeyboardEvent): void {
+    switch (_key.code) {
+      case "KeyM":
+        lockMode = false;
+        document.exitPointerLock();
+        break;
+      case "KeyT":
+        toggleTorch();
+        break;
+    }
+  }
+
+  function createForest(): void {
+    let tempMat: ƒ.Material = new ƒ.Material("treemat", ƒ.ShaderLit);
+    let trees: ƒ.Node = graph.getChildren()[0].getChildrenByName("Trees")[0];
+    let treeModel: ƒ.Graph = <ƒ.Graph>trees.getChildren()[0].getChildren()[0];
+    let terrainMesh: ƒ.MeshTerrain = <ƒ.MeshTerrain>graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
+
+    for (let i: number = 0; i < 30; i++) {
+      let tempX: number = (Math.random() - 0.5) * 60;
+      let tempZ: number = (Math.random() - 0.5) * 60;
+
+      let compMat: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(tempMat);
+      let tempTreeNode: ƒ.Node = new ƒ.Node("Tree" + i);
+      let comptransform: ƒ.ComponentTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
+      let tempTree: ƒ.MeshCube = new ƒ.MeshCube("hässlicher Baum");
+      let compMeshTree: ƒ.ComponentMesh = new ƒ.ComponentMesh(tempTree);
+      compMeshTree.mtxPivot.scale(new ƒ.Vector3(0.5, 5, 0.5));
+      tempTreeNode.addComponent(comptransform);
+      tempTreeNode.addComponent(compMeshTree);
+      tempTreeNode.addComponent(compMat);
+      tempTreeNode.addChild(treeModel);
+      tempTreeNode.mtxLocal.translation = new ƒ.Vector3(tempX, 0, tempZ);
+      trees.addChild(tempTreeNode);
+    }
+  }
+
+  function toggleTorch(): void{
+    torchOn = !torchOn;
+    torch.getComponent(ƒ.ComponentLight).activate(torchOn);
   }
 
   function setupAudio(): void {

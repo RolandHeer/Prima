@@ -22,6 +22,7 @@ var Script;
         hndEvent = (_event) => {
             switch (_event.type) {
                 case "componentAdd" /* COMPONENT_ADD */:
+                    //console.log(this.node.getAncestor().getChildren()[0].getChildren()[0]);
                     //this.node.mtxLocal.translateY(0);
                     break;
                 case "componentRemove" /* COMPONENT_REMOVE */:
@@ -40,13 +41,17 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
+    /// GAME HIRARCHIE \\\
+    let canvas;
     let graph;
     let viewport;
     let avatar;
     let camera;
     let cmpCamera;
-    let speedRotX = 0.1;
-    let speedRotY = -0.1;
+    let torch;
+    /// AVATAR CONTROLS \\\
+    let speedRotX = 0.3;
+    let speedRotY = -0.3;
     let walkSpeed = 6;
     let ctrlWalk = new ƒ.Control("cntrlWalk", walkSpeed, 0 /* PROPORTIONAL */);
     ctrlWalk.setDelay(200);
@@ -55,6 +60,9 @@ var Script;
     ctrlStrafe.setDelay(200);
     let rotX = 0;
     let rotY = 0;
+    ///     BOOLEAN     \\\
+    let lockMode = false;
+    let torchOn = true;
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
     let dialog;
@@ -82,16 +90,18 @@ var Script;
         }
         // setup the viewport
         let cmpCamera = new FudgeCore.ComponentCamera();
-        let canvas = document.querySelector("canvas");
+        canvas = document.querySelector("canvas");
         let viewport = new FudgeCore.Viewport();
         viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
-        canvas.addEventListener("mousedown", canvas.requestPointerLock);
-        canvas.addEventListener("mouseup", function () { document.exitPointerLock(); });
+        canvas.addEventListener("mousedown", enterPointerLock);
+        window.addEventListener("keydown", hndKeydown);
         viewport.draw();
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     }
     function start(_event) {
+        initValues();
         setupAvatar(_event);
+        createForest();
         setupAudio();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -132,20 +142,68 @@ var Script;
         avatar.mtxLocal.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
         avatar.mtxLocal.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
     }
+    function initValues() {
+        //enterPointerLock();
+    }
     function setupAvatar(_event) {
         viewport = _event.detail;
         graph = viewport.getBranch();
         avatar = viewport.getBranch().getChildrenByName("Avatar")[0];
         camera = avatar.getChild(0);
         viewport.camera = cmpCamera = camera.getComponent(ƒ.ComponentCamera);
+        torch = camera.getChild(0);
         viewport.getCanvas().addEventListener("pointermove", hndPointerMove);
     }
     function hndPointerMove(_event) {
-        rotY += _event.movementX * speedRotY;
-        avatar.mtxLocal.rotation = ƒ.Vector3.Y(rotY);
-        rotX += _event.movementY * speedRotX;
-        rotX = Math.min(60, Math.max(-60, rotX));
-        cmpCamera.mtxPivot.rotation = ƒ.Vector3.X(rotX);
+        if (lockMode) {
+            rotY += _event.movementX * speedRotY;
+            avatar.mtxLocal.rotation = ƒ.Vector3.Y(rotY);
+            rotX += _event.movementY * speedRotX;
+            rotX = Math.min(90, Math.max(-90, rotX));
+            cmpCamera.mtxPivot.rotation = ƒ.Vector3.X(rotX);
+            torch.mtxLocal.rotation = ƒ.Vector3.X(rotX);
+        }
+    }
+    function enterPointerLock() {
+        canvas.requestPointerLock();
+        lockMode = true;
+    }
+    function hndKeydown(_key) {
+        switch (_key.code) {
+            case "KeyM":
+                lockMode = false;
+                document.exitPointerLock();
+                break;
+            case "KeyT":
+                toggleTorch();
+                break;
+        }
+    }
+    function createForest() {
+        let tempMat = new ƒ.Material("treemat", ƒ.ShaderLit);
+        let trees = graph.getChildren()[0].getChildrenByName("Trees")[0];
+        let treeModel = trees.getChildren()[0].getChildren()[0];
+        let terrainMesh = graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
+        for (let i = 0; i < 30; i++) {
+            let tempX = (Math.random() - 0.5) * 60;
+            let tempZ = (Math.random() - 0.5) * 60;
+            let compMat = new ƒ.ComponentMaterial(tempMat);
+            let tempTreeNode = new ƒ.Node("Tree" + i);
+            let comptransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
+            let tempTree = new ƒ.MeshCube("hässlicher Baum");
+            let compMeshTree = new ƒ.ComponentMesh(tempTree);
+            compMeshTree.mtxPivot.scale(new ƒ.Vector3(0.5, 5, 0.5));
+            tempTreeNode.addComponent(comptransform);
+            tempTreeNode.addComponent(compMeshTree);
+            tempTreeNode.addComponent(compMat);
+            tempTreeNode.addChild(treeModel);
+            tempTreeNode.mtxLocal.translation = new ƒ.Vector3(tempX, 0, tempZ);
+            trees.addChild(tempTreeNode);
+        }
+    }
+    function toggleTorch() {
+        torchOn = !torchOn;
+        torch.getComponent(ƒ.ComponentLight).activate(torchOn);
     }
     function setupAudio() {
         //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];

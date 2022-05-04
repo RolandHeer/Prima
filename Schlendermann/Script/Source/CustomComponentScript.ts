@@ -2,12 +2,12 @@ namespace Script {
   import ƒ = FudgeCore;
   ƒ.Project.registerScriptNamespace(Script);  // Register the namespace to FUDGE for serialization
 
+
   export class CustomComponentScript extends ƒ.ComponentScript {
     // Register the script as component for use in the editor via drag&drop
     public static readonly iSubclass: number = ƒ.Component.registerSubclass(CustomComponentScript);
     // Properties may be mutated by users in the editor via the automatically created user interface
     public message: string = "CustomComponentScript added to ";
-
 
     constructor() {
       super();
@@ -26,6 +26,7 @@ namespace Script {
     public hndEvent = (_event: Event): void => {
       switch (_event.type) {
         case ƒ.EVENT.COMPONENT_ADD:
+         //console.log(this.node.getAncestor().getChildren()[0].getChildren()[0]);
           //this.node.mtxLocal.translateY(0);
           break;
         case ƒ.EVENT.COMPONENT_REMOVE:
