@@ -153,31 +153,31 @@ namespace Script {
   }
 
   function createForest(): void {
-    let tempMat: ƒ.Material = new ƒ.Material("treemat", ƒ.ShaderLit);
     let trees: ƒ.Node = graph.getChildren()[0].getChildrenByName("Trees")[0];
-    let treeModel: ƒ.Graph = <ƒ.Graph>trees.getChildren()[0].getChildren()[0];
-    let terrainMesh: ƒ.MeshTerrain = <ƒ.MeshTerrain>graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
+    //let terrainMesh: ƒ.MeshTerrain = <ƒ.MeshTerrain>graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
 
     for (let i: number = 0; i < 30; i++) {
       let tempX: number = (Math.random() - 0.5) * 60;
       let tempZ: number = (Math.random() - 0.5) * 60;
-
-      let compMat: ƒ.ComponentMaterial = new ƒ.ComponentMaterial(tempMat);
+      let rot: number = Math.random() * 360;
+      let scale: number = Math.random() * 0.3 + 0.6;
       let tempTreeNode: ƒ.Node = new ƒ.Node("Tree" + i);
       let comptransform: ƒ.ComponentTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
-      let tempTree: ƒ.MeshCube = new ƒ.MeshCube("hässlicher Baum");
-      let compMeshTree: ƒ.ComponentMesh = new ƒ.ComponentMesh(tempTree);
-      compMeshTree.mtxPivot.scale(new ƒ.Vector3(0.5, 5, 0.5));
       tempTreeNode.addComponent(comptransform);
-      tempTreeNode.addComponent(compMeshTree);
-      tempTreeNode.addComponent(compMat);
-      tempTreeNode.addChild(treeModel);
+      addGraphToNode(tempTreeNode, "Graph|2022-04-26T15:21:44.885Z|98189");
       tempTreeNode.mtxLocal.translation = new ƒ.Vector3(tempX, 0, tempZ);
+      tempTreeNode.mtxLocal.rotateY(rot);
+      tempTreeNode.mtxLocal.scale(new ƒ.Vector3(scale, scale, scale));
       trees.addChild(tempTreeNode);
     }
   }
 
-  function toggleTorch(): void{
+  async function addGraphToNode(_node: ƒ.Node, _id: string) {
+    const treeGraph = await ƒ.Project.createGraphInstance(ƒ.Project.resources[_id] as ƒ.Graph);
+    _node.addChild(treeGraph);
+  }
+
+  function toggleTorch(): void {
     torchOn = !torchOn;
     torch.getComponent(ƒ.ComponentLight).activate(torchOn);
   }

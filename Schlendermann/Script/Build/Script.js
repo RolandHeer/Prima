@@ -180,26 +180,26 @@ var Script;
         }
     }
     function createForest() {
-        let tempMat = new ƒ.Material("treemat", ƒ.ShaderLit);
         let trees = graph.getChildren()[0].getChildrenByName("Trees")[0];
-        let treeModel = trees.getChildren()[0].getChildren()[0];
-        let terrainMesh = graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
+        //let terrainMesh: ƒ.MeshTerrain = <ƒ.MeshTerrain>graph.getChildren()[0].getChildrenByName("Terrain")[0].getComponent(ƒ.ComponentMesh).mesh;
         for (let i = 0; i < 30; i++) {
             let tempX = (Math.random() - 0.5) * 60;
             let tempZ = (Math.random() - 0.5) * 60;
-            let compMat = new ƒ.ComponentMaterial(tempMat);
+            let rot = Math.random() * 360;
+            let scale = Math.random() * 0.3 + 0.6;
             let tempTreeNode = new ƒ.Node("Tree" + i);
             let comptransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
-            let tempTree = new ƒ.MeshCube("hässlicher Baum");
-            let compMeshTree = new ƒ.ComponentMesh(tempTree);
-            compMeshTree.mtxPivot.scale(new ƒ.Vector3(0.5, 5, 0.5));
             tempTreeNode.addComponent(comptransform);
-            tempTreeNode.addComponent(compMeshTree);
-            tempTreeNode.addComponent(compMat);
-            tempTreeNode.addChild(treeModel);
+            addGraphToNode(tempTreeNode, "Graph|2022-04-26T15:21:44.885Z|98189");
             tempTreeNode.mtxLocal.translation = new ƒ.Vector3(tempX, 0, tempZ);
+            tempTreeNode.mtxLocal.rotateY(rot);
+            tempTreeNode.mtxLocal.scale(new ƒ.Vector3(scale, scale, scale));
             trees.addChild(tempTreeNode);
         }
+    }
+    async function addGraphToNode(_node, _id) {
+        const treeGraph = await ƒ.Project.createGraphInstance(ƒ.Project.resources[_id]);
+        _node.addChild(treeGraph);
     }
     function toggleTorch() {
         torchOn = !torchOn;
