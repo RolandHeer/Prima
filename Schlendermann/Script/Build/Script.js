@@ -43,23 +43,25 @@ var Script;
     ƒ.Debug.info("Main Program Template running!");
     /// GAME HIRARCHIE \\\
     let canvas;
+    let crc2;
     let graph;
     let viewport;
     let avatar;
     let camera;
     let cmpCamera;
+    let cmpRigidAvatar;
     let cmpTerrain;
     let terrain;
     let torch;
     /// AVATAR CONTROLS \\\
     let speedRotX = 0.3;
     let speedRotY = -0.3;
-    let walkSpeed = 6;
+    let walkSpeed = 0.14;
     let ctrlWalk = new ƒ.Control("cntrlWalk", walkSpeed, 0 /* PROPORTIONAL */);
-    ctrlWalk.setDelay(200);
-    let strafeSpeed = 2;
+    ctrlWalk.setDelay(70);
+    let strafeSpeed = 0.05;
     let ctrlStrafe = new ƒ.Control("cntrlStrafe", strafeSpeed, 0 /* PROPORTIONAL */);
-    ctrlStrafe.setDelay(200);
+    ctrlStrafe.setDelay(70);
     let rotX = 0;
     let rotY = 0;
     ///     BOOLEAN     \\\
@@ -71,6 +73,19 @@ var Script;
     let gridRows = 16; //Number of Rows
     let gridColumns = 10; //Number of Columns
     let maxGridOffset = 4; //Offset of Trees in meter
+    let avatarHeight = 1.7; //Height of Avatar in meter
+    let maxStamina = 200; //Max ammount of time the avatar can run before having to catch his breath
+    let maxBatterylife = 5000; //Batterylife of Torch in  millisec.
+    let recoveryFactor = 0.3;
+    ///        VUI        \\\
+    let margin = 70;
+    let barheight = 20;
+    let barlength = 200;
+    let batteryWidth = 50;
+    ///       Stats       \\\
+    let stamina = maxStamina;
+    let batterylife = maxBatterylife; //Batterylife of Torch in  millisec.
+    let pages = 0; //number of collected Pages in numbers... lol
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
     let dialog;
@@ -119,7 +134,9 @@ var Script;
     function update(_event) {
         ƒ.Physics.simulate(); // if physics is included and used
         walkController();
+        updateTorch();
         viewport.draw();
+        drawVUI();
         ƒ.AudioManager.default.update();
     }
     function walkController() {
@@ -129,7 +146,18 @@ var Script;
         ctrlStrafe.setInput(inputStrafe);
         let speedMultiplier = 1;
         if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT])) {
-            speedMultiplier = 1.7;
+            speedMultiplier = 2;
+            stamina--;
+            if (stamina < 0) {
+                stamina = 0;
+                speedMultiplier = 1;
+            }
+        }
+        else {
+            stamina += recoveryFactor;
+            if (stamina > maxStamina) {
+                stamina = maxStamina;
+            }
         }
         if (inputWalk > 0) {
             ctrlStrafe.setFactor(strafeSpeed * 0.75 * speedMultiplier);
@@ -149,18 +177,27 @@ var Script;
         if (inputWalk < 0) {
             ctrlWalk.setFactor(walkSpeed * 0.4 * speedMultiplier);
         }
-        let mtxL = avatar.mtxLocal;
-        let mtxG = avatar.mtxWorld;
+        let tempVector = new ƒ.Vector3(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame, 0, ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame);
+        tempVector.transform(avatar.mtxLocal, false);
+        avatar.getComponent(ƒ.ComponentRigidbody).setVelocity(tempVector);
+        cmpRigidAvatar.translateBody(ƒ.Vector3.Y(-getDistanceToTerrain(cmpRigidAvatar.getPosition()) + (avatarHeight / 2)));
+        ///   Alte Variante   \\\
+        /*
+        let mtxL: ƒ.Matrix4x4 = avatar.mtxLocal;
+        let mtxG: ƒ.Matrix4x4 = avatar.mtxWorld;
         mtxL.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
         mtxL.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
-        //mtxL.translateY(-getDistanceToTerrain(new ƒ.Vector3(mtxG.translation.x, mtxG.translation.y, mtxG.translation.z)));
+        mtxL.translateY(-getDistanceToTerrain(new ƒ.Vector3(mtxG.translation.x, mtxG.translation.y, mtxG.translation.z)));
+        */
     }
     function initValues() {
+        crc2 = canvas.getContext("2d");
     }
     function setupAvatar(_event) {
         viewport = _event.detail;
         graph = viewport.getBranch();
         avatar = viewport.getBranch().getChildrenByName("Avatar")[0];
+        cmpRigidAvatar = avatar.getComponent(ƒ.ComponentRigidbody);
         camera = avatar.getChild(0);
         viewport.camera = cmpCamera = camera.getComponent(ƒ.ComponentCamera);
         torch = camera.getChild(0);
@@ -169,7 +206,7 @@ var Script;
     function hndPointerMove(_event) {
         if (lockMode) {
             rotY += _event.movementX * speedRotY;
-            avatar.mtxLocal.rotation = ƒ.Vector3.Y(rotY);
+            cmpRigidAvatar.setRotation(ƒ.Vector3.Y(rotY));
             rotX += _event.movementY * speedRotX;
             rotX = Math.min(90, Math.max(-90, rotX));
             cmpCamera.mtxPivot.rotation = ƒ.Vector3.X(rotX);
@@ -231,8 +268,36 @@ var Script;
         _node.addChild(treeGraph);
     }
     function toggleTorch() {
-        torchOn = !torchOn;
-        torch.getComponent(ƒ.ComponentLight).activate(torchOn);
+        if (batterylife > 0) {
+            torchOn = !torchOn;
+            torch.getComponent(ƒ.ComponentLight).activate(torchOn);
+        }
+    }
+    function updateTorch() {
+        if (torchOn) {
+            batterylife--;
+            if (batterylife < 0) {
+                batterylife = 0;
+                torchOn = false;
+                torch.getComponent(ƒ.ComponentLight).activate(torchOn);
+            }
+        }
+    }
+    function drawVUI() {
+        // Stamina
+        crc2.fillStyle = "#555";
+        crc2.fillRect(margin, canvas.height - barheight - margin, barlength, barheight);
+        crc2.fillStyle = "#fff";
+        crc2.fillRect(margin, canvas.height - barheight - margin, (stamina / maxStamina) * barlength, barheight);
+        // Battery
+        crc2.lineWidth = 3;
+        crc2.strokeStyle = "#fff";
+        crc2.strokeRect(margin, canvas.height - barheight * 3 - margin, batteryWidth, barheight);
+        crc2.fillRect(margin + batteryWidth, canvas.height - barheight * 2.666 - margin, 5, barheight / 3);
+        crc2.fillRect(margin, canvas.height - barheight * 3 - margin, (batterylife / maxBatterylife) * batteryWidth, barheight);
+        //Pages
+        crc2.font = barheight + "px Arial";
+        crc2.fillText("Pages: " + pages, margin, canvas.height - margin - barheight * 4);
     }
     function setupAudio() {
         //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];

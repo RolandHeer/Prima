@@ -4,11 +4,13 @@ namespace Script {
 
   /// GAME HIRARCHIE \\\
   let canvas: HTMLCanvasElement;
+  let crc2: CanvasRenderingContext2D;
   let graph: ƒ.Node;
   let viewport: ƒ.Viewport;
   let avatar: ƒ.Node;
   let camera: ƒ.Node;
   let cmpCamera: ƒ.ComponentCamera;
+  let cmpRigidAvatar: ƒ.ComponentRigidbody;
   let cmpTerrain: ƒ.ComponentMesh;
   let terrain: ƒ.MeshTerrain;
   let torch: ƒ.Node;
@@ -16,12 +18,12 @@ namespace Script {
   /// AVATAR CONTROLS \\\
   let speedRotX: number = 0.3;
   let speedRotY: number = -0.3;
-  let walkSpeed: number = 6;
+  let walkSpeed: number = 0.14;
   let ctrlWalk: ƒ.Control = new ƒ.Control("cntrlWalk", walkSpeed, ƒ.CONTROL_TYPE.PROPORTIONAL);
-  ctrlWalk.setDelay(200);
-  let strafeSpeed: number = 2;
+  ctrlWalk.setDelay(70);
+  let strafeSpeed: number = 0.05;
   let ctrlStrafe: ƒ.Control = new ƒ.Control("cntrlStrafe", strafeSpeed, ƒ.CONTROL_TYPE.PROPORTIONAL);
-  ctrlStrafe.setDelay(200);
+  ctrlStrafe.setDelay(70);
   let rotX: number = 0;
   let rotY: number = 0;
 
@@ -35,6 +37,21 @@ namespace Script {
   let gridRows: number = 16;                      //Number of Rows
   let gridColumns: number = 10;                   //Number of Columns
   let maxGridOffset: number = 4;                  //Offset of Trees in meter
+  let avatarHeight: number = 1.7;                 //Height of Avatar in meter
+  let maxStamina: number = 200;                   //Max ammount of time the avatar can run before having to catch his breath
+  let maxBatterylife: number = 5000;              //Batterylife of Torch in  millisec.
+  let recoveryFactor: number = 0.3;
+
+  ///        VUI        \\\
+  let margin: number = 70;
+  let barheight: number = 20;
+  let barlength: number = 200;
+  let batteryWidth: number = 50;
+
+  ///       Stats       \\\
+  let stamina: number = maxStamina;
+  let batterylife: number = maxBatterylife;       //Batterylife of Torch in  millisec.
+  let pages: number = 0;                          //number of collected Pages in numbers... lol
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
@@ -88,7 +105,9 @@ namespace Script {
   function update(_event: Event): void {
     ƒ.Physics.simulate();  // if physics is included and used
     walkController();
+    updateTorch();
     viewport.draw();
+    drawVUI();
     ƒ.AudioManager.default.update();
   }
 
@@ -99,7 +118,17 @@ namespace Script {
     ctrlStrafe.setInput(inputStrafe);
     let speedMultiplier: number = 1;
     if (ƒ.Keyboard.isPressedOne([ƒ.KEYBOARD_CODE.SHIFT_LEFT])) {
-      speedMultiplier = 1.7;
+      speedMultiplier = 2;
+      stamina--;
+      if (stamina < 0) {
+        stamina = 0;
+        speedMultiplier = 1
+      }
+    } else {
+      stamina += recoveryFactor;
+      if (stamina > maxStamina) {
+        stamina = maxStamina;
+      }
     }
 
     if (inputWalk > 0) {
@@ -117,21 +146,32 @@ namespace Script {
     if (inputWalk < 0) {
       ctrlWalk.setFactor(walkSpeed * 0.4 * speedMultiplier);
     }
+    let tempVector: ƒ.Vector3 = new ƒ.Vector3(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame, 0, ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame);
+
+    tempVector.transform(avatar.mtxLocal, false);
+
+    avatar.getComponent(ƒ.ComponentRigidbody).setVelocity(tempVector);
+    cmpRigidAvatar.translateBody(ƒ.Vector3.Y(-getDistanceToTerrain(cmpRigidAvatar.getPosition()) + (avatarHeight / 2)));
+
+    ///   Alte Variante   \\\
+    /*
     let mtxL: ƒ.Matrix4x4 = avatar.mtxLocal;
     let mtxG: ƒ.Matrix4x4 = avatar.mtxWorld;
     mtxL.translateZ(ctrlWalk.getOutput() * ƒ.Loop.timeFrameGame / 1000);
     mtxL.translateX(ctrlStrafe.getOutput() * ƒ.Loop.timeFrameGame / 1000);
-    //mtxL.translateY(-getDistanceToTerrain(new ƒ.Vector3(mtxG.translation.x, mtxG.translation.y, mtxG.translation.z)));
+    mtxL.translateY(-getDistanceToTerrain(new ƒ.Vector3(mtxG.translation.x, mtxG.translation.y, mtxG.translation.z)));
+    */
   }
 
   function initValues(): void {
-
+    crc2 = canvas.getContext("2d");
   }
 
   function setupAvatar(_event: CustomEvent): void {
     viewport = _event.detail;
     graph = viewport.getBranch();
     avatar = viewport.getBranch().getChildrenByName("Avatar")[0];
+    cmpRigidAvatar = avatar.getComponent(ƒ.ComponentRigidbody);
     camera = avatar.getChild(0);
     viewport.camera = cmpCamera = camera.getComponent(ƒ.ComponentCamera);
     torch = camera.getChild(0);
@@ -141,7 +181,7 @@ namespace Script {
   function hndPointerMove(_event: PointerEvent): void {
     if (lockMode) {
       rotY += _event.movementX * speedRotY;
-      avatar.mtxLocal.rotation = ƒ.Vector3.Y(rotY);
+      cmpRigidAvatar.setRotation(ƒ.Vector3.Y(rotY));
       rotX += _event.movementY * speedRotX;
       rotX = Math.min(90, Math.max(-90, rotX));
       cmpCamera.mtxPivot.rotation = ƒ.Vector3.X(rotX);
@@ -212,8 +252,40 @@ namespace Script {
   }
 
   function toggleTorch(): void {
-    torchOn = !torchOn;
-    torch.getComponent(ƒ.ComponentLight).activate(torchOn);
+    if (batterylife > 0) {
+      torchOn = !torchOn;
+      torch.getComponent(ƒ.ComponentLight).activate(torchOn);
+    }
+  }
+
+  function updateTorch(): void {
+    if (torchOn) {
+      batterylife--;
+      if (batterylife < 0) {
+        batterylife = 0;
+        torchOn = false;
+        torch.getComponent(ƒ.ComponentLight).activate(torchOn);
+      }
+    }
+  }
+
+  function drawVUI(): void {
+    // Stamina
+    crc2.fillStyle = "#555";
+    crc2.fillRect(margin, canvas.height - barheight - margin, barlength, barheight);
+    crc2.fillStyle = "#fff";
+    crc2.fillRect(margin, canvas.height - barheight - margin, (stamina / maxStamina) * barlength, barheight);
+
+    // Battery
+    crc2.lineWidth = 3;
+    crc2.strokeStyle = "#fff";
+    crc2.strokeRect(margin, canvas.height - barheight * 3 - margin, batteryWidth, barheight);
+    crc2.fillRect(margin + batteryWidth, canvas.height - barheight * 2.666 - margin, 5, barheight / 3);
+    crc2.fillRect(margin, canvas.height - barheight * 3 - margin, (batterylife / maxBatterylife) * batteryWidth, barheight);
+
+    //Pages
+    crc2.font = barheight + "px Arial";
+    crc2.fillText("Pages: " + pages, margin, canvas.height - margin - barheight * 4)
   }
 
   function setupAudio(): void {
