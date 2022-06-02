@@ -42,6 +42,7 @@ var Script;
     var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
     /// GAME HIRARCHIE \\\
+    let config;
     let canvas;
     let crc2;
     let graph;
@@ -53,6 +54,7 @@ var Script;
     let cmpTerrain;
     let terrain;
     let torch;
+    let heightRef;
     /// AVATAR CONTROLS \\\
     let speedRotX = 0.3;
     let speedRotY = -0.3;
@@ -74,7 +76,7 @@ var Script;
     let gridColumns = 10; //Number of Columns
     let maxGridOffset = 4; //Offset of Trees in meter
     let avatarHeight = 1.7; //Height of Avatar in meter
-    let maxStamina = 200; //Max ammount of time the avatar can run before having to catch his breath
+    let maxStamina; //Max ammount of time the avatar can run before having to catch his breath
     let maxBatterylife = 5000; //Batterylife of Torch in  millisec.
     let recoveryFactor = 0.3;
     ///        VUI        \\\
@@ -83,7 +85,7 @@ var Script;
     let barlength = 200;
     let batteryWidth = 50;
     ///       Stats       \\\
-    let stamina = maxStamina;
+    let stamina;
     let batterylife = maxBatterylife; //Batterylife of Torch in  millisec.
     let pages = 0; //number of collected Pages in numbers... lol
     window.addEventListener("load", init);
@@ -120,14 +122,18 @@ var Script;
         viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
         canvas.addEventListener("mousedown", enterPointerLock);
         window.addEventListener("keydown", hndKeydown);
+        graph.addEventListener("toggleTorch", hndToggleTorch);
         viewport.draw();
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     }
-    function start(_event) {
+    async function start(_event) {
+        let response = await fetch("config.json");
+        config = await response.json();
         initValues();
         setupAvatar(_event);
         createForest();
         setupAudio();
+        console.log(config);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -192,6 +198,8 @@ var Script;
     }
     function initValues() {
         crc2 = canvas.getContext("2d");
+        maxStamina = config.stamina;
+        stamina = maxStamina;
     }
     function setupAvatar(_event) {
         viewport = _event.detail;
@@ -201,6 +209,9 @@ var Script;
         camera = avatar.getChild(0);
         viewport.camera = cmpCamera = camera.getComponent(ƒ.ComponentCamera);
         torch = camera.getChild(0);
+        heightRef = graph.getChildrenByName("Environment")[0].getChildrenByName("Buildings")[0];
+        heightRef;
+        initAnim();
         viewport.getCanvas().addEventListener("pointermove", hndPointerMove);
     }
     function hndPointerMove(_event) {
@@ -271,6 +282,7 @@ var Script;
         if (batterylife > 0) {
             torchOn = !torchOn;
             torch.getComponent(ƒ.ComponentLight).activate(torchOn);
+            torch.dispatchEvent(new Event("toggleTorch", { bubbles: true }));
         }
     }
     function updateTorch() {
@@ -282,6 +294,9 @@ var Script;
                 torch.getComponent(ƒ.ComponentLight).activate(torchOn);
             }
         }
+    }
+    function hndToggleTorch(_event) {
+        console.log(_event);
     }
     function drawVUI() {
         // Stamina
@@ -302,6 +317,48 @@ var Script;
     function setupAudio() {
         //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
         ƒ.AudioManager.default.listenTo(graph);
+    }
+    function initAnim() {
+        console.log("%cStart over", "color: red;");
+        let time0 = 0;
+        let time1 = 2000;
+        let value0 = 0;
+        let value1 = 90;
+        let animseq = new ƒ.AnimationSequence();
+        animseq.addKey(new ƒ.AnimationKey(time0, value0));
+        animseq.addKey(new ƒ.AnimationKey(time1, value1));
+        let animStructure = {
+            components: {
+                ComponentTransform: [
+                    {
+                        "ƒ.ComponentTransform": {
+                            mtxLocal: {
+                                rotation: {
+                                    x: animseq,
+                                    y: animseq
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        };
+        let fps = 30;
+        let animation = new ƒ.Animation("testAnimation", animStructure, fps);
+        animation.setEvent("event", 1000);
+        animation.labels["jump"] = 500;
+        let cmpAnimator = new ƒ.ComponentAnimator(animation, ƒ.ANIMATION_PLAYMODE.LOOP, ƒ.ANIMATION_PLAYBACK.TIMEBASED_CONTINOUS);
+        cmpAnimator.scale = 1;
+        cmpAnimator.addEventListener("event", (_event) => {
+            let time = _event.target.time;
+            console.log(`Event fired at ${time}`, _event);
+        });
+        if (heightRef.getComponent(ƒ.ComponentAnimator)) {
+            heightRef.removeComponent(heightRef.getComponent(ƒ.ComponentAnimator));
+        }
+        heightRef.addComponent(cmpAnimator);
+        cmpAnimator.activate(true);
+        console.log("Component", cmpAnimator);
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map

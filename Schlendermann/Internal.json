@@ -240,6 +240,35 @@
                           "idMaterial": "Material|2022-05-12T07:26:23.860Z|81716"
                         }
                       }
+                    ],
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0, 0, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "ComponentAnimator": [
+                      {
+                        "ƒ.ComponentAnimator": {
+                          "active": true,
+                          "idAnimation": "Animation|2022-05-17T14:55:15.690Z|51705",
+                          "playmode": 0,
+                          "playback": 0,
+                          "scale": 1,
+                          "scaleWithGameTime": true,
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
                     ]
                   },
                   "children": []
@@ -484,6 +513,16 @@
       "children": [],
       "idResource": "Graph|2022-04-26T15:21:44.885Z|98189",
       "type": "Graph"
+    }
+  },
+  "Animation|2022-05-17T14:55:15.690Z|51705": {
+    "ƒ.Animation": {
+      "idResource": "Animation|2022-05-17T14:55:15.690Z|51705",
+      "name": "",
+      "labels": {},
+      "events": {},
+      "fps": 60,
+      "animationStructure": {}
     }
   }
 }

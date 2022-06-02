@@ -1,0 +1,8 @@
+{
+    "fontHeight": 40,
+    "margin": 30,
+    "maxSpeed": 0.1,
+    "accelSpeed": 3000,
+    "maxTurn": 0.2,
+    "accelTurn": 200
+}

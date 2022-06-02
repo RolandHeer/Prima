@@ -2,7 +2,13 @@ namespace Script {
   import ƒ = FudgeCore;
   ƒ.Debug.info("Main Program Template running!");
 
+  interface Config {
+    stamina: number;
+    [key: string]: number | string | Config;
+  }
+
   /// GAME HIRARCHIE \\\
+  let config: Config;
   let canvas: HTMLCanvasElement;
   let crc2: CanvasRenderingContext2D;
   let graph: ƒ.Node;
@@ -14,6 +20,8 @@ namespace Script {
   let cmpTerrain: ƒ.ComponentMesh;
   let terrain: ƒ.MeshTerrain;
   let torch: ƒ.Node;
+
+  let heightRef: ƒ.Node;
 
   /// AVATAR CONTROLS \\\
   let speedRotX: number = 0.3;
@@ -38,7 +46,7 @@ namespace Script {
   let gridColumns: number = 10;                   //Number of Columns
   let maxGridOffset: number = 4;                  //Offset of Trees in meter
   let avatarHeight: number = 1.7;                 //Height of Avatar in meter
-  let maxStamina: number = 200;                   //Max ammount of time the avatar can run before having to catch his breath
+  let maxStamina: number;                   //Max ammount of time the avatar can run before having to catch his breath
   let maxBatterylife: number = 5000;              //Batterylife of Torch in  millisec.
   let recoveryFactor: number = 0.3;
 
@@ -49,12 +57,12 @@ namespace Script {
   let batteryWidth: number = 50;
 
   ///       Stats       \\\
-  let stamina: number = maxStamina;
+  let stamina: number;
   let batterylife: number = maxBatterylife;       //Batterylife of Torch in  millisec.
   let pages: number = 0;                          //number of collected Pages in numbers... lol
 
   window.addEventListener("load", init);
-  document.addEventListener("interactiveViewportStarted", <EventListener>start);
+  document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
   let dialog: HTMLDialogElement;
 
   function init(_event: Event): void {
@@ -89,15 +97,20 @@ namespace Script {
     viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
     canvas.addEventListener("mousedown", enterPointerLock);
     window.addEventListener("keydown", hndKeydown);
+    graph.addEventListener("toggleTorch", hndToggleTorch);
     viewport.draw();
     canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
   }
 
-  function start(_event: CustomEvent): void {
+  async function start(_event: CustomEvent): Promise<void> {
+    let response: Response = await fetch("config.json");
+    config = await response.json();
     initValues();
     setupAvatar(_event);
     createForest();
     setupAudio();
+    console.log(config);
+
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }
@@ -165,6 +178,8 @@ namespace Script {
 
   function initValues(): void {
     crc2 = canvas.getContext("2d");
+    maxStamina = config.stamina;
+    stamina = maxStamina
   }
 
   function setupAvatar(_event: CustomEvent): void {
@@ -175,6 +190,11 @@ namespace Script {
     camera = avatar.getChild(0);
     viewport.camera = cmpCamera = camera.getComponent(ƒ.ComponentCamera);
     torch = camera.getChild(0);
+
+    heightRef = graph.getChildrenByName("Environment")[0].getChildrenByName("Buildings")[0];
+    heightRef
+    initAnim();
+
     viewport.getCanvas().addEventListener("pointermove", hndPointerMove);
   }
 
@@ -255,6 +275,7 @@ namespace Script {
     if (batterylife > 0) {
       torchOn = !torchOn;
       torch.getComponent(ƒ.ComponentLight).activate(torchOn);
+      torch.dispatchEvent(new Event("toggleTorch", { bubbles: true }));
     }
   }
 
@@ -267,6 +288,10 @@ namespace Script {
         torch.getComponent(ƒ.ComponentLight).activate(torchOn);
       }
     }
+  }
+
+  function hndToggleTorch(_event: Event): void {
+    console.log(_event);
   }
 
   function drawVUI(): void {
@@ -291,5 +316,58 @@ namespace Script {
   function setupAudio(): void {
     //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
     ƒ.AudioManager.default.listenTo(graph);
+  }
+
+  function initAnim(): void {
+    console.log("%cStart over", "color: red;");
+    let time0: number = 0;
+    let time1: number = 2000;
+    let value0: number = 0;
+    let value1: number = 90;
+
+    let animseq: ƒ.AnimationSequence = new ƒ.AnimationSequence();
+    animseq.addKey(new ƒ.AnimationKey(time0, value0));
+    animseq.addKey(new ƒ.AnimationKey(time1, value1));
+
+    let animStructure: ƒ.AnimationStructure = {
+      components: {
+        ComponentTransform: [
+          {
+            "ƒ.ComponentTransform": {
+              mtxLocal: {
+                rotation: {
+                  x: animseq,
+                  y: animseq
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    let fps: number = 30;
+
+    let animation: ƒ.Animation = new ƒ.Animation("testAnimation", animStructure, fps);
+    animation.setEvent("event", 1000);
+    animation.labels["jump"] = 500;
+
+    let cmpAnimator: ƒ.ComponentAnimator = new ƒ.ComponentAnimator(animation, ƒ.ANIMATION_PLAYMODE.LOOP, ƒ.ANIMATION_PLAYBACK.TIMEBASED_CONTINOUS);
+    cmpAnimator.scale = 1;
+    cmpAnimator.addEventListener("event", (_event: Event) => {
+      let time: number = (<ƒ.ComponentAnimator>_event.target).time;
+      console.log(`Event fired at ${time}`, _event);
+    });
+
+
+    if (heightRef.getComponent(ƒ.ComponentAnimator)) {
+      heightRef.removeComponent(heightRef.getComponent(ƒ.ComponentAnimator));
+    }
+
+
+    heightRef.addComponent(cmpAnimator);
+    cmpAnimator.activate(true);
+
+    console.log("Component", cmpAnimator);
   }
 }
