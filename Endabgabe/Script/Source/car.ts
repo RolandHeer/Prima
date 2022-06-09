@@ -15,7 +15,9 @@ namespace Endabgabe {
 
         // Runtime Values 
         private gaz: number = 100;
-        private posArray: ƒ.Vector3[] = []
+        private posArray: ƒ.Vector3[] = [];
+        private oldDrive: number = 0;
+        private newDrive: number = 0;
 
         constructor(_config: Config, _car: ƒ.Node) {
             this.config = _config;
@@ -63,15 +65,16 @@ namespace Endabgabe {
             } else {
                 this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-0.3, _drive));//ehemals Loop Frame Time
             }
-            this.updateTilt(_drive, this.ctrlTurn.getOutput());
+            this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
         }
 
-        private updateTilt(_drive: number, _turn: number): void {
+        private updateYawTilt(_drive: number, _turn: number): void {
             if (_drive > 0) {
-                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((_drive * _turn) * 5);
+                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = new ƒ.Vector3(0, 0, (_drive * _turn) * 3);
             } else {
-                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((-_drive * _turn) * 5);
+                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = new ƒ.Vector3(0, 0, (-_drive * _turn) * 3);
             }
+            this.oldDrive = _drive;
         }
 
         private updateGaz(_factor: number): void {

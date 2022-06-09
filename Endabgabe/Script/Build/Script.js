@@ -189,6 +189,8 @@ var Endabgabe;
         // Runtime Values 
         gaz = 100;
         posArray = [];
+        oldDrive = 0;
+        newDrive = 0;
         constructor(_config, _car) {
             this.config = _config;
             this.car = _car;
@@ -230,15 +232,16 @@ var Endabgabe;
             else {
                 this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-0.3, _drive)); //ehemals Loop Frame Time
             }
-            this.updateTilt(_drive, this.ctrlTurn.getOutput());
+            this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
         }
-        updateTilt(_drive, _turn) {
+        updateYawTilt(_drive, _turn) {
             if (_drive > 0) {
-                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((_drive * _turn) * 5);
+                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = new ƒ.Vector3(0, 0, (_drive * _turn) * 3);
             }
             else {
-                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((-_drive * _turn) * 5);
+                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = new ƒ.Vector3(0, 0, (-_drive * _turn) * 3);
             }
+            this.oldDrive = _drive;
         }
         updateGaz(_factor) {
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));

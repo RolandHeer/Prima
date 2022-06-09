@@ -40,6 +40,8 @@ declare namespace Endabgabe {
         private currentSpeed;
         private gaz;
         private posArray;
+        private oldDrive;
+        private newDrive;
         constructor(_config: Config, _car: ƒ.Node);
         update(): void;
         getCamPos(): ƒ.Vector3;
@@ -47,7 +49,7 @@ declare namespace Endabgabe {
         getGazPercent(): number;
         private updateDriving;
         private updateTurning;
-        private updateTilt;
+        private updateYawTilt;
         private updateGaz;
         private updatePosArray;
         private setupControls;
