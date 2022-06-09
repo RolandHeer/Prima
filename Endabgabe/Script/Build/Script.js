@@ -225,16 +225,20 @@ var Endabgabe;
             let inputTurn = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]);
             this.ctrlTurn.setInput(inputTurn);
             if (_drive > 0) {
-                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(1, _drive)); //ehemals Loop Frame Time
+                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive)); //ehemals Loop Frame Time
             }
             else {
-                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-1, _drive)); //ehemals Loop Frame Time
+                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-0.3, _drive)); //ehemals Loop Frame Time
             }
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
         }
         updateTilt(_drive, _turn) {
-            _drive = _drive; // / ƒ.Loop.timeFrameGame;
-            this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((_drive * _turn) * 10);
+            if (_drive > 0) {
+                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((_drive * _turn) * 5);
+            }
+            else {
+                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((-_drive * _turn) * 5);
+            }
         }
         updateGaz(_factor) {
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
