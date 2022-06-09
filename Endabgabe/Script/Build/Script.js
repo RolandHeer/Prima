@@ -45,6 +45,7 @@ var Endabgabe;
     let crc2;
     let graph;
     let viewport;
+    let camNode;
     let cameraNode;
     let cameraTranslatorNode;
     let cmpCamera;
@@ -55,6 +56,7 @@ var Endabgabe;
     let config;
     ///     OBJECTS    \\\
     let car;
+    let cam;
     /// RUNTIME VALUES \\\
     let coins = 0;
     window.addEventListener("load", init);
@@ -97,12 +99,14 @@ var Endabgabe;
         config = await response.json();
         initValues();
         setupCar();
+        setupCam();
         setupAudio();
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         car.update();
+        cam.update(car.getCamPos());
         //ƒ.Physics.simulate();  // if physics is included and used
         renderScreen();
     }
@@ -116,12 +120,12 @@ var Endabgabe;
         crc2.font = config.fontHeight + "px Arial";
         crc2.fillText("Coins: " + coins, config.margin, config.margin * 2);
         // Gaz
-        //crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin * 3, config.margin * 2);
+        crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin, config.margin * 4);
         // Speedometer
         crc2.save();
         crc2.resetTransform();
         crc2.translate(canvas.width - 200, canvas.height - 30);
-        crc2.rotate((car.getSpeedPercent() * 180) * Math.PI / 180);
+        crc2.rotate((Math.abs(car.getSpeedPercent()) * 180) * Math.PI / 180);
         crc2.fillRect(-100, -5, 105, 10);
         crc2.restore();
     }
@@ -143,15 +147,32 @@ var Endabgabe;
     }
     function setupCar() {
         carNode = graph.getChildren()[0];
-        cameraNode = carNode.getChildren()[0].getChildrenByName("Camera")[0];
+        car = new Endabgabe.Car(config, carNode);
+    }
+    function setupCam() {
+        camNode = graph.getChildrenByName("Cam")[0];
+        cameraNode = camNode.getChildren()[0].getChildrenByName("Camera")[0];
         cameraTranslatorNode = cameraNode.getChildren()[0];
         viewport.camera = cmpCamera = cameraTranslatorNode.getComponent(ƒ.ComponentCamera);
-        car = new Endabgabe.Car(config, carNode);
+        cam = new Endabgabe.Cam(camNode);
     }
     function setupAudio() {
         //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
         ƒ.AudioManager.default.listenTo(graph);
     }
+})(Endabgabe || (Endabgabe = {}));
+var Endabgabe;
+(function (Endabgabe) {
+    class Cam {
+        camNode;
+        constructor(_camNode) {
+            this.camNode = _camNode;
+        }
+        update(_newPos) {
+            this.camNode.mtxLocal.rotation = _newPos;
+        }
+    }
+    Endabgabe.Cam = Cam;
 })(Endabgabe || (Endabgabe = {}));
 var Endabgabe;
 (function (Endabgabe) {
@@ -167,6 +188,7 @@ var Endabgabe;
         currentSpeed;
         // Runtime Values 
         gaz = 100;
+        posArray = [];
         constructor(_config, _car) {
             this.config = _config;
             this.car = _car;
@@ -177,7 +199,10 @@ var Endabgabe;
         }
         update() {
             this.updateTurning(this.updateDriving());
-            this.updateGaz();
+            this.updatePosArray();
+        }
+        getCamPos() {
+            return this.posArray[0];
         }
         getSpeedPercent() {
             return this.currentSpeed / this.config.maxSpeed;
@@ -187,24 +212,40 @@ var Endabgabe;
         }
         updateDriving() {
             let inputDrive = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]);
+            if (inputDrive != 0 && this.gaz == 0) {
+                inputDrive = 0;
+            }
             this.ctrlDrive.setInput(inputDrive);
-            this.car.mtxLocal.rotateX(this.ctrlDrive.getOutput() * ƒ.Loop.timeFrameGame);
+            this.car.mtxLocal.rotateX(this.ctrlDrive.getOutput()); //ehemals Loop Frame Time
             this.currentSpeed = this.ctrlDrive.getOutput();
-            this.updateGaz(this.ctrlDrive.getOutput() * ƒ.Loop.timeFrameGame);
-            return this.ctrlDrive.getOutput() * ƒ.Loop.timeFrameGame;
+            this.updateGaz(this.ctrlDrive.getOutput()); //ehemals Loop Frame Time
+            return this.ctrlDrive.getOutput(); //ehemals Loop Frame Time
         }
-        updateTurning(_driving) {
+        updateTurning(_drive) {
             let inputTurn = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]);
             this.ctrlTurn.setInput(inputTurn);
-            if (_driving > 0) {
-                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(1, _driving) * ƒ.Loop.timeFrameGame);
+            if (_drive > 0) {
+                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(1, _drive)); //ehemals Loop Frame Time
             }
             else {
-                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-1, _driving) * ƒ.Loop.timeFrameGame);
+                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-1, _drive)); //ehemals Loop Frame Time
             }
+            this.updateTilt(_drive, this.ctrlTurn.getOutput());
+        }
+        updateTilt(_drive, _turn) {
+            _drive = _drive; // / ƒ.Loop.timeFrameGame;
+            this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((_drive * _turn) * 10);
         }
         updateGaz(_factor) {
-            Math.max(0, this.gaz -= 0.1 * _factor);
+            this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
+        }
+        updatePosArray() {
+            let tempPos = this.car.mtxLocal.getEulerAngles();
+            let newPos = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z);
+            this.posArray.push(newPos);
+            if (this.posArray.length > this.config.camDelay) {
+                this.posArray.splice(0, 1);
+            }
         }
         setupControls(_config) {
             this.ctrlDrive = new ƒ.Control("cntrlWalk", _config.maxSpeed, 0 /* PROPORTIONAL */);

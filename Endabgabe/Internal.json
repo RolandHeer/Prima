@@ -165,7 +165,7 @@
                       {
                         "ƒ.ComponentTransform": {
                           "local": {
-                            "translation": "[0, 51.000003814697266, 0]",
+                            "translation": "[0, 50.000003814697266, 0]",
                             "rotation": "[0, 0, 0]",
                             "scaling": "[1, 1, 1]"
                           },
@@ -181,7 +181,7 @@
                           "idMesh": "MeshObj|2022-05-18T20:03:40.613Z|34289",
                           "pivot": {
                             "translation": "[0, 0, 0]",
-                            "rotation": "[0, 180, 0]",
+                            "rotation": "[0, 0, 0]",
                             "scaling": "[1, 1, 1]"
                           },
                           "Component": {
@@ -223,7 +223,7 @@
                           "isTrigger": false,
                           "id": 2,
                           "pivot": {
-                            "translation": "[0, -0.6499999761581421, 0.30000001192092896]",
+                            "translation": "[0, 0, 1]",
                             "rotation": "[0, 0, 0]",
                             "scaling": "[1.559999942779541, 0.8999999761581421, 3.0299999713897705]"
                           },
@@ -333,78 +333,6 @@
                         "active": true,
                         "components": {},
                         "children": []
-                      }
-                    },
-                    {
-                      "ƒ.Node": {
-                        "name": "Camera",
-                        "active": true,
-                        "components": {
-                          "ComponentTransform": [
-                            {
-                              "ƒ.ComponentTransform": {
-                                "local": {
-                                  "translation": "[0, 0, 0]",
-                                  "rotation": "[50, 0, 0]",
-                                  "scaling": "[1, 1, 1]"
-                                },
-                                "Component": {
-                                  "active": true
-                                }
-                              }
-                            }
-                          ]
-                        },
-                        "children": [
-                          {
-                            "ƒ.Node": {
-                              "name": "CameraTranslator",
-                              "active": true,
-                              "components": {
-                                "ComponentTransform": [
-                                  {
-                                    "ƒ.ComponentTransform": {
-                                      "local": {
-                                        "translation": "[0, 7.5, -80]",
-                                        "rotation": "[0, 0, 0]",
-                                        "scaling": "[1, 1, 1]"
-                                      },
-                                      "Component": {
-                                        "active": true
-                                      }
-                                    }
-                                  }
-                                ],
-                                "ComponentCamera": [
-                                  {
-                                    "ƒ.ComponentCamera": {
-                                      "backgroundColor": {
-                                        "r": 0,
-                                        "g": 0,
-                                        "b": 0,
-                                        "a": 1
-                                      },
-                                      "backgroundEnabled": true,
-                                      "projection": "central",
-                                      "fieldOfView": 22.5,
-                                      "direction": 2,
-                                      "aspect": 1,
-                                      "pivot": {
-                                        "translation": "[0, 0, 0]",
-                                        "rotation": "[0, 0, 0]",
-                                        "scaling": "[1, 1, 1]"
-                                      },
-                                      "Component": {
-                                        "active": true
-                                      }
-                                    }
-                                  }
-                                ]
-                              },
-                              "children": []
-                            }
-                          }
-                        ]
                       }
                     }
                   ]
@@ -609,6 +537,126 @@
                     ]
                   },
                   "children": []
+                }
+              }
+            ]
+          }
+        },
+        {
+          "ƒ.Node": {
+            "name": "Cam",
+            "active": true,
+            "components": {
+              "ComponentTransform": [
+                {
+                  "ƒ.ComponentTransform": {
+                    "local": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ]
+            },
+            "children": [
+              {
+                "ƒ.Node": {
+                  "name": "Offset",
+                  "active": true,
+                  "components": {
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0, 50, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "children": [
+                    {
+                      "ƒ.Node": {
+                        "name": "Camera",
+                        "active": true,
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[0, 0, 0]",
+                                  "rotation": "[50, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "children": [
+                          {
+                            "ƒ.Node": {
+                              "name": "CameraTranslator",
+                              "active": true,
+                              "components": {
+                                "ComponentTransform": [
+                                  {
+                                    "ƒ.ComponentTransform": {
+                                      "local": {
+                                        "translation": "[0, 7.5, -80]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[1, 1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentCamera": [
+                                  {
+                                    "ƒ.ComponentCamera": {
+                                      "backgroundColor": {
+                                        "r": 0,
+                                        "g": 0,
+                                        "b": 0,
+                                        "a": 1
+                                      },
+                                      "backgroundEnabled": true,
+                                      "projection": "central",
+                                      "fieldOfView": 22.5,
+                                      "direction": 2,
+                                      "aspect": 1,
+                                      "pivot": {
+                                        "translation": "[0, 0, 0]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[1, 1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               }
             ]

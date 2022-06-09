@@ -1,16 +1,6 @@
 namespace Endabgabe {
     import ƒ = FudgeCore;
 
-    interface Config {
-        fontHeight: number;
-        margin: number;
-        maxSpeed: number;
-        accelSpeed: number;
-        maxTurn: number;
-        accelTurn: number;
-        [key: string]: number | string | Config;
-    }
-
     export class Car {
 
         private config: Config;
@@ -25,6 +15,7 @@ namespace Endabgabe {
 
         // Runtime Values 
         private gaz: number = 100;
+        private posArray: ƒ.Vector3[] = []
 
         constructor(_config: Config, _car: ƒ.Node) {
             this.config = _config;
@@ -37,7 +28,11 @@ namespace Endabgabe {
 
         public update(): void {
             this.updateTurning(this.updateDriving());
-            this.updateGaz();
+            this.updatePosArray();
+        }
+
+        public getCamPos(): ƒ.Vector3 {
+            return this.posArray[0];
         }
 
         public getSpeedPercent(): number {
@@ -50,25 +45,43 @@ namespace Endabgabe {
 
         private updateDriving(): number {
             let inputDrive: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
+            if (inputDrive != 0 && this.gaz == 0) {
+                inputDrive = 0;
+            }
             this.ctrlDrive.setInput(inputDrive);
-            this.car.mtxLocal.rotateX(this.ctrlDrive.getOutput() * ƒ.Loop.timeFrameGame);
+            this.car.mtxLocal.rotateX(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
             this.currentSpeed = this.ctrlDrive.getOutput();
-            this.updateGaz(this.ctrlDrive.getOutput() * ƒ.Loop.timeFrameGame);
-            return this.ctrlDrive.getOutput() * ƒ.Loop.timeFrameGame;
+            this.updateGaz(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
+            return this.ctrlDrive.getOutput();//ehemals Loop Frame Time
         }
 
-        private updateTurning(_driving: number): void {
+        private updateTurning(_drive: number): void {
             let inputTurn: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT])
             this.ctrlTurn.setInput(inputTurn);
-            if (_driving > 0) {
-                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(1, _driving) * ƒ.Loop.timeFrameGame);
+            if (_drive > 0) {
+                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(1, _drive));//ehemals Loop Frame Time
             } else {
-                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-1, _driving) * ƒ.Loop.timeFrameGame);
+                this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-1, _drive));//ehemals Loop Frame Time
             }
+            this.updateTilt(_drive, this.ctrlTurn.getOutput());
+        }
+
+        private updateTilt(_drive: number, _turn: number): void {
+            _drive = _drive;// / ƒ.Loop.timeFrameGame;
+            this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = ƒ.Vector3.Z((_drive * _turn) * 10);
         }
 
         private updateGaz(_factor: number): void {
-            Math.max(0, this.gaz -= 0.1 * _factor);
+            this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
+        }
+
+        private updatePosArray(): void {
+            let tempPos: ƒ.Vector3 = this.car.mtxLocal.getEulerAngles();
+            let newPos: ƒ.Vector3 = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z)
+            this.posArray.push(newPos);
+            if (this.posArray.length > this.config.camDelay) {
+                this.posArray.splice(0, 1);
+            }
         }
 
         private setupControls(_config: Config): void {

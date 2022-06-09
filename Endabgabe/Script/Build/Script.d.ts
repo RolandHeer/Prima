@@ -8,9 +8,6 @@ declare namespace Script {
     }
 }
 declare namespace Endabgabe {
-}
-declare namespace Endabgabe {
-    import ƒ = FudgeCore;
     interface Config {
         fontHeight: number;
         margin: number;
@@ -18,9 +15,21 @@ declare namespace Endabgabe {
         accelSpeed: number;
         maxTurn: number;
         accelTurn: number;
+        camDelay: number;
         [key: string]: number | string | Config;
     }
-    export class Car {
+}
+declare namespace Endabgabe {
+    import ƒ = FudgeCore;
+    class Cam {
+        private camNode;
+        constructor(_camNode: ƒ.Node);
+        update(_newPos: ƒ.Vector3): void;
+    }
+}
+declare namespace Endabgabe {
+    import ƒ = FudgeCore;
+    class Car {
         private config;
         private car;
         private chassis;
@@ -30,14 +39,17 @@ declare namespace Endabgabe {
         private ctrlTurn;
         private currentSpeed;
         private gaz;
+        private posArray;
         constructor(_config: Config, _car: ƒ.Node);
         update(): void;
+        getCamPos(): ƒ.Vector3;
         getSpeedPercent(): number;
         getGazPercent(): number;
         private updateDriving;
         private updateTurning;
+        private updateTilt;
         private updateGaz;
+        private updatePosArray;
         private setupControls;
     }
-    export {};
 }

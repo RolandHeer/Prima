@@ -2,13 +2,14 @@ namespace Endabgabe {
   import ƒ = FudgeCore;
   ƒ.Debug.info("Main Program Template running!");
 
-  interface Config {
+  export interface Config {
     fontHeight: number;
     margin: number;
     maxSpeed: number;
     accelSpeed: number;
     maxTurn: number;
     accelTurn: number;
+    camDelay: number;
     [key: string]: number | string | Config;
   }
 
@@ -17,6 +18,7 @@ namespace Endabgabe {
   let crc2: CanvasRenderingContext2D;
   let graph: ƒ.Node;
   let viewport: ƒ.Viewport;
+  let camNode: ƒ.Node;
   let cameraNode: ƒ.Node;
   let cameraTranslatorNode: ƒ.Node;
   let cmpCamera: ƒ.ComponentCamera;
@@ -30,6 +32,7 @@ namespace Endabgabe {
 
   ///     OBJECTS    \\\
   let car: Car;
+  let cam: Cam;
 
   /// RUNTIME VALUES \\\
   let coins: number = 0;
@@ -79,6 +82,7 @@ namespace Endabgabe {
     config = await response.json();
     initValues();
     setupCar();
+    setupCam();
     setupAudio();
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
@@ -87,6 +91,7 @@ namespace Endabgabe {
 
   function update(_event: Event): void {
     car.update();
+    cam.update(car.getCamPos());
     //ƒ.Physics.simulate();  // if physics is included and used
     renderScreen();
   }
@@ -102,12 +107,12 @@ namespace Endabgabe {
     crc2.font = config.fontHeight + "px Arial";
     crc2.fillText("Coins: " + coins, config.margin, config.margin * 2);
     // Gaz
-    //crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin * 3, config.margin * 2);
+    crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin, config.margin * 4);
     // Speedometer
     crc2.save();
     crc2.resetTransform();
     crc2.translate(canvas.width - 200, canvas.height - 30);
-    crc2.rotate((car.getSpeedPercent() * 180) * Math.PI / 180);
+    crc2.rotate((Math.abs(car.getSpeedPercent()) * 180) * Math.PI / 180);
     crc2.fillRect(-100, -5, 105, 10)
     crc2.restore();
   }
@@ -126,17 +131,22 @@ namespace Endabgabe {
     }
   }
 
-  function initValues() {
+  function initValues(): void {
     graph = viewport.getBranch();
     crc2 = canvas.getContext("2d");
   }
 
-  function setupCar() {
+  function setupCar(): void {
     carNode = graph.getChildren()[0];
-    cameraNode = carNode.getChildren()[0].getChildrenByName("Camera")[0];
+    car = new Car(config, carNode);
+  }
+
+  function setupCam(): void{
+    camNode = graph.getChildrenByName("Cam")[0];
+    cameraNode = camNode.getChildren()[0].getChildrenByName("Camera")[0];
     cameraTranslatorNode = cameraNode.getChildren()[0];
     viewport.camera = cmpCamera = cameraTranslatorNode.getComponent(ƒ.ComponentCamera);
-    car = new Car(config, carNode);
+    cam = new Cam(camNode);
   }
 
   function setupAudio(): void {
