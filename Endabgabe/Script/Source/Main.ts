@@ -92,7 +92,7 @@ namespace Endabgabe {
   function update(_event: Event): void {
     car.update();
     cam.update(car.getCamPos());
-    //ƒ.Physics.simulate();  // if physics is included and used
+    ƒ.Physics.simulate();  // if physics is included and used
     renderScreen();
   }
 

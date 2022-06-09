@@ -17,7 +17,6 @@ namespace Endabgabe {
         private gaz: number = 100;
         private posArray: ƒ.Vector3[] = [];
         private oldDrive: number = 0;
-        private newDrive: number = 0;
 
         constructor(_config: Config, _car: ƒ.Node) {
             this.config = _config;

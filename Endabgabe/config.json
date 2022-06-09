@@ -5,5 +5,5 @@
     "accelSpeed": 3000,
     "maxTurn": 5,
     "accelTurn": 200,
-    "camDelay": 12
+    "camDelay": 1
 }

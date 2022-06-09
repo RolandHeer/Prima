@@ -41,7 +41,6 @@ declare namespace Endabgabe {
         private gaz;
         private posArray;
         private oldDrive;
-        private newDrive;
         constructor(_config: Config, _car: ƒ.Node);
         update(): void;
         getCamPos(): ƒ.Vector3;

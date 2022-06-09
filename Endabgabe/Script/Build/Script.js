@@ -107,7 +107,7 @@ var Endabgabe;
     function update(_event) {
         car.update();
         cam.update(car.getCamPos());
-        //ƒ.Physics.simulate();  // if physics is included and used
+        ƒ.Physics.simulate(); // if physics is included and used
         renderScreen();
     }
     function renderScreen() {
@@ -190,7 +190,6 @@ var Endabgabe;
         gaz = 100;
         posArray = [];
         oldDrive = 0;
-        newDrive = 0;
         constructor(_config, _car) {
             this.config = _config;
             this.car = _car;
