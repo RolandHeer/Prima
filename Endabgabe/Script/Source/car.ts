@@ -7,7 +7,8 @@ namespace Endabgabe {
         private car: ƒ.Node;
         private chassis: ƒ.Node;
         private rigidBody: ƒ.ComponentRigidbody;
-        private mtxCar: ƒ.ComponentTransform;
+        private mtxTireL: ƒ.Matrix4x4;
+        private mtxTireR: ƒ.Matrix4x4;
 
         private ctrlDrive: ƒ.Control;
         private ctrlTurn: ƒ.Control;
@@ -16,14 +17,15 @@ namespace Endabgabe {
         // Runtime Values 
         private gaz: number = 100;
         private posArray: ƒ.Vector3[] = [];
-        private oldDrive: number = 0;
+        //private oldDrive: number = 0;
 
         constructor(_config: Config, _car: ƒ.Node) {
             this.config = _config;
             this.car = _car;
             this.chassis = _car.getChildren()[0];
             this.rigidBody = this.chassis.getComponent(ƒ.ComponentRigidbody);
-            this.mtxCar = this.car.getComponent(ƒ.ComponentTransform);
+            this.mtxTireL = this.chassis.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.mtxTireR = this.chassis.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
         }
 
@@ -65,6 +67,7 @@ namespace Endabgabe {
                 this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-0.3, _drive));//ehemals Loop Frame Time
             }
             this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
+            this.updateWheels(this.ctrlTurn.getOutput());
         }
 
         private updateYawTilt(_drive: number, _turn: number): void {
@@ -73,7 +76,12 @@ namespace Endabgabe {
             } else {
                 this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = new ƒ.Vector3(0, 0, (-_drive * _turn) * 3);
             }
-            this.oldDrive = _drive;
+            //this.oldDrive = _drive;
+        }
+
+        private updateWheels(_turn: number): void {
+            this.mtxTireL.rotation = ƒ.Vector3.Y(_turn * 3.5);
+            this.mtxTireR.rotation = ƒ.Vector3.Y(_turn * 3.5);
         }
 
         private updateGaz(_factor: number): void {

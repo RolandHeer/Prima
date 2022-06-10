@@ -10,6 +10,7 @@ namespace Endabgabe {
     maxTurn: number;
     accelTurn: number;
     camDelay: number;
+    maxCans: number;
     [key: string]: number | string | Config;
   }
 
@@ -33,6 +34,7 @@ namespace Endabgabe {
   ///     OBJECTS    \\\
   let car: Car;
   let cam: Cam;
+  let world: World;
 
   /// RUNTIME VALUES \\\
   let coins: number = 0;
@@ -84,6 +86,7 @@ namespace Endabgabe {
     setupCar();
     setupCam();
     setupAudio();
+    world = new World(config, graph.getChildrenByName("World")[0]);
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a

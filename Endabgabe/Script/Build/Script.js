@@ -8,6 +8,7 @@ var Script;
         static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
         // Properties may be mutated by users in the editor via the automatically created user interface
         message = "CustomComponentScript added to ";
+        rigid;
         constructor() {
             super();
             // Don't start when running in editor
@@ -28,7 +29,13 @@ var Script;
                     this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
                     this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
                     break;
+                case "loopFrame" /* LOOP_FRAME */:
+                    let v = this.rigid.getPosition();
+                    this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.1));
+                    break;
                 case "nodeDeserialized" /* NODE_DESERIALIZED */:
+                    this.rigid = this.node.getComponent(ƒ.ComponentRigidbody);
+                    ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.hndEvent);
                     // if deserialized the node is now fully reconstructed and access to all its components and children is possible
                     break;
             }
@@ -57,6 +64,7 @@ var Endabgabe;
     ///     OBJECTS    \\\
     let car;
     let cam;
+    let world;
     /// RUNTIME VALUES \\\
     let coins = 0;
     window.addEventListener("load", init);
@@ -101,6 +109,7 @@ var Endabgabe;
         setupCar();
         setupCam();
         setupAudio();
+        world = new Endabgabe.World(config, graph.getChildrenByName("World")[0]);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -163,6 +172,32 @@ var Endabgabe;
 })(Endabgabe || (Endabgabe = {}));
 var Endabgabe;
 (function (Endabgabe) {
+    class World {
+        config;
+        coins;
+        coinGraph;
+        cans;
+        canGraph;
+        constructor(_config, _world) {
+            this.config = _config;
+            this.coins = _world.getChildrenByName("Collectables")[0].getChildrenByName("Coins")[0];
+            this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
+            //this.canGraph = 
+            this.generateCoins();
+            this.generateCans();
+        }
+        generateCoins() {
+        }
+        generateCans() {
+            for (let i = 0; i < this.config.maxCans; i++) {
+                //this.cans.addChild()
+            }
+        }
+    }
+    Endabgabe.World = World;
+})(Endabgabe || (Endabgabe = {}));
+var Endabgabe;
+(function (Endabgabe) {
     class Cam {
         camNode;
         constructor(_camNode) {
@@ -182,20 +217,22 @@ var Endabgabe;
         car;
         chassis;
         rigidBody;
-        mtxCar;
+        mtxTireL;
+        mtxTireR;
         ctrlDrive;
         ctrlTurn;
         currentSpeed;
         // Runtime Values 
         gaz = 100;
         posArray = [];
-        oldDrive = 0;
+        //private oldDrive: number = 0;
         constructor(_config, _car) {
             this.config = _config;
             this.car = _car;
             this.chassis = _car.getChildren()[0];
             this.rigidBody = this.chassis.getComponent(ƒ.ComponentRigidbody);
-            this.mtxCar = this.car.getComponent(ƒ.ComponentTransform);
+            this.mtxTireL = this.chassis.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.mtxTireR = this.chassis.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
         }
         update() {
@@ -232,6 +269,7 @@ var Endabgabe;
                 this.car.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-0.3, _drive)); //ehemals Loop Frame Time
             }
             this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
+            this.updateWheels(this.ctrlTurn.getOutput());
         }
         updateYawTilt(_drive, _turn) {
             if (_drive > 0) {
@@ -240,7 +278,11 @@ var Endabgabe;
             else {
                 this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = new ƒ.Vector3(0, 0, (-_drive * _turn) * 3);
             }
-            this.oldDrive = _drive;
+            //this.oldDrive = _drive;
+        }
+        updateWheels(_turn) {
+            this.mtxTireL.rotation = ƒ.Vector3.Y(_turn * 3.5);
+            this.mtxTireR.rotation = ƒ.Vector3.Y(_turn * 3.5);
         }
         updateGaz(_factor) {
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));

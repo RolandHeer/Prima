@@ -8,6 +8,7 @@ namespace Script {
     // Properties may be mutated by users in the editor via the automatically created user interface
     public message: string = "CustomComponentScript added to ";
 
+    private rigid: ƒ.ComponentRigidbody;
 
     constructor() {
       super();
@@ -32,7 +33,13 @@ namespace Script {
           this.removeEventListener(ƒ.EVENT.COMPONENT_ADD, this.hndEvent);
           this.removeEventListener(ƒ.EVENT.COMPONENT_REMOVE, this.hndEvent);
           break;
+        case ƒ.EVENT.LOOP_FRAME:
+          let v: ƒ.Vector3 = this.rigid.getPosition();
+          this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.1),);
+          break;
         case ƒ.EVENT.NODE_DESERIALIZED:
+          this.rigid = this.node.getComponent(ƒ.ComponentRigidbody);
+          ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.hndEvent);
           // if deserialized the node is now fully reconstructed and access to all its components and children is possible
           break;
       }

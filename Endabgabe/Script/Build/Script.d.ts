@@ -3,6 +3,7 @@ declare namespace Script {
     class CustomComponentScript extends ƒ.ComponentScript {
         static readonly iSubclass: number;
         message: string;
+        private rigid;
         constructor();
         hndEvent: (_event: Event) => void;
     }
@@ -16,7 +17,21 @@ declare namespace Endabgabe {
         maxTurn: number;
         accelTurn: number;
         camDelay: number;
+        maxCans: number;
         [key: string]: number | string | Config;
+    }
+}
+declare namespace Endabgabe {
+    import ƒ = FudgeCore;
+    class World {
+        private config;
+        private coins;
+        private coinGraph;
+        private cans;
+        private canGraph;
+        constructor(_config: Config, _world: ƒ.Node);
+        private generateCoins;
+        private generateCans;
     }
 }
 declare namespace Endabgabe {
@@ -34,13 +49,13 @@ declare namespace Endabgabe {
         private car;
         private chassis;
         private rigidBody;
-        private mtxCar;
+        private mtxTireL;
+        private mtxTireR;
         private ctrlDrive;
         private ctrlTurn;
         private currentSpeed;
         private gaz;
         private posArray;
-        private oldDrive;
         constructor(_config: Config, _car: ƒ.Node);
         update(): void;
         getCamPos(): ƒ.Vector3;
@@ -49,6 +64,7 @@ declare namespace Endabgabe {
         private updateDriving;
         private updateTurning;
         private updateYawTilt;
+        private updateWheels;
         private updateGaz;
         private updatePosArray;
         private setupControls;
