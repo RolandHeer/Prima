@@ -31,7 +31,7 @@ var Script;
                     break;
                 case "loopFrame" /* LOOP_FRAME */:
                     let v = this.rigid.getPosition();
-                    this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.1));
+                    this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.2));
                     break;
                 case "nodeDeserialized" /* NODE_DESERIALIZED */:
                     this.rigid = this.node.getComponent(ƒ.ComponentRigidbody);
@@ -172,6 +172,7 @@ var Endabgabe;
 })(Endabgabe || (Endabgabe = {}));
 var Endabgabe;
 (function (Endabgabe) {
+    var ƒ = FudgeCore;
     class World {
         config;
         coins;
@@ -187,11 +188,39 @@ var Endabgabe;
             this.generateCans();
         }
         generateCoins() {
+            for (let j = 0; j < this.config.maxCoinCluster; j++) {
+                let tempCluster = new ƒ.Node("Cluster" + j);
+                let pos = new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+                for (let i = 0; i < 10; i++) {
+                    let tempPos = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(pos.x + Math.random() * 0.1, pos.y + Math.random() * 0.1, pos.z + Math.random() * 0.1), 50.5);
+                    let tempCoinNode = new ƒ.Node("Coin" + i);
+                    let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
+                    tempCoinNode.addComponent(cmpTransform);
+                    this.addGraphToNode(tempCoinNode, "Graph|2022-06-11T00:20:48.515Z|71676");
+                    tempCoinNode.mtxLocal.translation = tempPos;
+                    tempCoinNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
+                    tempCoinNode.mtxLocal.rotateX(-90);
+                    tempCluster.addChild(tempCoinNode);
+                }
+                this.coins.addChild(tempCluster);
+            }
         }
         generateCans() {
             for (let i = 0; i < this.config.maxCans; i++) {
-                //this.cans.addChild()
+                let tempPos = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1), 50.2);
+                let tempCanNode = new ƒ.Node("Can" + i);
+                let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
+                tempCanNode.addComponent(cmpTransform);
+                this.addGraphToNode(tempCanNode, "Graph|2022-06-10T22:51:14.617Z|07901");
+                tempCanNode.mtxLocal.translation = tempPos;
+                tempCanNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
+                tempCanNode.mtxLocal.rotateX(-90);
+                this.cans.addChild(tempCanNode);
             }
+        }
+        async addGraphToNode(_node, _id) {
+            const graph = await ƒ.Project.createGraphInstance(ƒ.Project.resources[_id]);
+            _node.addChild(graph);
         }
     }
     Endabgabe.World = World;

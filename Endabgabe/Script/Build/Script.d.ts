@@ -17,6 +17,7 @@ declare namespace Endabgabe {
         maxTurn: number;
         accelTurn: number;
         camDelay: number;
+        maxCoinCluster: number;
         maxCans: number;
         [key: string]: number | string | Config;
     }
@@ -32,6 +33,7 @@ declare namespace Endabgabe {
         constructor(_config: Config, _world: ƒ.Node);
         private generateCoins;
         private generateCans;
+        private addGraphToNode;
     }
 }
 declare namespace Endabgabe {

@@ -6,5 +6,6 @@
     "maxTurn": 5,
     "accelTurn": 200,
     "camDelay": 12,
-    "maxCans": 30
+    "maxCoinCluster": 6,
+    "maxCans": 3
 }

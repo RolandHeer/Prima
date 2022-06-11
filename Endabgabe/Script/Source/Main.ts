@@ -10,6 +10,7 @@ namespace Endabgabe {
     maxTurn: number;
     accelTurn: number;
     camDelay: number;
+    maxCoinCluster: number;
     maxCans: number;
     [key: string]: number | string | Config;
   }
