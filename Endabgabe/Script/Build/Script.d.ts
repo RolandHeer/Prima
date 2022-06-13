@@ -49,7 +49,8 @@ declare namespace Endabgabe {
     class Car {
         private config;
         private car;
-        private chassis;
+        private main;
+        private body;
         private rigidBody;
         private mtxTireL;
         private mtxTireR;

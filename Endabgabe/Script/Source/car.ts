@@ -5,7 +5,8 @@ namespace Endabgabe {
 
         private config: Config;
         private car: ƒ.Node;
-        private chassis: ƒ.Node;
+        private main: ƒ.Node;
+        private body: ƒ.Node;
         private rigidBody: ƒ.ComponentRigidbody;
         private mtxTireL: ƒ.Matrix4x4;
         private mtxTireR: ƒ.Matrix4x4;
@@ -22,10 +23,11 @@ namespace Endabgabe {
         constructor(_config: Config, _car: ƒ.Node) {
             this.config = _config;
             this.car = _car;
-            this.chassis = _car.getChildren()[0];
-            this.rigidBody = this.chassis.getComponent(ƒ.ComponentRigidbody);
-            this.mtxTireL = this.chassis.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.mtxTireR = this.chassis.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.main = _car.getChildren()[0];
+            this.body = this.main.getChildrenByName("Body")[0];
+            this.rigidBody = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
         }
 
@@ -72,9 +74,9 @@ namespace Endabgabe {
 
         private updateYawTilt(_drive: number, _turn: number): void {
             if (_drive > 0) {
-                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = new ƒ.Vector3(0, 0, (_drive * _turn) * 3);
+                this.body.mtxLocal.rotation = new ƒ.Vector3(0, 0, (_drive * _turn) * 3);
             } else {
-                this.chassis.getComponents(ƒ.ComponentMesh)[0].mtxPivot.rotation = new ƒ.Vector3(0, 0, (-_drive * _turn) * 3);
+                this.body.mtxLocal.rotation = new ƒ.Vector3(0, 0, (-_drive * _turn) * 3);
             }
             //this.oldDrive = _drive;
         }
