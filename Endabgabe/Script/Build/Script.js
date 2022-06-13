@@ -31,7 +31,7 @@ var Script;
                     break;
                 case "loopFrame" /* LOOP_FRAME */:
                     let v = this.rigid.getPosition();
-                    this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.2));
+                    this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.4));
                     break;
                 case "nodeDeserialized" /* NODE_DESERIALIZED */:
                     this.rigid = this.node.getComponent(ƒ.ComponentRigidbody);
