@@ -312,8 +312,8 @@ var Endabgabe;
             //this.oldDrive = _drive;
         }
         updateWheels(_turn) {
-            this.mtxTireL.rotation = ƒ.Vector3.Y(_turn * 3.5);
-            this.mtxTireR.rotation = ƒ.Vector3.Y(_turn * 3.5);
+            this.mtxTireL.rotation = ƒ.Vector3.Y(_turn * 4);
+            this.mtxTireR.rotation = ƒ.Vector3.Y(_turn * 4);
         }
         updateGaz(_factor) {
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));

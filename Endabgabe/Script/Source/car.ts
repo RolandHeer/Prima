@@ -82,8 +82,8 @@ namespace Endabgabe {
         }
 
         private updateWheels(_turn: number): void {
-            this.mtxTireL.rotation = ƒ.Vector3.Y(_turn * 3.5);
-            this.mtxTireR.rotation = ƒ.Vector3.Y(_turn * 3.5);
+            this.mtxTireL.rotation = ƒ.Vector3.Y(_turn * 4);
+            this.mtxTireR.rotation = ƒ.Vector3.Y(_turn * 4);
         }
 
         private updateGaz(_factor: number): void {
