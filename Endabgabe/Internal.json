@@ -203,6 +203,68 @@
       "url": "obj\\MetalParts.obj"
     }
   },
+  "MeshObj|2022-06-13T22:14:38.342Z|50732": {
+    "ƒ.MeshObj": {
+      "idResource": "MeshObj|2022-06-13T22:14:38.342Z|50732",
+      "name": "body",
+      "type": "MeshObj",
+      "url": "obj\\body.obj"
+    }
+  },
+  "Material|2022-06-10T22:43:01.782Z|32989": {
+    "ƒ.Material": {
+      "name": "PaintMat",
+      "idResource": "Material|2022-06-10T22:43:01.782Z|32989",
+      "shader": "ShaderGouraud",
+      "coat": {
+        "ƒ.CoatRemissive": {
+          "color": "[1, 1, 1, 1]",
+          "diffuse": 1,
+          "specular": 5
+        }
+      }
+    }
+  },
+  "MeshObj|2022-06-13T22:22:16.888Z|61148": {
+    "ƒ.MeshObj": {
+      "idResource": "MeshObj|2022-06-13T22:22:16.888Z|61148",
+      "name": "windows",
+      "type": "MeshObj",
+      "url": "obj\\windows.obj"
+    }
+  },
+  "MeshObj|2022-06-13T22:57:07.156Z|54693": {
+    "ƒ.MeshObj": {
+      "idResource": "MeshObj|2022-06-13T22:57:07.156Z|54693",
+      "name": "obj\\shadow.obj",
+      "type": "MeshObj",
+      "url": "obj\\shadow.obj"
+    }
+  },
+  "Material|2022-06-13T22:57:24.149Z|57169": {
+    "ƒ.Material": {
+      "name": "ContactShadow",
+      "idResource": "Material|2022-06-13T22:57:24.149Z|57169",
+      "shader": "ShaderLitTextured",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2022-06-13T23:05:52.335Z|54188"
+        }
+      }
+    }
+  },
+  "TextureImage|2022-06-13T23:05:52.335Z|54188": {
+    "ƒ.TextureImage": {
+      "url": "tex\\shadow.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-06-13T23:05:52.335Z|54188",
+        "name": "shadow.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
   "Graph|2022-05-18T20:10:05.727Z|72077": {
     "ƒ.Graph": {
       "name": "Game",
@@ -1200,15 +1262,7 @@
                         "name": "Coins",
                         "active": true,
                         "components": {},
-                        "children": [
-                          {
-                            "ƒ.GraphInstance": {
-                              "deserializeFromSource": true,
-                              "name": "CoinGraph",
-                              "idSource": "Graph|2022-06-11T00:20:48.515Z|71676"
-                            }
-                          }
-                        ]
+                        "children": []
                       }
                     },
                     {
@@ -1216,15 +1270,7 @@
                         "name": "Cans",
                         "active": true,
                         "components": {},
-                        "children": [
-                          {
-                            "ƒ.GraphInstance": {
-                              "deserializeFromSource": true,
-                              "name": "CanGraph",
-                              "idSource": "Graph|2022-06-10T22:51:14.617Z|07901"
-                            }
-                          }
-                        ]
+                        "children": []
                       }
                     }
                   ]
@@ -1633,20 +1679,6 @@
       "url": "obj\\GazCan.obj"
     }
   },
-  "Material|2022-06-10T22:43:01.782Z|32989": {
-    "ƒ.Material": {
-      "name": "PaintMat",
-      "idResource": "Material|2022-06-10T22:43:01.782Z|32989",
-      "shader": "ShaderGouraud",
-      "coat": {
-        "ƒ.CoatRemissive": {
-          "color": "[1, 1, 1, 1]",
-          "diffuse": 1,
-          "specular": 5
-        }
-      }
-    }
-  },
   "Graph|2022-06-10T22:51:14.617Z|07901": {
     "ƒ.Graph": {
       "name": "CanGraph",
@@ -1710,17 +1742,26 @@
               "dampRotation": 0.1,
               "effectGravity": 1,
               "typeBody": "STATIC",
-              "typeCollider": "CUBE",
+              "typeCollider": "CYLINDER",
               "isTrigger": false,
               "id": 1,
               "pivot": {
                 "translation": "[0, 0.3600001335144043, 0]",
                 "rotation": "[0, 0, 0]",
-                "scaling": "[0.30000001192092896, 0.699999988079071, 0.5999999642372131]"
+                "scaling": "[0.7000000476837158, 0.699999988079071, 0.5999999642372131]"
               },
               "Component": {
                 "active": true
               }
+            }
+          }
+        ],
+        "RotationScript": [
+          {
+            "Script.RotationScript": {
+              "active": true,
+              "message": "RotationScript added to ",
+              "rotationSpeed": 3
             }
           }
         ]
@@ -1814,27 +1855,20 @@
               }
             }
           }
+        ],
+        "RotationScript": [
+          {
+            "Script.RotationScript": {
+              "active": true,
+              "message": "RotationScript added to ",
+              "rotationSpeed": 5
+            }
+          }
         ]
       },
       "children": [],
       "idResource": "Graph|2022-06-11T00:20:48.515Z|71676",
       "type": "Graph"
-    }
-  },
-  "MeshObj|2022-06-13T22:14:38.342Z|50732": {
-    "ƒ.MeshObj": {
-      "idResource": "MeshObj|2022-06-13T22:14:38.342Z|50732",
-      "name": "body",
-      "type": "MeshObj",
-      "url": "obj\\body.obj"
-    }
-  },
-  "MeshObj|2022-06-13T22:22:16.888Z|61148": {
-    "ƒ.MeshObj": {
-      "idResource": "MeshObj|2022-06-13T22:22:16.888Z|61148",
-      "name": "windows",
-      "type": "MeshObj",
-      "url": "obj\\windows.obj"
     }
   },
   "Graph|2022-06-13T22:52:37.498Z|91425": {
@@ -1914,11 +1948,11 @@
             }
           }
         ],
-        "CustomComponentScript": [
+        "GravityScript": [
           {
-            "Script.CustomComponentScript": {
+            "Script.GravityScript": {
               "active": true,
-              "message": "CustomComponentScript added to "
+              "message": "GravityScript added to "
             }
           }
         ]
@@ -1983,38 +2017,6 @@
       ],
       "idResource": "Graph|2022-06-13T22:52:37.498Z|91425",
       "type": "Graph"
-    }
-  },
-  "MeshObj|2022-06-13T22:57:07.156Z|54693": {
-    "ƒ.MeshObj": {
-      "idResource": "MeshObj|2022-06-13T22:57:07.156Z|54693",
-      "name": "obj\\shadow.obj",
-      "type": "MeshObj",
-      "url": "obj\\shadow.obj"
-    }
-  },
-  "Material|2022-06-13T22:57:24.149Z|57169": {
-    "ƒ.Material": {
-      "name": "ContactShadow",
-      "idResource": "Material|2022-06-13T22:57:24.149Z|57169",
-      "shader": "ShaderLitTextured",
-      "coat": {
-        "ƒ.CoatTextured": {
-          "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2022-06-13T23:05:52.335Z|54188"
-        }
-      }
-    }
-  },
-  "TextureImage|2022-06-13T23:05:52.335Z|54188": {
-    "ƒ.TextureImage": {
-      "url": "tex\\shadow.png",
-      "type": "TextureImage",
-      "Texture": {
-        "idResource": "TextureImage|2022-06-13T23:05:52.335Z|54188",
-        "name": "shadow.png",
-        "mipmap": "CRISP"
-      }
     }
   }
 }

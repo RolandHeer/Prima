@@ -26,6 +26,7 @@ namespace Endabgabe {
             this.main = _car.getChildren()[0];
             this.body = this.main.getChildrenByName("Body")[0];
             this.rigidBody = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.rigidBody.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision)
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
@@ -46,6 +47,10 @@ namespace Endabgabe {
 
         public getGazPercent(): number {
             return this.gaz;
+        }
+
+        private hndCollision(): void{
+            console.log("ich collidiere");
         }
 
         private updateDriving(): number {

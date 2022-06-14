@@ -1,6 +1,6 @@
 declare namespace Script {
     import ƒ = FudgeCore;
-    class CustomComponentScript extends ƒ.ComponentScript {
+    class GravityScript extends ƒ.ComponentScript {
         static readonly iSubclass: number;
         message: string;
         private rigid;
@@ -20,6 +20,17 @@ declare namespace Endabgabe {
         maxCoinCluster: number;
         maxCans: number;
         [key: string]: number | string | Config;
+    }
+}
+declare namespace Script {
+    import ƒ = FudgeCore;
+    class RotationScript extends ƒ.ComponentScript {
+        static readonly iSubclass: number;
+        message: string;
+        private mtx;
+        private rotationSpeed;
+        constructor();
+        hndEvent: (_event: Event) => void;
     }
 }
 declare namespace Endabgabe {
@@ -64,6 +75,7 @@ declare namespace Endabgabe {
         getCamPos(): ƒ.Vector3;
         getSpeedPercent(): number;
         getGazPercent(): number;
+        private hndCollision;
         private updateDriving;
         private updateTurning;
         private updateYawTilt;

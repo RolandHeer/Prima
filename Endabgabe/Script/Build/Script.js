@@ -3,11 +3,11 @@ var Script;
 (function (Script) {
     var ƒ = FudgeCore;
     ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
-    class CustomComponentScript extends ƒ.ComponentScript {
+    class GravityScript extends ƒ.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
-        static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
+        static iSubclass = ƒ.Component.registerSubclass(GravityScript);
         // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "CustomComponentScript added to ";
+        message = "GravityScript added to ";
         rigid;
         constructor() {
             super();
@@ -23,25 +23,25 @@ var Script;
         hndEvent = (_event) => {
             switch (_event.type) {
                 case "componentAdd" /* COMPONENT_ADD */:
-                    ƒ.Debug.log(this.message, this.node);
+                    //ƒ.Debug.log(this.message, this.node);
                     break;
                 case "componentRemove" /* COMPONENT_REMOVE */:
                     this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
                     this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
                     break;
-                case "loopFrame" /* LOOP_FRAME */:
+                case "renderPrepare" /* RENDER_PREPARE */:
                     let v = this.rigid.getPosition();
-                    this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.4));
+                    this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.3));
                     break;
                 case "nodeDeserialized" /* NODE_DESERIALIZED */:
                     this.rigid = this.node.getComponent(ƒ.ComponentRigidbody);
-                    ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.hndEvent);
+                    this.node.addEventListener("renderPrepare" /* RENDER_PREPARE */, this.hndEvent);
                     // if deserialized the node is now fully reconstructed and access to all its components and children is possible
                     break;
             }
         };
     }
-    Script.CustomComponentScript = CustomComponentScript;
+    Script.GravityScript = GravityScript;
 })(Script || (Script = {}));
 var Endabgabe;
 (function (Endabgabe) {
@@ -170,6 +170,51 @@ var Endabgabe;
         ƒ.AudioManager.default.listenTo(graph);
     }
 })(Endabgabe || (Endabgabe = {}));
+var Script;
+(function (Script) {
+    var ƒ = FudgeCore;
+    ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
+    class RotationScript extends ƒ.ComponentScript {
+        // Register the script as component for use in the editor via drag&drop
+        static iSubclass = ƒ.Component.registerSubclass(RotationScript);
+        // Properties may be mutated by users in the editor via the automatically created user interface
+        message = "RotationScript added to ";
+        mtx;
+        rotationSpeed = 4;
+        constructor() {
+            super();
+            // Don't start when running in editor
+            if (ƒ.Project.mode == ƒ.MODE.EDITOR)
+                return;
+            // Listen to this component being added to or removed from a node
+            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
+        }
+        // Activate the functions of this component as response to events
+        hndEvent = (_event) => {
+            switch (_event.type) {
+                case "componentAdd" /* COMPONENT_ADD */:
+                    //ƒ.Debug.log(this.message, this.node);
+                    break;
+                case "componentRemove" /* COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                    break;
+                case "renderPrepare" /* RENDER_PREPARE */:
+                    this.mtx.rotate(ƒ.Vector3.Y(this.rotationSpeed));
+                    break;
+                case "nodeDeserialized" /* NODE_DESERIALIZED */:
+                    this.mtx = this.node.getComponent(ƒ.ComponentMesh).mtxPivot;
+                    this.mtx.rotate(ƒ.Vector3.Y(Math.random() * 360));
+                    this.node.addEventListener("renderPrepare" /* RENDER_PREPARE */, this.hndEvent);
+                    // if deserialized the node is now fully reconstructed and access to all its components and children is possible
+                    break;
+            }
+        };
+    }
+    Script.RotationScript = RotationScript;
+})(Script || (Script = {}));
 var Endabgabe;
 (function (Endabgabe) {
     var ƒ = FudgeCore;
@@ -262,6 +307,7 @@ var Endabgabe;
             this.main = _car.getChildren()[0];
             this.body = this.main.getChildrenByName("Body")[0];
             this.rigidBody = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.rigidBody.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
@@ -278,6 +324,9 @@ var Endabgabe;
         }
         getGazPercent() {
             return this.gaz;
+        }
+        hndCollision() {
+            console.log("ich collidiere");
         }
         updateDriving() {
             let inputDrive = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]);
