@@ -38,7 +38,6 @@ namespace Endabgabe {
   let world: World;
 
   /// RUNTIME VALUES \\\
-  let coins: number = 0;
 
 
   window.addEventListener("load", init);
@@ -84,10 +83,10 @@ namespace Endabgabe {
     let response: Response = await fetch("config.json");
     config = await response.json();
     initValues();
+    world = new World(config, graph.getChildrenByName("World")[0]);
     setupCar();
     setupCam();
     setupAudio();
-    world = new World(config, graph.getChildrenByName("World")[0]);
 
     ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, update);
     ƒ.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -109,7 +108,7 @@ namespace Endabgabe {
     // Coins
     crc2.fillStyle = "#fff";
     crc2.font = config.fontHeight + "px Arial";
-    crc2.fillText("Coins: " + coins, config.margin, config.margin * 2);
+    crc2.fillText("Coins: " + car.getScore(), config.margin, config.margin * 2);
     // Gaz
     crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin, config.margin * 4);
     // Speedometer

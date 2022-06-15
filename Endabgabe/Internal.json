@@ -326,9 +326,9 @@
                           "isTrigger": false,
                           "id": 2,
                           "pivot": {
-                            "translation": "[0, 0.5, 0.04999999329447746]",
+                            "translation": "[0, 0.48000001907348633, 0.04999999329447746]",
                             "rotation": "[0, 0, 0]",
-                            "scaling": "[1.559999942779541, 0.8999999761581421, 3.5999999046325684]"
+                            "scaling": "[1.559999942779541, 1.100000023841858, 3.5999999046325684]"
                           },
                           "Component": {
                             "active": true
@@ -1239,7 +1239,7 @@
                           "pivot": {
                             "translation": "[0, 0, 0]",
                             "rotation": "[0, 0, 0]",
-                            "scaling": "[100.0999984741211, 100.0999984741211, 100.0999984741211]"
+                            "scaling": "[100, 100, 100]"
                           },
                           "Component": {
                             "active": true
@@ -1743,7 +1743,7 @@
               "effectGravity": 1,
               "typeBody": "STATIC",
               "typeCollider": "CYLINDER",
-              "isTrigger": false,
+              "isTrigger": true,
               "id": 1,
               "pivot": {
                 "translation": "[0, 0.3600001335144043, 0]",
@@ -1843,7 +1843,7 @@
               "effectGravity": 1,
               "typeBody": "STATIC",
               "typeCollider": "SPHERE",
-              "isTrigger": false,
+              "isTrigger": true,
               "id": 4,
               "pivot": {
                 "translation": "[0, 0, 0]",
@@ -1927,12 +1927,12 @@
           {
             "ƒ.ComponentRigidbody": {
               "initialization": "TO_PIVOT",
-              "friction": 0.2,
-              "restitution": 0.2,
-              "mass": 1,
+              "friction": 0.30000000000000004,
+              "restitution": 0.10000000000000002,
+              "mass": 5,
               "dampTranslation": 0.1,
               "dampRotation": 0.1,
-              "effectGravity": 1,
+              "effectGravity": 0,
               "typeBody": "DYNAMIC",
               "typeCollider": "CYLINDER",
               "isTrigger": false,

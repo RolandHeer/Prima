@@ -66,7 +66,6 @@ var Endabgabe;
     let cam;
     let world;
     /// RUNTIME VALUES \\\
-    let coins = 0;
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
     let dialog;
@@ -106,10 +105,10 @@ var Endabgabe;
         let response = await fetch("config.json");
         config = await response.json();
         initValues();
+        world = new Endabgabe.World(config, graph.getChildrenByName("World")[0]);
         setupCar();
         setupCam();
         setupAudio();
-        world = new Endabgabe.World(config, graph.getChildrenByName("World")[0]);
         ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
@@ -127,7 +126,7 @@ var Endabgabe;
         // Coins
         crc2.fillStyle = "#fff";
         crc2.font = config.fontHeight + "px Arial";
-        crc2.fillText("Coins: " + coins, config.margin, config.margin * 2);
+        crc2.fillText("Coins: " + car.getScore(), config.margin, config.margin * 2);
         // Gaz
         crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin, config.margin * 4);
         // Speedometer
@@ -221,27 +220,28 @@ var Endabgabe;
     class World {
         config;
         coins;
-        coinGraph;
+        static coinGraphID;
         cans;
-        canGraph;
+        static canGraphID;
         constructor(_config, _world) {
             this.config = _config;
             this.coins = _world.getChildrenByName("Collectables")[0].getChildrenByName("Coins")[0];
+            World.coinGraphID = "Graph|2022-06-11T00:20:48.515Z|71676";
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
-            //this.canGraph = 
-            this.generateCoins();
-            this.generateCans();
+            World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
+            this.generateCoins(this.config.maxCoinCluster, 10);
+            this.generateCans(this.config.maxCans);
         }
-        generateCoins() {
-            for (let j = 0; j < this.config.maxCoinCluster; j++) {
+        generateCoins(_clusterCount, _clusterSize) {
+            for (let j = 0; j < _clusterCount; j++) {
                 let tempCluster = new ƒ.Node("Cluster" + j);
                 let pos = new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < _clusterSize; i++) {
                     let tempPos = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(pos.x + Math.random() * 0.1, pos.y + Math.random() * 0.1, pos.z + Math.random() * 0.1), 50.5);
                     let tempCoinNode = new ƒ.Node("Coin" + i);
                     let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
                     tempCoinNode.addComponent(cmpTransform);
-                    this.addGraphToNode(tempCoinNode, "Graph|2022-06-11T00:20:48.515Z|71676");
+                    this.addGraphToNode(tempCoinNode, World.coinGraphID);
                     tempCoinNode.mtxLocal.translation = tempPos;
                     tempCoinNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
                     tempCoinNode.mtxLocal.rotateX(-90);
@@ -250,13 +250,13 @@ var Endabgabe;
                 this.coins.addChild(tempCluster);
             }
         }
-        generateCans() {
-            for (let i = 0; i < this.config.maxCans; i++) {
+        generateCans(_canCount) {
+            for (let i = 0; i < _canCount; i++) {
                 let tempPos = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1), 50.2);
                 let tempCanNode = new ƒ.Node("Can" + i);
                 let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
                 tempCanNode.addComponent(cmpTransform);
-                this.addGraphToNode(tempCanNode, "Graph|2022-06-10T22:51:14.617Z|07901");
+                this.addGraphToNode(tempCanNode, World.canGraphID);
                 tempCanNode.mtxLocal.translation = tempPos;
                 tempCanNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
                 tempCanNode.mtxLocal.rotateX(-90);
@@ -299,6 +299,7 @@ var Endabgabe;
         currentSpeed;
         // Runtime Values 
         gaz = 100;
+        score = 0;
         posArray = [];
         //private oldDrive: number = 0;
         constructor(_config, _car) {
@@ -325,9 +326,20 @@ var Endabgabe;
         getGazPercent() {
             return this.gaz;
         }
-        hndCollision() {
-            console.log("ich collidiere");
+        getScore() {
+            return this.score;
         }
+        hndCollision = (_event) => {
+            let graph = _event.cmpRigidbody.node;
+            if (graph.idSource == Endabgabe.World.coinGraphID) {
+                this.score++;
+                graph.getParent().getParent().removeChild(graph.getParent());
+            }
+            if (graph.idSource == Endabgabe.World.canGraphID) {
+                this.gaz = 100;
+                graph.getParent().getParent().removeChild(graph.getParent());
+            }
+        };
         updateDriving() {
             let inputDrive = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]);
             if (inputDrive != 0 && this.gaz == 0) {

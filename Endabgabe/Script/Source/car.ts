@@ -17,6 +17,7 @@ namespace Endabgabe {
 
         // Runtime Values 
         private gaz: number = 100;
+        private score: number = 0;
         private posArray: ƒ.Vector3[] = [];
         //private oldDrive: number = 0;
 
@@ -26,7 +27,7 @@ namespace Endabgabe {
             this.main = _car.getChildren()[0];
             this.body = this.main.getChildrenByName("Body")[0];
             this.rigidBody = this.main.getComponent(ƒ.ComponentRigidbody);
-            this.rigidBody.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision)
+            this.rigidBody.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
@@ -49,8 +50,20 @@ namespace Endabgabe {
             return this.gaz;
         }
 
-        private hndCollision(): void{
-            console.log("ich collidiere");
+        public getScore(): number{
+            return this.score;
+        }
+
+        private hndCollision =(_event: ƒ.EventPhysics): void =>{
+            let graph: ƒ.GraphInstance = <ƒ.GraphInstance>_event.cmpRigidbody.node;
+            if(graph.idSource == World.coinGraphID){
+                this.score ++;
+                graph.getParent().getParent().removeChild(graph.getParent());
+            }
+            if(graph.idSource == World.canGraphID){
+                this.gaz = 100;
+                graph.getParent().getParent().removeChild(graph.getParent());
+            }
         }
 
         private updateDriving(): number {

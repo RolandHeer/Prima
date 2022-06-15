@@ -38,9 +38,9 @@ declare namespace Endabgabe {
     class World {
         private config;
         private coins;
-        private coinGraph;
+        static coinGraphID: string;
         private cans;
-        private canGraph;
+        static canGraphID: string;
         constructor(_config: Config, _world: ƒ.Node);
         private generateCoins;
         private generateCans;
@@ -69,12 +69,14 @@ declare namespace Endabgabe {
         private ctrlTurn;
         private currentSpeed;
         private gaz;
+        private score;
         private posArray;
         constructor(_config: Config, _car: ƒ.Node);
         update(): void;
         getCamPos(): ƒ.Vector3;
         getSpeedPercent(): number;
         getGazPercent(): number;
+        getScore(): number;
         private hndCollision;
         private updateDriving;
         private updateTurning;
