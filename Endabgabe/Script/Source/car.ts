@@ -68,8 +68,16 @@ namespace Endabgabe {
 
         private updateDriving(): number {
             let inputDrive: number = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])
-            if (inputDrive != 0 && this.gaz == 0) {
-                inputDrive = 0;
+            if (this.ctrlDrive.getOutput() >= 0) {              //Driving Forward
+                this.ctrlDrive.setFactor(this.config.maxSpeed);
+                if(this.gaz == 0 && inputDrive > 0){            //Disable Speedup without gaz while still beeing able to break
+                    inputDrive = 0;
+                }
+            }else{                                              //Driving Backward
+                this.ctrlDrive.setFactor(this.config.maxSpeed/3);
+                if(this.gaz == 0 && inputDrive < 0){            //Disable Speedup without gaz while still beeing able to break
+                    inputDrive = 0;
+                }
             }
             this.ctrlDrive.setInput(inputDrive);
             this.car.mtxLocal.rotateX(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
@@ -118,7 +126,7 @@ namespace Endabgabe {
         }
 
         private setupControls(_config: Config): void {
-            this.ctrlDrive = new ƒ.Control("cntrlWalk", _config.maxSpeed, ƒ.CONTROL_TYPE.PROPORTIONAL);
+            this.ctrlDrive = new ƒ.Control("cntrlDrive", _config.maxSpeed, ƒ.CONTROL_TYPE.PROPORTIONAL);
             this.ctrlDrive.setDelay(_config.accelSpeed);
             this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, ƒ.CONTROL_TYPE.PROPORTIONAL);
             this.ctrlTurn.setDelay(_config.accelTurn);
