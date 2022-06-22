@@ -14,15 +14,15 @@ namespace Endabgabe {
         protected ctrlTurn: ƒ.Control;
 
         public abstract update(): void;
-        
+
         protected abstract updateDriving(_inputDrive: number): number;
 
-        protected updateTurning(_drive: number, _turnInput: number): void{
+        protected updateTurning(_drive: number, _turnInput: number): void {
             this.ctrlTurn.setInput(_turnInput);
             if (_drive > 0) {
-                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive));//ehemals Loop Frame Time
+                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive));
             } else {
-                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-0.3, _drive));//ehemals Loop Frame Time
+                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(-0.3, _drive));
             }
             this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());

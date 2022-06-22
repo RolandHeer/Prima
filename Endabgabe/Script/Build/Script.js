@@ -28,10 +28,10 @@ var Endabgabe;
         updateTurning(_drive, _turnInput) {
             this.ctrlTurn.setInput(_turnInput);
             if (_drive > 0) {
-                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive)); //ehemals Loop Frame Time
+                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive));
             }
             else {
-                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.max(-0.3, _drive)); //ehemals Loop Frame Time
+                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(-0.3, _drive));
             }
             this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
@@ -261,6 +261,7 @@ var Endabgabe;
             //console.log("local y: " + Math.round(this.main.mtxLocal.translation.y) + ", world y: " + Math.round(this.main.mtxWorld.translation.y));
             this.updateTurning(this.updateDriving(), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
             this.updatePosArray();
+            // this.applyRotation();
         }
         getCamPos() {
             return this.posArray[0];
@@ -275,7 +276,7 @@ var Endabgabe;
             return this.score;
         }
         getPosition() {
-            return this.rigidBody.getPosition();
+            return this.main.mtxWorld.translation;
         }
         updateDriving() {
             let inputDrive = ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]);
@@ -294,7 +295,7 @@ var Endabgabe;
                 }
             }
             this.ctrlDrive.setInput(inputDrive);
-            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput()); //ehemals Loop Frame Time
+            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
             this.currentSpeed = this.ctrlDrive.getOutput();
             this.updateGaz(this.ctrlDrive.getOutput()); //ehemals Loop Frame Time
             return this.ctrlDrive.getOutput(); //ehemals Loop Frame Time
@@ -345,7 +346,9 @@ var Endabgabe;
             this.setupControls(_config);
         }
         update() {
-            this.updateTurning(this.updateDriving(this.getDir().x), this.getDir().y);
+            let tempDir = this.getDir();
+            this.updateTurning(this.updateDriving(tempDir.x), tempDir.y);
+            //this.updateTurning(this.updateDriving(0), 0);
         }
         updateDriving(_imputDrive) {
             let inputDrive = _imputDrive;
@@ -358,22 +361,24 @@ var Endabgabe;
                 this.ctrlDrive.setFactor(this.config.maxSpeed / 3);
             }
             this.ctrlDrive.setInput(inputDrive);
-            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput()); //ehemals Loop Frame Time
+            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
             return this.ctrlDrive.getOutput(); //ehemals Loop Frame Time
         }
         getDir() {
-            let v1 = this.rigidBody.getPosition();
-            let v2 = new ƒ.Ray(this.player.getPosition());
-            let vR = ƒ.Vector3.DIFFERENCE(v1, v2.intersectPlane(v1, v1));
+            let v1 = this.main.mtxWorld.translation;
+            let v2 = this.player.getPosition();
+            let vR = ƒ.Vector3.DIFFERENCE(v1, v2);
             vR.normalize();
+            let vRot = ƒ.Vector3.SCALE(this.carNode.mtxLocal.getEulerAngles(), -1);
             let testNode = this.policeNode.getChildrenByName("TestNode")[0];
             let destNode = testNode.getChildren()[0];
+            testNode.mtxLocal.rotation = ƒ.Vector3.ZERO();
             destNode.mtxLocal.translation = vR;
-            testNode.mtxLocal.rotation = new ƒ.Vector3(-this.carNode.mtxLocal.rotation.x, -this.carNode.mtxLocal.rotation.y, -this.carNode.mtxLocal.rotation.z);
+            testNode.mtxLocal.rotateX(vRot.x);
+            testNode.mtxLocal.rotateY(vRot.y);
+            testNode.mtxLocal.rotateZ(vRot.z);
             //console.log("x: " + Math.round(destNode.mtxWorld.translation.x) + ", z: " + Math.round(destNode.mtxWorld.translation.z));
             return new ƒ.Vector2(-destNode.mtxWorld.translation.z, -destNode.mtxWorld.translation.x);
-            /*let pPos: ƒ.Vector3 = this.player.getPosition();                                                                                                                      Längen und Breitengrade oder so
-            console.log("Länge: " + Math.round(Vector.getRotOfXY(pPos.x, pPos.z)) + ", Breite: " + Math.round(Vector.getRotOfXY(Math.sqrt((pPos.x ^ 2) + (pPos.z ^ 2)), pPos.y)));*/
         }
     }
     Endabgabe.PoliceCar = PoliceCar;

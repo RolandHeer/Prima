@@ -26,6 +26,7 @@ namespace Endabgabe {
             //console.log("local y: " + Math.round(this.main.mtxLocal.translation.y) + ", world y: " + Math.round(this.main.mtxWorld.translation.y));
             this.updateTurning(this.updateDriving(), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
             this.updatePosArray();
+           // this.applyRotation();
         }
 
         public getCamPos(): ƒ.Vector3 {
@@ -45,7 +46,7 @@ namespace Endabgabe {
         }
 
         public getPosition(): ƒ.Vector3 {
-            return this.rigidBody.getPosition();
+            return this.main.mtxWorld.translation;
         }
 
 
@@ -65,7 +66,7 @@ namespace Endabgabe {
                 }
             }
             this.ctrlDrive.setInput(inputDrive);
-            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
+            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
             this.currentSpeed = this.ctrlDrive.getOutput();
             this.updateGaz(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
             return this.ctrlDrive.getOutput();//ehemals Loop Frame Time
@@ -89,7 +90,8 @@ namespace Endabgabe {
 
         private updatePosArray(): void {
             let tempPos: ƒ.Vector3 = this.carNode.mtxLocal.getEulerAngles();
-            let newPos: ƒ.Vector3 = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z)
+            let newPos: ƒ.Vector3 = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z);
+
             this.posArray.push(newPos);
             if (this.posArray.length > this.config.camDelay) {
                 this.posArray.splice(0, 1);
