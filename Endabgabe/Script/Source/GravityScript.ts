@@ -35,7 +35,7 @@ namespace Script {
           break;
         case ƒ.EVENT.RENDER_PREPARE:
           let v: ƒ.Vector3 = this.rigid.getPosition();
-          this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.3),);
+          this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.2),);
           break;
         case ƒ.EVENT.NODE_DESERIALIZED:
           this.rigid = this.node.getComponent(ƒ.ComponentRigidbody);

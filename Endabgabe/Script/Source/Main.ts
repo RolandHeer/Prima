@@ -25,6 +25,7 @@ namespace Endabgabe {
   let cameraTranslatorNode: ƒ.Node;
   let cmpCamera: ƒ.ComponentCamera;
   let carNode: ƒ.Node;
+  let policeCarNode: ƒ.Node;
 
   ///   GAME MODES   \\\
   let isMenue: boolean = true;
@@ -33,7 +34,8 @@ namespace Endabgabe {
   let config: Config;
 
   ///     OBJECTS    \\\
-  let car: Car;
+  let car: PlayerCar;
+  let policeCar: PoliceCar;
   let cam: Cam;
   let world: World;
 
@@ -85,6 +87,7 @@ namespace Endabgabe {
     initValues();
     world = new World(config, graph.getChildrenByName("World")[0]);
     setupCar();
+    setupPolice();
     setupCam();
     setupAudio();
 
@@ -94,6 +97,7 @@ namespace Endabgabe {
 
   function update(_event: Event): void {
     car.update();
+    policeCar.update();
     cam.update(car.getCamPos());
     ƒ.Physics.simulate();  // if physics is included and used
     renderScreen();
@@ -141,10 +145,15 @@ namespace Endabgabe {
 
   function setupCar(): void {
     carNode = graph.getChildren()[0];
-    car = new Car(config, carNode);
+    car = new PlayerCar(config, carNode);
   }
 
-  function setupCam(): void{
+  function setupPolice(): void {
+    policeCarNode = graph.getChildrenByName("Police")[0].getChildrenByName("Cars")[0].getChildren()[0];
+    policeCar = new PoliceCar(config, policeCarNode, car);
+  }
+
+  function setupCam(): void {
     camNode = graph.getChildrenByName("Cam")[0];
     cameraNode = camNode.getChildren()[0].getChildrenByName("Camera")[0];
     cameraTranslatorNode = cameraNode.getChildren()[0];
