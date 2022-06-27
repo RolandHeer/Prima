@@ -175,6 +175,7 @@ var Endabgabe;
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
+        world.update();
         car.update();
         policeCar.update();
         cam.update(car.getCamPos());
@@ -353,12 +354,12 @@ var Endabgabe;
         updateDriving(_imputDrive) {
             let inputDrive = _imputDrive;
             if (this.ctrlDrive.getOutput() >= 0) { //Driving Forward
-                this.ctrlDrive.setDelay(this.config.accelSpeed);
-                this.ctrlDrive.setFactor(this.config.maxSpeed);
+                this.ctrlDrive.setDelay(this.config.pAccelSpeed);
+                this.ctrlDrive.setFactor(this.config.pMaxSpeed);
             }
             else { //Driving Backward
-                this.ctrlDrive.setDelay(this.config.accelSpeed / 3);
-                this.ctrlDrive.setFactor(this.config.maxSpeed / 3);
+                this.ctrlDrive.setDelay(this.config.pAccelSpeed / 3);
+                this.ctrlDrive.setFactor(this.config.pMaxSpeed / 3);
             }
             this.ctrlDrive.setInput(inputDrive);
             this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
@@ -367,7 +368,7 @@ var Endabgabe;
         getDir() {
             let v1 = this.main.mtxWorld.translation;
             let v2 = this.player.getPosition();
-            let vR = ƒ.Vector3.DIFFERENCE(v1, v2);
+            let vR = ƒ.Vector3.DIFFERENCE(v2, v1);
             vR.normalize();
             let vRot = ƒ.Vector3.SCALE(this.carNode.mtxLocal.getEulerAngles(), -1);
             let testNode = this.policeNode.getChildrenByName("TestNode")[0];
@@ -378,7 +379,12 @@ var Endabgabe;
             testNode.mtxLocal.rotateY(vRot.y);
             testNode.mtxLocal.rotateZ(vRot.z);
             //console.log("x: " + Math.round(destNode.mtxWorld.translation.x) + ", z: " + Math.round(destNode.mtxWorld.translation.z));
-            return new ƒ.Vector2(-destNode.mtxWorld.translation.z, -destNode.mtxWorld.translation.x);
+            if (v1.getDistance(v2) > 4 && destNode.mtxWorld.translation.z < 0) {
+                return new ƒ.Vector2(destNode.mtxWorld.translation.z, destNode.mtxWorld.translation.x); //um die Polizei logisch fahren zu lassen müsste hier in den "umdrehmodus" gewechselt werden
+            }
+            else {
+                return new ƒ.Vector2(destNode.mtxWorld.translation.z, destNode.mtxWorld.translation.x);
+            }
         }
     }
     Endabgabe.PoliceCar = PoliceCar;
@@ -524,6 +530,17 @@ var Endabgabe;
             World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
             this.generateCoins(this.config.maxCoinCluster, 10);
             this.generateCans(this.config.maxCans);
+        }
+        update() {
+            for (let i = 0; i < this.coins.getChildren().length; i++) {
+                if (this.coins.getChildren()[i].getChildren().length == 0) {
+                    this.coins.removeChild(this.coins.getChildren()[i]);
+                    this.generateCoins(1, 10);
+                }
+            }
+            if (this.cans.getChildren().length - 1 < this.config.maxCans) {
+                this.generateCans(1);
+            }
         }
         generateCoins(_clusterCount, _clusterSize) {
             for (let j = 0; j < _clusterCount; j++) {

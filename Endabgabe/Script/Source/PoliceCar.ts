@@ -29,11 +29,11 @@ namespace Endabgabe {
         protected updateDriving(_imputDrive: number): number {
             let inputDrive: number = _imputDrive;
             if (this.ctrlDrive.getOutput() >= 0) {              //Driving Forward
-                this.ctrlDrive.setDelay(this.config.accelSpeed);
-                this.ctrlDrive.setFactor(this.config.maxSpeed);
+                this.ctrlDrive.setDelay(this.config.pAccelSpeed);
+                this.ctrlDrive.setFactor(this.config.pMaxSpeed);
             } else {                                              //Driving Backward
-                this.ctrlDrive.setDelay(this.config.accelSpeed / 3);
-                this.ctrlDrive.setFactor(this.config.maxSpeed / 3);
+                this.ctrlDrive.setDelay(this.config.pAccelSpeed / 3);
+                this.ctrlDrive.setFactor(this.config.pMaxSpeed / 3);
             }
             this.ctrlDrive.setInput(inputDrive);
             this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
@@ -43,7 +43,7 @@ namespace Endabgabe {
         private getDir(): ƒ.Vector2 {
             let v1: ƒ.Vector3 = this.main.mtxWorld.translation;
             let v2: ƒ.Vector3 = this.player.getPosition();
-            let vR: ƒ.Vector3 = ƒ.Vector3.DIFFERENCE(v1, v2);
+            let vR: ƒ.Vector3 = ƒ.Vector3.DIFFERENCE(v2, v1);
             vR.normalize();
             let vRot: ƒ.Vector3 = ƒ.Vector3.SCALE(this.carNode.mtxLocal.getEulerAngles(), -1);
             let testNode: ƒ.Node = this.policeNode.getChildrenByName("TestNode")[0];
@@ -54,7 +54,11 @@ namespace Endabgabe {
             testNode.mtxLocal.rotateY(vRot.y);
             testNode.mtxLocal.rotateZ(vRot.z);
             //console.log("x: " + Math.round(destNode.mtxWorld.translation.x) + ", z: " + Math.round(destNode.mtxWorld.translation.z));
-            return new ƒ.Vector2(-destNode.mtxWorld.translation.z, -destNode.mtxWorld.translation.x);
+            if (v1.getDistance(v2) > 4 && destNode.mtxWorld.translation.z < 0) {
+                return new ƒ.Vector2(destNode.mtxWorld.translation.z, destNode.mtxWorld.translation.x); //um die Polizei logisch fahren zu lassen müsste hier in den "umdrehmodus" gewechselt werden
+            }else{
+                return new ƒ.Vector2(destNode.mtxWorld.translation.z, destNode.mtxWorld.translation.x);
+            }
         }
     }
 }

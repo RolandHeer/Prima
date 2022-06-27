@@ -42,6 +42,8 @@ declare namespace Endabgabe {
         margin: number;
         maxSpeed: number;
         accelSpeed: number;
+        pMaxSpeed: number;
+        pAccelSpeed: number;
         maxTurn: number;
         accelTurn: number;
         camDelay: number;
@@ -122,6 +124,7 @@ declare namespace Endabgabe {
         private cans;
         static canGraphID: string;
         constructor(_config: Config, _world: ƒ.Node);
+        update(): void;
         private generateCoins;
         private generateCans;
         private addGraphToNode;

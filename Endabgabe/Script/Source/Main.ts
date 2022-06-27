@@ -7,6 +7,8 @@ namespace Endabgabe {
     margin: number;
     maxSpeed: number;
     accelSpeed: number;
+    pMaxSpeed: number;
+    pAccelSpeed: number;
     maxTurn: number;
     accelTurn: number;
     camDelay: number;
@@ -96,6 +98,7 @@ namespace Endabgabe {
   }
 
   function update(_event: Event): void {
+    world.update();
     car.update();
     policeCar.update();
     cam.update(car.getCamPos());

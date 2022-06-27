@@ -18,6 +18,18 @@ namespace Endabgabe {
             this.generateCans(this.config.maxCans);
         }
 
+        public update(): void {
+            for (let i: number = 0; i < this.coins.getChildren().length; i++) {
+                if (this.coins.getChildren()[i].getChildren().length == 0) {
+                    this.coins.removeChild(this.coins.getChildren()[i]);
+                    this.generateCoins(1, 10);
+                }
+            }
+            if (this.cans.getChildren().length -1 < this.config.maxCans){
+                this.generateCans(1);
+            }
+        }
+
         private generateCoins(_clusterCount: number, _clusterSize: number): void {
             for (let j: number = 0; j < _clusterCount; j++) {
                 let tempCluster: ƒ.Node = new ƒ.Node("Cluster" + j);
