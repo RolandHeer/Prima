@@ -26,7 +26,7 @@ namespace Endabgabe {
             //console.log("local y: " + Math.round(this.main.mtxLocal.translation.y) + ", world y: " + Math.round(this.main.mtxWorld.translation.y));
             this.updateTurning(this.updateDriving(), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
             this.updatePosArray();
-           // this.applyRotation();
+            // this.applyRotation();
         }
 
         public getCamPos(): ƒ.Vector3 {
@@ -65,9 +65,12 @@ namespace Endabgabe {
                     inputDrive = 0;
                 }
             }
+            if (this.wasTurning) {
+                inputDrive = inputDrive * 0.7;
+            }
             this.ctrlDrive.setInput(inputDrive);
-            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
-            this.currentSpeed = this.ctrlDrive.getOutput();
+            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput() * this.factor);
+            this.currentSpeed = this.ctrlDrive.getOutput() * this.factor;
             this.updateGaz(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
             return this.ctrlDrive.getOutput();//ehemals Loop Frame Time
         }

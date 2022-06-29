@@ -12,6 +12,8 @@ namespace Endabgabe {
 
         protected ctrlDrive: ƒ.Control;
         protected ctrlTurn: ƒ.Control;
+        protected wasTurning: boolean;
+        protected factor: number = 1;
 
         public abstract update(): void;
 
@@ -23,6 +25,11 @@ namespace Endabgabe {
                 this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive));
             } else {
                 this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(-0.3, _drive));
+            }
+            if (Math.abs(_turnInput) > 0) {
+                this.wasTurning = true;
+            } else {
+                this.wasTurning = false;
             }
             this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());

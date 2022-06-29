@@ -18,6 +18,8 @@ declare namespace Endabgabe {
         protected mtxTireR: ƒ.Matrix4x4;
         protected ctrlDrive: ƒ.Control;
         protected ctrlTurn: ƒ.Control;
+        protected wasTurning: boolean;
+        protected factor: number;
         abstract update(): void;
         protected abstract updateDriving(_inputDrive: number): number;
         protected updateTurning(_drive: number, _turnInput: number): void;

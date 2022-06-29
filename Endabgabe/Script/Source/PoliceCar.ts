@@ -35,6 +35,9 @@ namespace Endabgabe {
                 this.ctrlDrive.setDelay(this.config.pAccelSpeed / 3);
                 this.ctrlDrive.setFactor(this.config.pMaxSpeed / 3);
             }
+            if (this.wasTurning) {
+                inputDrive = inputDrive * 0.7;
+            }
             this.ctrlDrive.setInput(inputDrive);
             this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
             return this.ctrlDrive.getOutput();//ehemals Loop Frame Time

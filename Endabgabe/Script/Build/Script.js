@@ -25,6 +25,8 @@ var Endabgabe;
         mtxTireR;
         ctrlDrive;
         ctrlTurn;
+        wasTurning;
+        factor = 1;
         updateTurning(_drive, _turnInput) {
             this.ctrlTurn.setInput(_turnInput);
             if (_drive > 0) {
@@ -32,6 +34,12 @@ var Endabgabe;
             }
             else {
                 this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(-0.3, _drive));
+            }
+            if (Math.abs(_turnInput) > 0) {
+                this.wasTurning = true;
+            }
+            else {
+                this.wasTurning = false;
             }
             this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
@@ -295,9 +303,12 @@ var Endabgabe;
                     inputDrive = 0;
                 }
             }
+            if (this.wasTurning) {
+                inputDrive = inputDrive * 0.7;
+            }
             this.ctrlDrive.setInput(inputDrive);
-            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
-            this.currentSpeed = this.ctrlDrive.getOutput();
+            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput() * this.factor);
+            this.currentSpeed = this.ctrlDrive.getOutput() * this.factor;
             this.updateGaz(this.ctrlDrive.getOutput()); //ehemals Loop Frame Time
             return this.ctrlDrive.getOutput(); //ehemals Loop Frame Time
         }
@@ -360,6 +371,9 @@ var Endabgabe;
             else { //Driving Backward
                 this.ctrlDrive.setDelay(this.config.pAccelSpeed / 3);
                 this.ctrlDrive.setFactor(this.config.pMaxSpeed / 3);
+            }
+            if (this.wasTurning) {
+                inputDrive = inputDrive * 0.7;
             }
             this.ctrlDrive.setInput(inputDrive);
             this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
