@@ -20,7 +20,9 @@ var Endabgabe;
         carNode;
         main;
         body;
-        rigidBody;
+        centerRB;
+        mainRB;
+        sphericalJoint;
         mtxTireL;
         mtxTireR;
         ctrlDrive;
@@ -30,10 +32,12 @@ var Endabgabe;
         updateTurning(_drive, _turnInput) {
             this.ctrlTurn.setInput(_turnInput);
             if (_drive > 0) {
-                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive));
+                this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive)));
+                //this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive));
             }
             else {
-                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(-0.3, _drive));
+                this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(-0.3, _drive)));
+                //this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(-0.3, _drive));
             }
             if (Math.abs(_turnInput) > 0) {
                 this.wasTurning = true;
@@ -41,10 +45,10 @@ var Endabgabe;
             else {
                 this.wasTurning = false;
             }
-            this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
+            this.updateTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
         }
-        updateYawTilt(_drive, _turn) {
+        updateTilt(_drive, _turn) {
             if (_drive > 0) {
                 this.body.mtxLocal.rotation = new ƒ.Vector3(0, 0, (_drive * _turn) * 3);
             }
@@ -238,6 +242,7 @@ var Endabgabe;
         cameraNode = camNode.getChildren()[0].getChildrenByName("Camera")[0];
         cameraTranslatorNode = cameraNode.getChildren()[0];
         viewport.camera = cmpCamera = cameraTranslatorNode.getComponent(ƒ.ComponentCamera);
+        //viewport.camera = cmpCamera = carNode.getChildrenByName("Main")[0].getChildrenByName("testcam")[0].getComponent(ƒ.ComponentCamera);
         cam = new Endabgabe.Cam(camNode);
     }
     function setupAudio() {
@@ -260,8 +265,14 @@ var Endabgabe;
             this.carNode = _car;
             this.main = _car.getChildren()[0];
             this.body = this.main.getChildrenByName("Body")[0];
-            this.rigidBody = this.main.getComponent(ƒ.ComponentRigidbody);
-            this.rigidBody.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
+            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
+            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
+            this.sphericalJoint.springFrequency = 0;
+            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.carNode.addComponent(this.sphericalJoint);
+            this.mainRB.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
@@ -307,7 +318,7 @@ var Endabgabe;
                 inputDrive = inputDrive * 0.7;
             }
             this.ctrlDrive.setInput(inputDrive);
-            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput() * this.factor);
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), inputDrive * 60));
             this.currentSpeed = this.ctrlDrive.getOutput() * this.factor;
             this.updateGaz(this.ctrlDrive.getOutput()); //ehemals Loop Frame Time
             return this.ctrlDrive.getOutput(); //ehemals Loop Frame Time
@@ -327,7 +338,7 @@ var Endabgabe;
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
         }
         updatePosArray() {
-            let tempPos = this.carNode.mtxLocal.getEulerAngles();
+            let tempPos = this.main.mtxLocal.getEulerAngles();
             let newPos = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z);
             this.posArray.push(newPos);
             if (this.posArray.length > this.config.camDelay) {
@@ -351,7 +362,12 @@ var Endabgabe;
             this.player = _player;
             this.main = _carNode.getChildren()[0];
             this.body = this.main.getChildrenByName("Body")[0];
-            this.rigidBody = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
+            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
+            this.sphericalJoint.springFrequency = 0;
+            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             //this.rigidBody.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
@@ -360,10 +376,8 @@ var Endabgabe;
         update() {
             let tempDir = this.getDir();
             this.updateTurning(this.updateDriving(tempDir.x), tempDir.y);
-            //this.updateTurning(this.updateDriving(0), 0);
         }
-        updateDriving(_imputDrive) {
-            let inputDrive = _imputDrive;
+        updateDriving(_inputDrive) {
             if (this.ctrlDrive.getOutput() >= 0) { //Driving Forward
                 this.ctrlDrive.setDelay(this.config.pAccelSpeed);
                 this.ctrlDrive.setFactor(this.config.pMaxSpeed);
@@ -373,10 +387,11 @@ var Endabgabe;
                 this.ctrlDrive.setFactor(this.config.pMaxSpeed / 3);
             }
             if (this.wasTurning) {
-                inputDrive = inputDrive * 0.7;
+                _inputDrive = _inputDrive * 0.7;
             }
-            this.ctrlDrive.setInput(inputDrive);
-            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
+            this.ctrlDrive.setInput(_inputDrive);
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 70));
+            //this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
             return this.ctrlDrive.getOutput(); //ehemals Loop Frame Time
         }
         getDir() {
@@ -384,7 +399,7 @@ var Endabgabe;
             let v2 = this.player.getPosition();
             let vR = ƒ.Vector3.DIFFERENCE(v2, v1);
             vR.normalize();
-            let vRot = ƒ.Vector3.SCALE(this.carNode.mtxLocal.getEulerAngles(), -1);
+            let vRot = ƒ.Vector3.SCALE(this.main.mtxLocal.getEulerAngles(), -1);
             let testNode = this.policeNode.getChildrenByName("TestNode")[0];
             let destNode = testNode.getChildren()[0];
             testNode.mtxLocal.rotation = ƒ.Vector3.ZERO();

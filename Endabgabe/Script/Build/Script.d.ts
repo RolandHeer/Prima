@@ -13,7 +13,9 @@ declare namespace Endabgabe {
         protected carNode: ƒ.Node;
         protected main: ƒ.Node;
         protected body: ƒ.Node;
-        protected rigidBody: ƒ.ComponentRigidbody;
+        protected centerRB: ƒ.ComponentRigidbody;
+        protected mainRB: ƒ.ComponentRigidbody;
+        protected sphericalJoint: ƒ.JointSpherical;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
         protected ctrlDrive: ƒ.Control;
@@ -23,7 +25,7 @@ declare namespace Endabgabe {
         abstract update(): void;
         protected abstract updateDriving(_inputDrive: number): number;
         protected updateTurning(_drive: number, _turnInput: number): void;
-        protected updateYawTilt(_drive: number, _turn: number): void;
+        protected updateTilt(_drive: number, _turn: number): void;
         protected updateWheels(_turn: number): void;
         protected setupControls(_config: Config): void;
     }
@@ -81,7 +83,7 @@ declare namespace Endabgabe {
         private policeNode;
         constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar);
         update(): void;
-        protected updateDriving(_imputDrive: number): number;
+        protected updateDriving(_inputDrive: number): number;
         private getDir;
     }
 }

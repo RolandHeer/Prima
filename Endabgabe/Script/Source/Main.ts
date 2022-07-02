@@ -161,6 +161,7 @@ namespace Endabgabe {
     cameraNode = camNode.getChildren()[0].getChildrenByName("Camera")[0];
     cameraTranslatorNode = cameraNode.getChildren()[0];
     viewport.camera = cmpCamera = cameraTranslatorNode.getComponent(ƒ.ComponentCamera);
+    //viewport.camera = cmpCamera = carNode.getChildrenByName("Main")[0].getChildrenByName("testcam")[0].getComponent(ƒ.ComponentCamera);
     cam = new Cam(camNode);
   }
 

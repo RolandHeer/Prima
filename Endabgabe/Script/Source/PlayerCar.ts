@@ -15,8 +15,14 @@ namespace Endabgabe {
             this.carNode = _car;
             this.main = _car.getChildren()[0];
             this.body = this.main.getChildrenByName("Body")[0];
-            this.rigidBody = this.main.getComponent(ƒ.ComponentRigidbody);
-            this.rigidBody.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
+            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
+            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
+            this.sphericalJoint.springFrequency = 0;
+            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.carNode.addComponent(this.sphericalJoint);
+            this.mainRB.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
@@ -69,13 +75,14 @@ namespace Endabgabe {
                 inputDrive = inputDrive * 0.7;
             }
             this.ctrlDrive.setInput(inputDrive);
-            this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput() * this.factor);
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), inputDrive * 60));
             this.currentSpeed = this.ctrlDrive.getOutput() * this.factor;
             this.updateGaz(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
             return this.ctrlDrive.getOutput();//ehemals Loop Frame Time
         }
 
         private hndCollision = (_event: ƒ.EventPhysics): void => {
+
             let graph: ƒ.GraphInstance = <ƒ.GraphInstance>_event.cmpRigidbody.node;
             if (graph.idSource == World.coinGraphID) {
                 this.score++;
@@ -92,7 +99,7 @@ namespace Endabgabe {
         }
 
         private updatePosArray(): void {
-            let tempPos: ƒ.Vector3 = this.carNode.mtxLocal.getEulerAngles();
+            let tempPos: ƒ.Vector3 = this.main.mtxLocal.getEulerAngles();
             let newPos: ƒ.Vector3 = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z);
 
             this.posArray.push(newPos);

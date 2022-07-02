@@ -1,0 +1,13 @@
+{
+    "fontHeight": 40,
+    "margin": 30,
+    "maxSpeed": 1,
+    "accelSpeed": 3000,
+    "pMaxSpeed": 1.5,
+    "pAccelSpeed": 2500,
+    "maxTurn": 6,
+    "accelTurn": 200,
+    "camDelay": 12,
+    "maxCoinCluster": 6,
+    "maxCans": 3
+}

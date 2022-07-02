@@ -6,7 +6,9 @@ namespace Endabgabe {
         protected carNode: ƒ.Node;
         protected main: ƒ.Node;
         protected body: ƒ.Node;
-        protected rigidBody: ƒ.ComponentRigidbody;
+        protected centerRB: ƒ.ComponentRigidbody;
+        protected mainRB: ƒ.ComponentRigidbody;
+        protected sphericalJoint: ƒ.JointSpherical;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
 
@@ -22,20 +24,22 @@ namespace Endabgabe {
         protected updateTurning(_drive: number, _turnInput: number): void {
             this.ctrlTurn.setInput(_turnInput);
             if (_drive > 0) {
-                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive));
+                this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive)));
+                //this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(0.3, _drive));
             } else {
-                this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(-0.3, _drive));
+                this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(-0.3, _drive)));
+                //this.carNode.mtxLocal.rotateY(this.ctrlTurn.getOutput() * Math.min(-0.3, _drive));
             }
             if (Math.abs(_turnInput) > 0) {
                 this.wasTurning = true;
             } else {
                 this.wasTurning = false;
             }
-            this.updateYawTilt(_drive, this.ctrlTurn.getOutput());
+            this.updateTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
         }
 
-        protected updateYawTilt(_drive: number, _turn: number): void {
+        protected updateTilt(_drive: number, _turn: number): void {
             if (_drive > 0) {
                 this.body.mtxLocal.rotation = new ƒ.Vector3(0, 0, (_drive * _turn) * 3);
             } else {
