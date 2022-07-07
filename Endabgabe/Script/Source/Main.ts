@@ -141,6 +141,7 @@ namespace Endabgabe {
     }
   }
 
+
   function initValues(): void {
     graph = viewport.getBranch();
     crc2 = canvas.getContext("2d");
@@ -148,7 +149,7 @@ namespace Endabgabe {
 
   function setupCar(): void {
     carNode = graph.getChildren()[0];
-    car = new PlayerCar(config, carNode);
+    car = new PlayerCar(config, carNode, world);
   }
 
   function setupPolice(): void {

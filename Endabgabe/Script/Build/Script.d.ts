@@ -18,15 +18,20 @@ declare namespace Endabgabe {
         protected sphericalJoint: ƒ.JointSpherical;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
+        protected world: World;
         protected ctrlDrive: ƒ.Control;
         protected ctrlTurn: ƒ.Control;
+        protected gaz: number;
+        protected currentSpeed: number;
         protected wasTurning: boolean;
         protected factor: number;
         abstract update(): void;
-        protected abstract updateDriving(_inputDrive: number): number;
+        protected updateDriving(_inputDrive: number): number;
         protected updateTurning(_drive: number, _turnInput: number): void;
+        protected pinToGround(): void;
         protected updateTilt(_drive: number, _turn: number): void;
         protected updateWheels(_turn: number): void;
+        protected abstract updateGaz(_factor: number): void;
         protected setupControls(_config: Config): void;
     }
 }
@@ -59,20 +64,19 @@ declare namespace Endabgabe {
 declare namespace Endabgabe {
     import ƒ = FudgeCore;
     class PlayerCar extends Car {
-        private currentSpeed;
-        private gaz;
         private score;
         private posArray;
-        constructor(_config: Config, _car: ƒ.Node);
+        constructor(_config: Config, _car: ƒ.Node, _world: World);
         update(): void;
+        incScore(): void;
+        fillTank(): void;
         getCamPos(): ƒ.Vector3;
         getSpeedPercent(): number;
         getGazPercent(): number;
         getScore(): number;
         getPosition(): ƒ.Vector3;
-        protected updateDriving(): number;
         private hndCollision;
-        private updateGaz;
+        protected updateGaz(_factor: number): void;
         private updatePosArray;
     }
 }
@@ -83,7 +87,7 @@ declare namespace Endabgabe {
         private policeNode;
         constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar);
         update(): void;
-        protected updateDriving(_inputDrive: number): number;
+        protected updateGaz(_factor: number): void;
         private getDir;
     }
 }
@@ -127,10 +131,15 @@ declare namespace Endabgabe {
         static coinGraphID: string;
         private cans;
         static canGraphID: string;
+        private doomedCollect;
+        private playerCar;
         constructor(_config: Config, _world: ƒ.Node);
         update(): void;
+        addToDoomedCollectables(_graph: ƒ.GraphInstance): void;
+        setPlayerCar(_car: PlayerCar): void;
         private generateCoins;
         private generateCans;
+        private spliceDoomed;
         private addGraphToNode;
     }
 }

@@ -7,6 +7,8 @@ namespace Endabgabe {
         static coinGraphID: string;
         private cans: ƒ.Node;
         static canGraphID: string;
+        private doomedCollect: ƒ.GraphInstance[] = [];
+        private playerCar: PlayerCar;
 
         constructor(_config: Config, _world: ƒ.Node) {
             this.config = _config;
@@ -25,9 +27,18 @@ namespace Endabgabe {
                     this.generateCoins(1, 10);
                 }
             }
-            if (this.cans.getChildren().length -1 < this.config.maxCans){
+            if (this.cans.getChildren().length - 1 < this.config.maxCans) {
                 this.generateCans(1);
             }
+            this.spliceDoomed();
+        }
+
+        public addToDoomedCollectables(_graph: ƒ.GraphInstance): void {
+            this.doomedCollect.push(_graph);
+        }
+
+        public setPlayerCar(_car: PlayerCar):void{
+            this.playerCar  = _car;
         }
 
         private generateCoins(_clusterCount: number, _clusterSize: number): void {
@@ -60,6 +71,18 @@ namespace Endabgabe {
                 tempCanNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
                 tempCanNode.mtxLocal.rotateX(-90);
                 this.cans.addChild(tempCanNode);
+            }
+        }
+
+        private spliceDoomed(): void {
+            if (this.doomedCollect.length > 0) {
+                if(this.doomedCollect[0].idSource == World.coinGraphID){
+                    this.playerCar.incScore();
+                }else{
+                    this.playerCar.fillTank();
+                }
+                this.doomedCollect[0].getParent().getParent().removeChild(this.doomedCollect[0].getParent());
+                this.doomedCollect.splice(0, 1);
             }
         }
 

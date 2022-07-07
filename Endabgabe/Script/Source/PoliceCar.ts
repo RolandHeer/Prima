@@ -28,23 +28,11 @@ namespace Endabgabe {
         public update(): void {
             let tempDir: ƒ.Vector2 = this.getDir();
             this.updateTurning(this.updateDriving(tempDir.x), tempDir.y);
+            this.pinToGround();
         }
 
-        protected updateDriving(_inputDrive: number): number {
-            if (this.ctrlDrive.getOutput() >= 0) {              //Driving Forward
-                this.ctrlDrive.setDelay(this.config.pAccelSpeed);
-                this.ctrlDrive.setFactor(this.config.pMaxSpeed);
-            } else {                                              //Driving Backward
-                this.ctrlDrive.setDelay(this.config.pAccelSpeed / 3);
-                this.ctrlDrive.setFactor(this.config.pMaxSpeed / 3);
-            }
-            if (this.wasTurning) {
-                _inputDrive = _inputDrive * 0.7;
-            }
-            this.ctrlDrive.setInput(_inputDrive);
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 70));
-            //this.carNode.mtxLocal.rotateX(this.ctrlDrive.getOutput());
-            return this.ctrlDrive.getOutput();//ehemals Loop Frame Time
+        protected updateGaz(_factor: number): void {
+            
         }
 
         private getDir(): ƒ.Vector2 {
