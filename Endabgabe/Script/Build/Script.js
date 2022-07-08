@@ -47,8 +47,7 @@ var Endabgabe;
                 _inputDrive = _inputDrive * 0.7;
             }
             this.ctrlDrive.setInput(_inputDrive);
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 60));
-            this.currentSpeed = this.ctrlDrive.getOutput() * this.factor;
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150));
             this.updateGaz(this.ctrlDrive.getOutput()); //ehemals Loop Frame Time
             return this.ctrlDrive.getOutput(); //ehemals Loop Frame Time
         }
@@ -281,6 +280,8 @@ var Endabgabe;
         // Runtime Values 
         score = 0;
         posArray = [];
+        camPosArray = [];
+        pos;
         constructor(_config, _car, _world) {
             super();
             this.config = _config;
@@ -291,6 +292,7 @@ var Endabgabe;
             this.body = this.main.getChildrenByName("Body")[0];
             this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
             this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.pos = this.mainRB.getPosition();
             this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
             this.sphericalJoint.springFrequency = 0;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
@@ -302,11 +304,11 @@ var Endabgabe;
             this.setupControls(_config);
         }
         update() {
-            //console.log("local y: " + Math.round(this.main.mtxLocal.translation.y) + ", world y: " + Math.round(this.main.mtxWorld.translation.y));
             this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
             this.pinToGround();
+            this.setSpeed();
             this.updatePosArray();
-            // this.applyRotation();
+            this.updatePos();
         }
         incScore() {
             this.score++;
@@ -315,10 +317,10 @@ var Endabgabe;
             this.gaz = 100;
         }
         getCamPos() {
-            return this.posArray[0];
+            return this.camPosArray[0];
         }
         getSpeedPercent() {
-            return this.currentSpeed / this.config.maxSpeed;
+            return this.currentSpeed / 0.015;
         }
         getGazPercent() {
             return this.gaz;
@@ -335,16 +337,22 @@ var Endabgabe;
                 this.world.addToDoomedCollectables(graph);
             }
         };
+        setSpeed() {
+            this.currentSpeed = this.pos.getDistance(this.mainRB.getPosition()) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
+        }
         updateGaz(_factor) {
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
         }
         updatePosArray() {
             let tempPos = this.main.mtxLocal.getEulerAngles();
             let newPos = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z);
-            this.posArray.push(newPos);
-            if (this.posArray.length > this.config.camDelay) {
-                this.posArray.splice(0, 1);
+            this.camPosArray.push(newPos);
+            if (this.camPosArray.length > this.config.camDelay) {
+                this.camPosArray.splice(0, 1);
             }
+        }
+        updatePos() {
+            this.pos = this.mainRB.getPosition();
         }
     }
     Endabgabe.PlayerCar = PlayerCar;
@@ -369,18 +377,25 @@ var Endabgabe;
             this.sphericalJoint.springFrequency = 0;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            //this.rigidBody.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
+            this.mainRB.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.hndCollision);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
         }
         update() {
             let tempDir = this.getDir();
+            //this.updateTurning(this.updateDriving(0), tempDir.y);
             this.updateTurning(this.updateDriving(tempDir.x), tempDir.y);
             this.pinToGround();
         }
         updateGaz(_factor) {
         }
+        hndCollision = (_event) => {
+            let node = _event.cmpRigidbody.node;
+            if (node.name == "PlayerMain") {
+                console.log("ich hab ihn!");
+            }
+        };
         getDir() {
             let v1 = this.main.mtxWorld.translation;
             let v2 = this.player.getPosition();

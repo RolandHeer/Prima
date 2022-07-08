@@ -19,7 +19,7 @@ namespace Endabgabe {
             this.sphericalJoint.springFrequency = 0;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            //this.rigidBody.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
+            this.mainRB.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, this.hndCollision);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
@@ -27,12 +27,20 @@ namespace Endabgabe {
 
         public update(): void {
             let tempDir: ƒ.Vector2 = this.getDir();
+            //this.updateTurning(this.updateDriving(0), tempDir.y);
             this.updateTurning(this.updateDriving(tempDir.x), tempDir.y);
             this.pinToGround();
         }
 
         protected updateGaz(_factor: number): void {
             
+        }
+
+        private hndCollision = (_event: ƒ.EventPhysics): void => {
+            let node: ƒ.Node = _event.cmpRigidbody.node;
+            if(node.name == "PlayerMain"){
+                console.log("ich hab ihn!");
+            }
         }
 
         private getDir(): ƒ.Vector2 {

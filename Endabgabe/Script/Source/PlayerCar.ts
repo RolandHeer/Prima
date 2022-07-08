@@ -6,6 +6,8 @@ namespace Endabgabe {
         // Runtime Values 
         private score: number = 0;
         private posArray: ƒ.Vector3[] = [];
+        private camPosArray: ƒ.Vector3[] = [];
+        private pos: ƒ.Vector3;
 
         constructor(_config: Config, _car: ƒ.Node, _world: World) {
             super();
@@ -17,6 +19,7 @@ namespace Endabgabe {
             this.body = this.main.getChildrenByName("Body")[0];
             this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
             this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.pos = this.mainRB.getPosition();
             this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
             this.sphericalJoint.springFrequency = 0;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
@@ -29,27 +32,27 @@ namespace Endabgabe {
         }
 
         public update(): void {
-            //console.log("local y: " + Math.round(this.main.mtxLocal.translation.y) + ", world y: " + Math.round(this.main.mtxWorld.translation.y));
             this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
             this.pinToGround();
+            this.setSpeed();
             this.updatePosArray();
-            // this.applyRotation();
+            this.updatePos();
         }
 
-        public incScore():void{
-            this.score ++;
+        public incScore(): void {
+            this.score++;
         }
 
-        public fillTank():void{
+        public fillTank(): void {
             this.gaz = 100;
         }
 
         public getCamPos(): ƒ.Vector3 {
-            return this.posArray[0];
+            return this.camPosArray[0];
         }
 
         public getSpeedPercent(): number {
-            return this.currentSpeed / this.config.maxSpeed;
+            return this.currentSpeed / 0.015;
         }
 
         public getGazPercent(): number {
@@ -71,6 +74,10 @@ namespace Endabgabe {
             }
         }
 
+        private setSpeed(): void {
+                this.currentSpeed = this.pos.getDistance(this.mainRB.getPosition()) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
+        }
+
         protected updateGaz(_factor: number): void {
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
         }
@@ -79,10 +86,14 @@ namespace Endabgabe {
             let tempPos: ƒ.Vector3 = this.main.mtxLocal.getEulerAngles();
             let newPos: ƒ.Vector3 = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z);
 
-            this.posArray.push(newPos);
-            if (this.posArray.length > this.config.camDelay) {
-                this.posArray.splice(0, 1);
+            this.camPosArray.push(newPos);
+            if (this.camPosArray.length > this.config.camDelay) {
+                this.camPosArray.splice(0, 1);
             }
+        }
+
+        private updatePos(): void{
+            this.pos = this.mainRB.getPosition();
         }
     }
 }

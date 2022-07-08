@@ -16,7 +16,7 @@ namespace Endabgabe {
 
         protected ctrlDrive: ƒ.Control;
         protected ctrlTurn: ƒ.Control;
-        protected gaz: number= 100;
+        protected gaz: number = 100;
         protected currentSpeed: number = 0;
         protected wasTurning: boolean;
         protected factor: number = 1;
@@ -37,8 +37,7 @@ namespace Endabgabe {
                 _inputDrive = _inputDrive * 0.7;
             }
             this.ctrlDrive.setInput(_inputDrive);
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 60));
-            this.currentSpeed = this.ctrlDrive.getOutput() * this.factor;
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150));
             this.updateGaz(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
             return this.ctrlDrive.getOutput();//ehemals Loop Frame Time
         }
@@ -59,7 +58,7 @@ namespace Endabgabe {
             this.updateWheels(this.ctrlTurn.getOutput());
         }
 
-        protected pinToGround(): void{
+        protected pinToGround(): void {
             this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 50.4)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
         }
 

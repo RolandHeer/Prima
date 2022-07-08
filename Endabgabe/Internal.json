@@ -333,7 +333,7 @@
             "children": [
               {
                 "ƒ.Node": {
-                  "name": "Main",
+                  "name": "PlayerMain",
                   "active": true,
                   "components": {
                     "ComponentTransform": [
@@ -356,7 +356,7 @@
                           "initialization": "TO_PIVOT",
                           "friction": 1,
                           "restitution": 0.19999999999999996,
-                          "mass": 1,
+                          "mass": 2.5,
                           "dampTranslation": 1.2,
                           "dampRotation": 1,
                           "effectGravity": 0,
@@ -1341,48 +1341,7 @@
                         "name": "Coins",
                         "active": true,
                         "components": {},
-                        "children": [
-                          {
-                            "ƒ.Node": {
-                              "name": "CoinCluster",
-                              "active": true,
-                              "components": {},
-                              "children": [
-                                {
-                                  "ƒ.Node": {
-                                    "name": "Coin",
-                                    "active": true,
-                                    "components": {
-                                      "ComponentTransform": [
-                                        {
-                                          "ƒ.ComponentTransform": {
-                                            "local": {
-                                              "translation": "[0, 50.5, 0]",
-                                              "rotation": "[0, 0, 0]",
-                                              "scaling": "[1, 1, 1]"
-                                            },
-                                            "Component": {
-                                              "active": true
-                                            }
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    "children": [
-                                      {
-                                        "ƒ.GraphInstance": {
-                                          "deserializeFromSource": true,
-                                          "name": "CoinGraph",
-                                          "idSource": "Graph|2022-06-11T00:20:48.515Z|71676"
-                                        }
-                                      }
-                                    ]
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        ]
+                        "children": []
                       }
                     },
                     {
@@ -1939,7 +1898,7 @@
                                       "initialization": "TO_PIVOT",
                                       "friction": 1,
                                       "restitution": 0.19999999999999996,
-                                      "mass": 1,
+                                      "mass": 2.5,
                                       "dampTranslation": 1.2,
                                       "dampRotation": 1,
                                       "effectGravity": 0,
@@ -3092,18 +3051,18 @@
           {
             "ƒ.ComponentRigidbody": {
               "initialization": "TO_PIVOT",
-              "friction": 0.05,
-              "restitution": 0.5,
-              "mass": 0.09999999999999996,
+              "friction": 0.09999999999999998,
+              "restitution": 0.19999999999999993,
+              "mass": 0.35,
               "dampTranslation": 0.05,
-              "dampRotation": 0.05,
+              "dampRotation": 0.05000000000000002,
               "effectGravity": 0,
               "typeBody": "DYNAMIC",
               "typeCollider": "CYLINDER",
               "isTrigger": false,
               "id": 0,
               "pivot": {
-                "translation": "[0.10500000417232513, 0, 0]",
+                "translation": "[0.10000000149011612, 0, 0]",
                 "rotation": "[0, 0, 90]",
                 "scaling": "[0.6000000238418579, 0.20000001788139343, 0.6000000238418579]"
               },
