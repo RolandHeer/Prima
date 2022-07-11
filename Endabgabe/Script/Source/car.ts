@@ -2,64 +2,92 @@ namespace Endabgabe {
     import ƒ = FudgeCore;
     export abstract class Car {
 
+        //OBJECTS
         protected config: Config;
+        protected world: World;
+
+        //NODES
         protected carNode: ƒ.Node;
         protected main: ƒ.Node;
         protected body: ƒ.Node;
+
+        //REFERENCES
         protected centerRB: ƒ.ComponentRigidbody;
         protected mainRB: ƒ.ComponentRigidbody;
         protected sphericalJoint: ƒ.JointSpherical;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
 
-        protected world: World;
-
-        protected ctrlDrive: ƒ.Control;
+        //RUNTIME VARIABLES
         protected ctrlTurn: ƒ.Control;
+        protected velocity: ƒ.Vector3 = ƒ.Vector3.ZERO();
+        protected pos: ƒ.Vector3;
         protected gaz: number = 100;
         protected currentSpeed: number = 0;
-        protected wasTurning: boolean;
-        protected factor: number = 1;
+        protected gripFactor: number = 0.8;               // 0 = no grip, 1 = full grip
 
         public abstract update(): void;
 
-        protected updateDriving(_inputDrive: number): number {
-            if (_inputDrive >= 0) {              //Driving Forward
-                if (this.gaz == 0) {            //Disable Speedup without gaz while still beeing able to break
-                    _inputDrive = 0;
-                }
-            } else {                            //Driving Backward
-                if (this.gaz == 0) {            //Disable Speedup without gaz while still beeing able to break
-                    _inputDrive = 0;
+        public getSpeedPercent(): number {
+            return this.currentSpeed / 0.018;
+        }
+
+        protected updateDriving(_inputDrive: number): number {  //PROBLEM: MAN MUSS FESTSTELLEN OB SICH DER WAGEN NACH VORN ODER HINTEN BEWEGT allerdings hat es sich noch nicht bewegt... menno
+            let forward: number;
+            if (this.getRelative2Dvector(this.velocity, this.main.mtxLocal.getEulerAngles()).y > 0) {
+                forward = 1;
+            } else if (this.getRelative2Dvector(this.velocity, this.main.mtxLocal.getEulerAngles()).y < 0) {
+                forward = -1;
+            } else {
+                forward = 0;
+            }
+
+            if (this.gaz == 0) {
+                if (forward == 1 && _inputDrive >= 0) {         //Driving Forward
+                    _inputDrive = 0;                            //Disable Speedup without gaz while still beeing able to break
+                } else if (forward == -1 && _inputDrive < 0) {  //Driving Backward
+                    _inputDrive = 0;                            //Disable Speedup without gaz while still beeing able to break
+                } else if (forward == 0) {                      //Standing Still
+                    _inputDrive = 0;                            //Disable Speedup without gaz
                 }
             }
-            if (this.wasTurning) {
-                _inputDrive = _inputDrive * 0.7;
+            if (_inputDrive < 0 && forward <= 0) {
+                _inputDrive = _inputDrive / 3;
             }
-            this.ctrlDrive.setInput(_inputDrive);
+            if (forward >= 0) {
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor)));
+            } else {
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor)));
+            }
             this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150));
-            this.updateGaz(this.ctrlDrive.getOutput());//ehemals Loop Frame Time
-            return this.ctrlDrive.getOutput();//ehemals Loop Frame Time
+            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2)));//ehemals Loop Frame Time
+            if (forward > 0) {
+                return this.getSpeedPercent();
+            } else {
+                return -this.getSpeedPercent();
+            }
         }
 
         protected updateTurning(_drive: number, _turnInput: number): void {
             this.ctrlTurn.setInput(_turnInput);
-            if (_drive > 0) {
-                this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive)));
-            } else {
-                this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(-0.3, _drive)));
-            }
-            if (Math.abs(_turnInput) > 0) {
-                this.wasTurning = true;
-            } else {
-                this.wasTurning = false;
-            }
+            this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive)));
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
         }
 
         protected pinToGround(): void {
             this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 50.4)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
+        }
+
+        protected updatePos(): void {
+            this.velocity = ƒ.Vector3.DIFFERENCE(this.mainRB.getPosition(), this.pos);
+            this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
+        }
+
+        protected setSpeed(): void {
+            this.currentSpeed = this.pos.getDistance(this.mainRB.getPosition()) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
         }
 
         protected updateTilt(_drive: number, _turn: number): void {
@@ -76,10 +104,21 @@ namespace Endabgabe {
             this.mtxTireR.rotation = tempV;
         }
 
+        protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2 {
+            let mtx: ƒ.Matrix4x4 = new ƒ.Matrix4x4();
+            let refMtx: ƒ.Matrix4x4 = new ƒ.Matrix4x4();
+            let vRot: ƒ.Vector3 = ƒ.Vector3.SCALE(_vRot, -1);
+            let vDir: ƒ.Vector3 = ƒ.Vector3.SCALE(_vDir, 1);
+            mtx.rotateX(vRot.x);
+            mtx.rotateY(vRot.y);
+            mtx.rotateZ(vRot.z);
+            mtx.translate(vDir, true);
+            mtx.getTranslationTo(refMtx);
+            return new ƒ.Vector2(mtx.translation.x, mtx.translation.z);
+        }
+
         protected abstract updateGaz(_factor: number): void;
         protected setupControls(_config: Config): void {
-            this.ctrlDrive = new ƒ.Control("cntrlDrive", _config.maxSpeed, ƒ.CONTROL_TYPE.PROPORTIONAL);
-            this.ctrlDrive.setDelay(_config.accelSpeed);
             this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, ƒ.CONTROL_TYPE.PROPORTIONAL);
             this.ctrlTurn.setDelay(_config.accelTurn);
         }

@@ -7,10 +7,21 @@
       "coat": {
         "ƒ.CoatRemissiveTextured": {
           "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2022-06-12T13:55:29.577Z|92301",
+          "idTexture": "TextureImage|2022-07-09T08:09:19.424Z|17248",
           "diffuse": 1,
           "specular": 0.19999999999999996
         }
+      }
+    }
+  },
+  "TextureImage|2022-07-09T08:09:19.424Z|17248": {
+    "ƒ.TextureImage": {
+      "url": "tex\\Equirectangular-projection-topographic-world.jpg",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2022-07-09T08:09:19.424Z|17248",
+        "name": "tex\\Equirectangular-projection-topographic-world.jpg",
+        "mipmap": "CRISP"
       }
     }
   },
@@ -358,7 +369,7 @@
                           "restitution": 0.19999999999999996,
                           "mass": 2.5,
                           "dampTranslation": 1.2,
-                          "dampRotation": 1,
+                          "dampRotation": 10,
                           "effectGravity": 0,
                           "typeBody": "DYNAMIC",
                           "typeCollider": "CUBE",
@@ -1900,7 +1911,7 @@
                                       "restitution": 0.19999999999999996,
                                       "mass": 2.5,
                                       "dampTranslation": 1.2,
-                                      "dampRotation": 1,
+                                      "dampRotation": 10,
                                       "effectGravity": 0,
                                       "typeBody": "DYNAMIC",
                                       "typeCollider": "CUBE",
@@ -2735,53 +2746,6 @@
                             }
                           }
                         ]
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                "ƒ.Node": {
-                  "name": "TestNode",
-                  "active": true,
-                  "components": {
-                    "ComponentTransform": [
-                      {
-                        "ƒ.ComponentTransform": {
-                          "local": {
-                            "translation": "[0, 0, 0]",
-                            "rotation": "[0, 0, 0]",
-                            "scaling": "[1, 1, 1]"
-                          },
-                          "Component": {
-                            "active": true
-                          }
-                        }
-                      }
-                    ]
-                  },
-                  "children": [
-                    {
-                      "ƒ.Node": {
-                        "name": "DestNode",
-                        "active": true,
-                        "components": {
-                          "ComponentTransform": [
-                            {
-                              "ƒ.ComponentTransform": {
-                                "local": {
-                                  "translation": "[0, 0, 0]",
-                                  "rotation": "[0, 0, 0]",
-                                  "scaling": "[1, 1, 1]"
-                                },
-                                "Component": {
-                                  "active": true
-                                }
-                              }
-                            }
-                          ]
-                        },
-                        "children": []
                       }
                     }
                   ]

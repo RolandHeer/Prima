@@ -16,20 +16,11 @@ namespace Endabgabe {
             World.coinGraphID = "Graph|2022-06-11T00:20:48.515Z|71676";
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
             World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
-            this.generateCoins(this.config.maxCoinCluster, 10);
+            this.generateCoinCluster(this.config.maxCoinCluster, 10);
             this.generateCans(this.config.maxCans);
         }
 
         public update(): void {
-            for (let i: number = 0; i < this.coins.getChildren().length; i++) {
-                if (this.coins.getChildren()[i].getChildren().length == 0) {
-                    this.coins.removeChild(this.coins.getChildren()[i]);
-                    this.generateCoins(1, 10);
-                }
-            }
-            if (this.cans.getChildren().length - 1 < this.config.maxCans) {
-                this.generateCans(1);
-            }
             this.spliceDoomed();
         }
 
@@ -41,7 +32,7 @@ namespace Endabgabe {
             this.playerCar  = _car;
         }
 
-        private generateCoins(_clusterCount: number, _clusterSize: number): void {
+        private generateCoinCluster(_clusterCount: number, _clusterSize: number): void {
             for (let j: number = 0; j < _clusterCount; j++) {
                 let tempCluster: ƒ.Node = new ƒ.Node("Cluster" + j);
                 let pos: ƒ.Vector3 = new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
@@ -78,10 +69,18 @@ namespace Endabgabe {
             if (this.doomedCollect.length > 0) {
                 if(this.doomedCollect[0].idSource == World.coinGraphID){
                     this.playerCar.incScore();
+                    let coinCluster: ƒ.Node = this.doomedCollect[0].getParent().getParent();
+                    if(coinCluster.getChildren().length == 1){
+                        coinCluster.getParent().removeChild(coinCluster);
+                        this.generateCoinCluster(1, 10);
+                    }else{
+                        coinCluster.removeChild(this.doomedCollect[0].getParent());
+                    }
                 }else{
                     this.playerCar.fillTank();
+                    this.doomedCollect[0].getParent().getParent().removeChild(this.doomedCollect[0].getParent());
+                    this.generateCans(1);
                 }
-                this.doomedCollect[0].getParent().getParent().removeChild(this.doomedCollect[0].getParent());
                 this.doomedCollect.splice(0, 1);
             }
         }

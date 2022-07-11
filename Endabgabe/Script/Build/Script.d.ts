@@ -10,6 +10,7 @@ declare namespace Endabgabe {
     import ƒ = FudgeCore;
     abstract class Car {
         protected config: Config;
+        protected world: World;
         protected carNode: ƒ.Node;
         protected main: ƒ.Node;
         protected body: ƒ.Node;
@@ -18,19 +19,22 @@ declare namespace Endabgabe {
         protected sphericalJoint: ƒ.JointSpherical;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
-        protected world: World;
-        protected ctrlDrive: ƒ.Control;
         protected ctrlTurn: ƒ.Control;
+        protected velocity: ƒ.Vector3;
+        protected pos: ƒ.Vector3;
         protected gaz: number;
         protected currentSpeed: number;
-        protected wasTurning: boolean;
-        protected factor: number;
+        protected gripFactor: number;
         abstract update(): void;
+        getSpeedPercent(): number;
         protected updateDriving(_inputDrive: number): number;
         protected updateTurning(_drive: number, _turnInput: number): void;
         protected pinToGround(): void;
+        protected updatePos(): void;
+        protected setSpeed(): void;
         protected updateTilt(_drive: number, _turn: number): void;
         protected updateWheels(_turn: number): void;
+        protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2;
         protected abstract updateGaz(_factor: number): void;
         protected setupControls(_config: Config): void;
     }
@@ -65,30 +69,24 @@ declare namespace Endabgabe {
     import ƒ = FudgeCore;
     class PlayerCar extends Car {
         private score;
-        private posArray;
         private camPosArray;
-        private pos;
         constructor(_config: Config, _car: ƒ.Node, _world: World);
         update(): void;
         incScore(): void;
         fillTank(): void;
         getCamPos(): ƒ.Vector3;
-        getSpeedPercent(): number;
         getGazPercent(): number;
         getScore(): number;
         getPosition(): ƒ.Vector3;
         private hndCollision;
-        private setSpeed;
         protected updateGaz(_factor: number): void;
-        private updatePosArray;
-        private updatePos;
+        private updateCamPosArray;
     }
 }
 declare namespace Endabgabe {
     import ƒ = FudgeCore;
     class PoliceCar extends Car {
         private player;
-        private policeNode;
         constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar);
         update(): void;
         protected updateGaz(_factor: number): void;
@@ -142,7 +140,7 @@ declare namespace Endabgabe {
         update(): void;
         addToDoomedCollectables(_graph: ƒ.GraphInstance): void;
         setPlayerCar(_car: PlayerCar): void;
-        private generateCoins;
+        private generateCoinCluster;
         private generateCans;
         private spliceDoomed;
         private addGraphToNode;
