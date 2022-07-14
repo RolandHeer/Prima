@@ -95,6 +95,7 @@ declare namespace Endabgabe {
     import ƒ = FudgeCore;
     class PoliceCar extends Car {
         private player;
+        gottchaEvent: CustomEvent;
         constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar);
         update(): void;
         protected updateGaz(_factor: number): void;

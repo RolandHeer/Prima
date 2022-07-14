@@ -322,6 +322,7 @@ var Endabgabe;
     }
     function setupPolice() {
         policeCarNode = graph.getChildrenByName("Police")[0].getChildrenByName("Cars")[0].getChildren()[0];
+        policeCarNode.addEventListener("gottcha", (_e) => console.log(_e.detail.message));
         policeCar = new Endabgabe.PoliceCar(config, policeCarNode, car);
     }
     function setupCam() {
@@ -416,6 +417,11 @@ var Endabgabe;
     var ƒ = FudgeCore;
     class PoliceCar extends Endabgabe.Car {
         player;
+        gottchaEvent = new CustomEvent("gottcha", {
+            detail: {
+                message: "I got him lads!"
+            }
+        });
         constructor(_config, _carNode, _player) {
             super();
             this.config = _config;
@@ -447,7 +453,7 @@ var Endabgabe;
         hndCollision = (_event) => {
             let node = _event.cmpRigidbody.node;
             if (node.name == "PlayerMain") {
-                console.log("ich hab ihn!");
+                this.carNode.dispatchEvent(this.gottchaEvent);
             }
         };
         getDir() {

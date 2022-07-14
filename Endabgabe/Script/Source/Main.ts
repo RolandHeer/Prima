@@ -165,6 +165,8 @@ namespace Endabgabe {
 
   function setupPolice(): void {
     policeCarNode = graph.getChildrenByName("Police")[0].getChildrenByName("Cars")[0].getChildren()[0];
+    policeCarNode.addEventListener("gottcha", (_e: CustomEvent) =>
+      console.log(_e.detail.message));
     policeCar = new PoliceCar(config, policeCarNode, car);
   }
 

@@ -3,6 +3,11 @@ namespace Endabgabe {
     export class PoliceCar extends Car {
 
         private player: PlayerCar;
+        public gottchaEvent: CustomEvent = new CustomEvent("gottcha", {
+            detail: {
+                message: "I got him lads!"
+            }
+        });
 
         constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar) {
             super();
@@ -42,7 +47,7 @@ namespace Endabgabe {
         private hndCollision = (_event: ƒ.EventPhysics): void => {
             let node: ƒ.Node = _event.cmpRigidbody.node;
             if (node.name == "PlayerMain") {
-                console.log("ich hab ihn!");
+                this.carNode.dispatchEvent(this.gottchaEvent);
             }
         }
 
