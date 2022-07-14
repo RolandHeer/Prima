@@ -40,9 +40,10 @@ namespace Endabgabe {
   let policeCar: PoliceCar;
   let cam: Cam;
   let world: World;
+  let gamestate: GameState;
 
   /// RUNTIME VALUES \\\
-
+  let jirkaMode: boolean = false;
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
@@ -87,7 +88,8 @@ namespace Endabgabe {
     let response: Response = await fetch("config.json");
     config = await response.json();
     initValues();
-    world = new World(config, graph.getChildrenByName("World")[0]);
+    gamestate = new GameState();
+    world = new World(config, graph.getChildrenByName("World")[0], gamestate);
     setupCar();
     setupPolice();
     setupCam();
@@ -115,7 +117,9 @@ namespace Endabgabe {
     // Coins
     crc2.fillStyle = "#fff";
     crc2.font = config.fontHeight + "px Arial";
-    crc2.fillText("Coins: " + car.getScore(), config.margin, config.margin * 2);
+    if (!jirkaMode) {
+      crc2.fillText("Coins: " + car.getScore(), config.margin, config.margin * 2);
+    }
     // Gaz
     crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin, config.margin * 4);
     // Speedometer
@@ -138,6 +142,13 @@ namespace Endabgabe {
         isMenue = true;
         document.exitPointerLock();
         break;
+      case "KeyJ":
+        jirkaMode = !jirkaMode;
+        if (jirkaMode) {
+          document.getElementById("vui").style.visibility = "visible";
+        } else {
+          document.getElementById("vui").style.visibility = "hidden";
+        }
     }
   }
 

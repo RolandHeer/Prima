@@ -129,6 +129,21 @@ var Endabgabe;
     }
     Endabgabe.Car = Car;
 })(Endabgabe || (Endabgabe = {}));
+var Endabgabe;
+(function (Endabgabe) {
+    var ƒ = FudgeCore;
+    var ƒUi = FudgeUserInterface;
+    class GameState extends ƒ.Mutable {
+        coins = 0;
+        constructor() {
+            super();
+            const domVui = document.querySelector("div#vui");
+            console.log("Vui-Controller", new ƒUi.Controller(this, domVui));
+        }
+        reduceMutator(_mutator) { }
+    }
+    Endabgabe.GameState = GameState;
+})(Endabgabe || (Endabgabe = {}));
 var Script;
 (function (Script) {
     var ƒ = FudgeCore;
@@ -197,7 +212,9 @@ var Endabgabe;
     let policeCar;
     let cam;
     let world;
+    let gamestate;
     /// RUNTIME VALUES \\\
+    let jirkaMode = false;
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
     let dialog;
@@ -237,7 +254,8 @@ var Endabgabe;
         let response = await fetch("config.json");
         config = await response.json();
         initValues();
-        world = new Endabgabe.World(config, graph.getChildrenByName("World")[0]);
+        gamestate = new Endabgabe.GameState();
+        world = new Endabgabe.World(config, graph.getChildrenByName("World")[0], gamestate);
         setupCar();
         setupPolice();
         setupCam();
@@ -261,7 +279,9 @@ var Endabgabe;
         // Coins
         crc2.fillStyle = "#fff";
         crc2.font = config.fontHeight + "px Arial";
-        crc2.fillText("Coins: " + car.getScore(), config.margin, config.margin * 2);
+        if (!jirkaMode) {
+            crc2.fillText("Coins: " + car.getScore(), config.margin, config.margin * 2);
+        }
         // Gaz
         crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin, config.margin * 4);
         // Speedometer
@@ -282,6 +302,14 @@ var Endabgabe;
                 isMenue = true;
                 document.exitPointerLock();
                 break;
+            case "KeyJ":
+                jirkaMode = !jirkaMode;
+                if (jirkaMode) {
+                    document.getElementById("vui").style.visibility = "visible";
+                }
+                else {
+                    document.getElementById("vui").style.visibility = "hidden";
+                }
         }
     }
     function initValues() {
@@ -566,8 +594,10 @@ var Endabgabe;
         static canGraphID;
         doomedCollect = [];
         playerCar;
-        constructor(_config, _world) {
+        gameState;
+        constructor(_config, _world, _gameState) {
             this.config = _config;
+            this.gameState = _gameState;
             this.coins = _world.getChildrenByName("Collectables")[0].getChildrenByName("Coins")[0];
             World.coinGraphID = "Graph|2022-06-11T00:20:48.515Z|71676";
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
@@ -619,6 +649,7 @@ var Endabgabe;
             if (this.doomedCollect.length > 0) {
                 if (this.doomedCollect[0].idSource == World.coinGraphID) {
                     this.playerCar.incScore();
+                    this.gameState.coins += 1;
                     let coinCluster = this.doomedCollect[0].getParent().getParent();
                     if (coinCluster.getChildren().length == 1) {
                         coinCluster.getParent().removeChild(coinCluster);

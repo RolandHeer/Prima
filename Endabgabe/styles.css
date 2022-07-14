@@ -14,3 +14,17 @@ canvas.fullscreen {
   width: 100vw; 
   height: 100vh; 
 }
+
+#vui {
+  position: absolute;
+  top: 20px;
+  padding: 20px;
+  font-size: 20px;
+  visibility: hidden;
+}
+
+.element {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}

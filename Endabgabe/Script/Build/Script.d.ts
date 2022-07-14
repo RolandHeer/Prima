@@ -39,6 +39,14 @@ declare namespace Endabgabe {
         protected setupControls(_config: Config): void;
     }
 }
+declare namespace Endabgabe {
+    import ƒ = FudgeCore;
+    class GameState extends ƒ.Mutable {
+        coins: number;
+        constructor();
+        protected reduceMutator(_mutator: ƒ.Mutator): void;
+    }
+}
 declare namespace Script {
     import ƒ = FudgeCore;
     class GravityScript extends ƒ.ComponentScript {
@@ -136,7 +144,8 @@ declare namespace Endabgabe {
         static canGraphID: string;
         private doomedCollect;
         private playerCar;
-        constructor(_config: Config, _world: ƒ.Node);
+        private gameState;
+        constructor(_config: Config, _world: ƒ.Node, _gameState: GameState);
         update(): void;
         addToDoomedCollectables(_graph: ƒ.GraphInstance): void;
         setPlayerCar(_car: PlayerCar): void;

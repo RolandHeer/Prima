@@ -9,9 +9,11 @@ namespace Endabgabe {
         static canGraphID: string;
         private doomedCollect: ƒ.GraphInstance[] = [];
         private playerCar: PlayerCar;
+        private gameState: GameState;
 
-        constructor(_config: Config, _world: ƒ.Node) {
+        constructor(_config: Config, _world: ƒ.Node, _gameState: GameState) {
             this.config = _config;
+            this.gameState = _gameState
             this.coins = _world.getChildrenByName("Collectables")[0].getChildrenByName("Coins")[0];
             World.coinGraphID = "Graph|2022-06-11T00:20:48.515Z|71676";
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
@@ -28,8 +30,8 @@ namespace Endabgabe {
             this.doomedCollect.push(_graph);
         }
 
-        public setPlayerCar(_car: PlayerCar):void{
-            this.playerCar  = _car;
+        public setPlayerCar(_car: PlayerCar): void {
+            this.playerCar = _car;
         }
 
         private generateCoinCluster(_clusterCount: number, _clusterSize: number): void {
@@ -67,16 +69,17 @@ namespace Endabgabe {
 
         private spliceDoomed(): void {
             if (this.doomedCollect.length > 0) {
-                if(this.doomedCollect[0].idSource == World.coinGraphID){
+                if (this.doomedCollect[0].idSource == World.coinGraphID) {
                     this.playerCar.incScore();
+                    this.gameState.coins += 1;
                     let coinCluster: ƒ.Node = this.doomedCollect[0].getParent().getParent();
-                    if(coinCluster.getChildren().length == 1){
+                    if (coinCluster.getChildren().length == 1) {
                         coinCluster.getParent().removeChild(coinCluster);
                         this.generateCoinCluster(1, 10);
-                    }else{
+                    } else {
                         coinCluster.removeChild(this.doomedCollect[0].getParent());
                     }
-                }else{
+                } else {
                     this.playerCar.fillTank();
                     this.doomedCollect[0].getParent().getParent().removeChild(this.doomedCollect[0].getParent());
                     this.generateCans(1);
