@@ -37,7 +37,7 @@ var Endabgabe;
         currentSpeed = 0;
         gripFactor = 0.8; // 0 = no grip, 1 = full grip
         getSpeedPercent() {
-            return this.currentSpeed / 0.018;
+            return this.currentSpeed / 0.022;
         }
         updateDriving(_inputDrive) {
             let forward;
