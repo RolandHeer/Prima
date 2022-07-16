@@ -88,7 +88,7 @@ var Endabgabe;
             this.updateWheels(this.ctrlTurn.getOutput());
         }
         pinToGround() {
-            this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 50.4)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
+            this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 50.45)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
         }
         updatePos() {
             this.velocity = ƒ.Vector3.DIFFERENCE(this.mainRB.getPosition(), this.pos);
