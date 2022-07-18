@@ -19,6 +19,7 @@ declare namespace Endabgabe {
         protected sphericalJoint: ƒ.JointSpherical;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
+        protected engineSoundComponent: ƒ.ComponentAudio;
         protected ctrlTurn: ƒ.Control;
         protected velocity: ƒ.Vector3;
         protected pos: ƒ.Vector3;
@@ -37,6 +38,7 @@ declare namespace Endabgabe {
         protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2;
         protected abstract updateGaz(_factor: number): void;
         protected setupControls(_config: Config): void;
+        protected manageAudio(): void;
     }
 }
 declare namespace Endabgabe {
@@ -78,6 +80,7 @@ declare namespace Endabgabe {
     class PlayerCar extends Car {
         private score;
         private camPosArray;
+        private audio;
         constructor(_config: Config, _car: ƒ.Node, _world: World);
         update(): void;
         incScore(): void;
@@ -88,7 +91,9 @@ declare namespace Endabgabe {
         getPosition(): ƒ.Vector3;
         private hndCollision;
         protected updateGaz(_factor: number): void;
+        private setupEngineSound;
         private updateCamPosArray;
+        private updateEngineSound;
     }
 }
 declare namespace Endabgabe {
@@ -143,6 +148,8 @@ declare namespace Endabgabe {
         static coinGraphID: string;
         private cans;
         static canGraphID: string;
+        private trees;
+        static treeGraphID: string;
         private doomedCollect;
         private playerCar;
         private gameState;
@@ -150,7 +157,7 @@ declare namespace Endabgabe {
         update(): void;
         addToDoomedCollectables(_graph: ƒ.GraphInstance): void;
         setPlayerCar(_car: PlayerCar): void;
-        private generateCoinCluster;
+        private generateGraphCluster;
         private generateCans;
         private spliceDoomed;
         private addGraphToNode;

@@ -29,6 +29,7 @@ var Endabgabe;
         sphericalJoint;
         mtxTireL;
         mtxTireR;
+        engineSoundComponent;
         //RUNTIME VARIABLES
         ctrlTurn;
         velocity = ƒ.Vector3.ZERO();
@@ -125,6 +126,11 @@ var Endabgabe;
         setupControls(_config) {
             this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, 0 /* PROPORTIONAL */);
             this.ctrlTurn.setDelay(_config.accelTurn);
+        }
+        manageAudio() {
+            let ant;
+            let audioNode = this.engineSoundComponent.getAudioNode(ant);
+            //audioNode.
         }
     }
     Endabgabe.Car = Car;
@@ -269,6 +275,7 @@ var Endabgabe;
         policeCar.update();
         cam.update(car.getCamPos());
         ƒ.Physics.simulate(); // if physics is included and used
+        ƒ.AudioManager.default.update();
         renderScreen();
     }
     function renderScreen() {
@@ -334,8 +341,8 @@ var Endabgabe;
         cam = new Endabgabe.Cam(camNode);
     }
     function setupAudio() {
-        //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
         ƒ.AudioManager.default.listenTo(graph);
+        ƒ.AudioManager.default.listenWith(carNode.getChild(0).getChildrenByName("Audio")[0].getComponent(ƒ.ComponentAudioListener));
     }
 })(Endabgabe || (Endabgabe = {}));
 var Endabgabe;
@@ -345,6 +352,7 @@ var Endabgabe;
         // Runtime Values 
         score = 0;
         camPosArray = [];
+        audio = new Audio("audio/2cv.mp3");
         constructor(_config, _car, _world) {
             super();
             this.config = _config;
@@ -361,6 +369,8 @@ var Endabgabe;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.carNode.addComponent(this.sphericalJoint);
             this.mainRB.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
+            this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
+            this.setupEngineSound();
             this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
@@ -373,6 +383,7 @@ var Endabgabe;
             this.setSpeed();
             this.updateCamPosArray();
             this.updatePos();
+            this.updateEngineSound();
         }
         incScore() {
             this.score++;
@@ -401,6 +412,17 @@ var Endabgabe;
         updateGaz(_factor) {
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
         }
+        setupEngineSound() {
+            this.audio.play();
+            this.audio.volume = 0.2;
+            this.audio.loop = true;
+            if ("preservesPitch" in this.audio) {
+                this.audio.preservesPitch = false;
+            }
+            else if ("mozPreservesPitch" in this.audio) {
+                this.audio.mozPreservesPitch = false;
+            }
+        }
         updateCamPosArray() {
             let tempPos = this.main.mtxLocal.getEulerAngles();
             let newPos = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z);
@@ -408,6 +430,9 @@ var Endabgabe;
             if (this.camPosArray.length > this.config.camDelay) {
                 this.camPosArray.splice(0, 1);
             }
+        }
+        updateEngineSound() {
+            this.audio.playbackRate = 1 + this.getSpeedPercent();
         }
     }
     Endabgabe.PlayerCar = PlayerCar;
@@ -436,6 +461,9 @@ var Endabgabe;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.hndCollision);
+            this.mainRB.setPosition(new ƒ.Vector3(0, 0, -50.5));
+            this.mainRB.setRotation(new ƒ.Vector3(-90, 0, 0));
+            this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
             this.pos = this.mainRB.getPosition();
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
@@ -598,6 +626,8 @@ var Endabgabe;
         static coinGraphID;
         cans;
         static canGraphID;
+        trees;
+        static treeGraphID;
         doomedCollect = [];
         playerCar;
         gameState;
@@ -608,7 +638,10 @@ var Endabgabe;
             World.coinGraphID = "Graph|2022-06-11T00:20:48.515Z|71676";
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
             World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
-            this.generateCoinCluster(this.config.maxCoinCluster, 10);
+            this.trees = _world.getChildrenByName("Plants")[0].getChildrenByName("Trees")[0];
+            World.treeGraphID = "Graph|2022-07-18T02:17:48.525Z|91815";
+            this.generateGraphCluster(World.treeGraphID, this.trees, 5, 5, 0.15, 0.8);
+            this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
         }
         update() {
@@ -620,22 +653,27 @@ var Endabgabe;
         setPlayerCar(_car) {
             this.playerCar = _car;
         }
-        generateCoinCluster(_clusterCount, _clusterSize) {
+        generateGraphCluster(_graphID, _destNode, _clusterCount, _clusterSize, _spread, _randomScale) {
             for (let j = 0; j < _clusterCount; j++) {
                 let tempCluster = new ƒ.Node("Cluster" + j);
                 let pos = new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
                 for (let i = 0; i < _clusterSize; i++) {
-                    let tempPos = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(pos.x + Math.random() * 0.1, pos.y + Math.random() * 0.1, pos.z + Math.random() * 0.1), 50.5);
-                    let tempCoinNode = new ƒ.Node("Coin" + i);
+                    let tempPos = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(pos.x + Math.random() * _spread, pos.y + Math.random() * _spread, pos.z + Math.random() * _spread), 50);
+                    let tempNode = new ƒ.Node("Graph" + i);
                     let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
-                    tempCoinNode.addComponent(cmpTransform);
-                    this.addGraphToNode(tempCoinNode, World.coinGraphID);
-                    tempCoinNode.mtxLocal.translation = tempPos;
-                    tempCoinNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
-                    tempCoinNode.mtxLocal.rotateX(-90);
-                    tempCluster.addChild(tempCoinNode);
+                    tempNode.addComponent(cmpTransform);
+                    this.addGraphToNode(tempNode, _graphID);
+                    tempNode.mtxLocal.translation = tempPos;
+                    tempNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
+                    tempNode.mtxLocal.rotateX(-90);
+                    tempNode.mtxLocal.rotateY(Math.random() * 360);
+                    if (_randomScale > 0) {
+                        let r = 0.5 + (Math.random() * _randomScale);
+                        tempNode.mtxLocal.scale(new ƒ.Vector3(r, r, r));
+                    }
+                    tempCluster.addChild(tempNode);
                 }
-                this.coins.addChild(tempCluster);
+                _destNode.addChild(tempCluster);
             }
         }
         generateCans(_canCount) {
@@ -659,7 +697,7 @@ var Endabgabe;
                     let coinCluster = this.doomedCollect[0].getParent().getParent();
                     if (coinCluster.getChildren().length == 1) {
                         coinCluster.getParent().removeChild(coinCluster);
-                        this.generateCoinCluster(1, 10);
+                        this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1);
                     }
                     else {
                         coinCluster.removeChild(this.doomedCollect[0].getParent());

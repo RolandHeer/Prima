@@ -105,6 +105,7 @@ namespace Endabgabe {
     policeCar.update();
     cam.update(car.getCamPos());
     ƒ.Physics.simulate();  // if physics is included and used
+    ƒ.AudioManager.default.update();
     renderScreen();
   }
 
@@ -180,7 +181,7 @@ namespace Endabgabe {
   }
 
   function setupAudio(): void {
-    //let audioNode: ƒ.Node = graph.getChildrenByName("Sound")[0];
     ƒ.AudioManager.default.listenTo(graph);
+    ƒ.AudioManager.default.listenWith(carNode.getChild(0).getChildrenByName("Audio")[0].getComponent(ƒ.ComponentAudioListener));
   }
 }

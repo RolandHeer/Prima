@@ -7,6 +7,8 @@ namespace Endabgabe {
         static coinGraphID: string;
         private cans: ƒ.Node;
         static canGraphID: string;
+        private trees: ƒ.Node;
+        static treeGraphID: string;
         private doomedCollect: ƒ.GraphInstance[] = [];
         private playerCar: PlayerCar;
         private gameState: GameState;
@@ -18,7 +20,10 @@ namespace Endabgabe {
             World.coinGraphID = "Graph|2022-06-11T00:20:48.515Z|71676";
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
             World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
-            this.generateCoinCluster(this.config.maxCoinCluster, 10);
+            this.trees = _world.getChildrenByName("Plants")[0].getChildrenByName("Trees")[0];
+            World.treeGraphID = "Graph|2022-07-18T02:17:48.525Z|91815"
+            this.generateGraphCluster(World.treeGraphID, this.trees, 5, 5, 0.15, 0.8);
+            this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
         }
 
@@ -34,22 +39,27 @@ namespace Endabgabe {
             this.playerCar = _car;
         }
 
-        private generateCoinCluster(_clusterCount: number, _clusterSize: number): void {
+        private generateGraphCluster(_graphID: string, _destNode: ƒ.Node, _clusterCount: number, _clusterSize: number, _spread: number, _randomScale: number): void {
             for (let j: number = 0; j < _clusterCount; j++) {
                 let tempCluster: ƒ.Node = new ƒ.Node("Cluster" + j);
                 let pos: ƒ.Vector3 = new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
                 for (let i: number = 0; i < _clusterSize; i++) {
-                    let tempPos: ƒ.Vector3 = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(pos.x + Math.random() * 0.1, pos.y + Math.random() * 0.1, pos.z + Math.random() * 0.1), 50.5);
-                    let tempCoinNode: ƒ.Node = new ƒ.Node("Coin" + i);
+                    let tempPos: ƒ.Vector3 = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(pos.x + Math.random() * _spread, pos.y + Math.random() * _spread, pos.z + Math.random() * _spread), 50);
+                    let tempNode: ƒ.Node = new ƒ.Node("Graph" + i);
                     let cmpTransform: ƒ.ComponentTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
-                    tempCoinNode.addComponent(cmpTransform);
-                    this.addGraphToNode(tempCoinNode, World.coinGraphID);
-                    tempCoinNode.mtxLocal.translation = tempPos;
-                    tempCoinNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
-                    tempCoinNode.mtxLocal.rotateX(-90);
-                    tempCluster.addChild(tempCoinNode);
+                    tempNode.addComponent(cmpTransform);
+                    this.addGraphToNode(tempNode, _graphID);
+                    tempNode.mtxLocal.translation = tempPos;
+                    tempNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
+                    tempNode.mtxLocal.rotateX(-90);
+                    tempNode.mtxLocal.rotateY(Math.random() * 360);
+                    if (_randomScale > 0) {
+                        let r: number = 0.5 + (Math.random() * _randomScale);
+                        tempNode.mtxLocal.scale(new ƒ.Vector3(r, r, r));
+                    }
+                    tempCluster.addChild(tempNode);
                 }
-                this.coins.addChild(tempCluster);
+                _destNode.addChild(tempCluster);
             }
         }
 
@@ -75,7 +85,7 @@ namespace Endabgabe {
                     let coinCluster: ƒ.Node = this.doomedCollect[0].getParent().getParent();
                     if (coinCluster.getChildren().length == 1) {
                         coinCluster.getParent().removeChild(coinCluster);
-                        this.generateCoinCluster(1, 10);
+                        this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1);
                     } else {
                         coinCluster.removeChild(this.doomedCollect[0].getParent());
                     }

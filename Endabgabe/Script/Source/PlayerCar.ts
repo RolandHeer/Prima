@@ -6,6 +6,7 @@ namespace Endabgabe {
         // Runtime Values 
         private score: number = 0;
         private camPosArray: ƒ.Vector3[] = [];
+        private audio: any = new Audio("audio/2cv.mp3");
 
         constructor(_config: Config, _car: ƒ.Node, _world: World) {
             super();
@@ -26,7 +27,10 @@ namespace Endabgabe {
             this.carNode.addComponent(this.sphericalJoint);
             this.mainRB.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
 
-            this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(),1);
+            this.engineSoundComponent = <ƒ.ComponentAudio>this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
+            this.setupEngineSound();
+
+            this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
@@ -39,6 +43,7 @@ namespace Endabgabe {
             this.setSpeed();
             this.updateCamPosArray();
             this.updatePos();
+            this.updateEngineSound();
         }
 
         public incScore(): void {
@@ -62,7 +67,7 @@ namespace Endabgabe {
         }
 
         public getPosition(): ƒ.Vector3 {
-            return ƒ.Vector3.SCALE(this.mainRB.getPosition(),1);
+            return ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
         }
 
         private hndCollision = (_event: ƒ.EventPhysics): void => {
@@ -76,6 +81,17 @@ namespace Endabgabe {
             this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
         }
 
+        private setupEngineSound(): void {
+            this.audio.play();
+            this.audio.volume = 0.2;
+            this.audio.loop = true;
+            if ("preservesPitch" in this.audio) {
+                this.audio.preservesPitch = false;
+            } else if ("mozPreservesPitch" in this.audio) {
+                this.audio.mozPreservesPitch = false;
+            }
+        }
+
         private updateCamPosArray(): void {
             let tempPos: ƒ.Vector3 = this.main.mtxLocal.getEulerAngles();
             let newPos: ƒ.Vector3 = new ƒ.Vector3(tempPos.x, tempPos.y, tempPos.z);
@@ -84,6 +100,10 @@ namespace Endabgabe {
             if (this.camPosArray.length > this.config.camDelay) {
                 this.camPosArray.splice(0, 1);
             }
+        }
+
+        private updateEngineSound() {
+            this.audio.playbackRate = 1 + this.getSpeedPercent();
         }
     }
 }

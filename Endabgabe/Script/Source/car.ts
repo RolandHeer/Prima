@@ -17,6 +17,7 @@ namespace Endabgabe {
         protected sphericalJoint: ƒ.JointSpherical;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
+        protected engineSoundComponent: ƒ.ComponentAudio;
 
         //RUNTIME VARIABLES
         protected ctrlTurn: ƒ.Control;
@@ -121,6 +122,12 @@ namespace Endabgabe {
         protected setupControls(_config: Config): void {
             this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, ƒ.CONTROL_TYPE.PROPORTIONAL);
             this.ctrlTurn.setDelay(_config.accelTurn);
+        }
+
+        protected manageAudio(): void{
+            let ant: ƒ.AUDIO_NODE_TYPE;
+            let audioNode: AudioNode = this.engineSoundComponent.getAudioNode(ant);
+            //audioNode.
         }
     }
 }

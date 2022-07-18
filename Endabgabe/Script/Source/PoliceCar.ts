@@ -25,6 +25,10 @@ namespace Endabgabe {
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.addEventListener(ƒ.EVENT_PHYSICS.COLLISION_ENTER, this.hndCollision);
+            this.mainRB.setPosition(new ƒ.Vector3(0,0,-50.5));
+            this.mainRB.setRotation(new ƒ.Vector3(-90,0,0));
+
+            this.engineSoundComponent = <ƒ.ComponentAudio>this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
 
             this.pos = this.mainRB.getPosition();
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
