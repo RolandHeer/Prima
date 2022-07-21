@@ -70,13 +70,15 @@ declare namespace Endabgabe {
     interface Config {
         speedDivider: number;
         turnDivider: number;
-        fontHeight: number;
-        margin: number;
         maxTurn: number;
         accelTurn: number;
+        gazSub: number;
         camDelay: number;
         maxCoinCluster: number;
         maxCans: number;
+        fontHeight: number;
+        margin: number;
+        speedometerHeight: number;
         [key: string]: number | string | Config;
     }
 }

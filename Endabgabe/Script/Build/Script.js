@@ -63,7 +63,7 @@ var Endabgabe;
         gripFactor = 0.8; // 0 = no grip, 1 = full grip
         isPolice = false;
         getSpeedPercent() {
-            return this.currentSpeed / 0.03;
+            return this.currentSpeed / 0.025;
         }
         updateDriving(_inputDrive) {
             let forward;
@@ -250,6 +250,8 @@ var Endabgabe;
     //       DATA      \\\
     let speedImg = new Image;
     speedImg.src = "././Img/speedometer.png";
+    let needleImg = new Image;
+    needleImg.src = "././Img/needle.png";
     /// RUNTIME VALUES \\\
     let jirkaMode = false;
     window.addEventListener("load", init);
@@ -326,10 +328,20 @@ var Endabgabe;
         // Speedometer
         crc2.save();
         crc2.resetTransform();
-        crc2.drawImage(speedImg, canvas.width - speedImg.width, canvas.height - speedImg.height);
-        crc2.translate(canvas.width - 200, canvas.height - 30);
-        crc2.rotate((Math.abs(car.getSpeedPercent()) * 180) * Math.PI / 180);
-        crc2.fillRect(-100, -5, 105, 10);
+        let s = canvas.height * config.speedometerHeight;
+        crc2.fillStyle = "#000";
+        crc2.fillRect(canvas.width - s * 0.8, canvas.height - s * 0.7, s * 0.5, s * 0.5);
+        crc2.fillStyle = "#444";
+        crc2.fillRect(canvas.width - s * 0.69, canvas.height - s * 0.6, s * 0.3 * (car.getGazPercent() / 100), s * 0.2); //Tankanzeigebalken
+        crc2.drawImage(speedImg, canvas.width - s, canvas.height - s, s, s);
+        crc2.translate(canvas.width - s * 0.53, canvas.height - s * 0.34);
+        let x1 = 0;
+        let x2 = -45;
+        let y1 = 180;
+        let y2 = 225;
+        let rot = (Math.abs(car.getSpeedPercent()) * 180 - x1) * (y2 - x2) / (y1 - x1) + x2;
+        crc2.rotate(rot * Math.PI / 180);
+        crc2.drawImage(needleImg, -s * 0.45, -s / 16, s / 2, s / 8);
         crc2.restore();
     }
     function enterPointerLock() {
@@ -443,7 +455,7 @@ var Endabgabe;
             }
         };
         updateGaz(_factor) {
-            this.gaz = Math.max(0, this.gaz - 0.05 * Math.abs(_factor));
+            this.gaz = Math.max(0, this.gaz - this.config.gazSub * Math.abs(_factor));
         }
         setupEngineSound() {
             this.audio.play();

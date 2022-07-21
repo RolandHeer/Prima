@@ -2784,7 +2784,7 @@
                       {
                         "ƒ.ComponentTransform": {
                           "local": {
-                            "translation": "[0, 53, 0]",
+                            "translation": "[0, 50, 0]",
                             "rotation": "[0, 0, 0]",
                             "scaling": "[1, 1, 1]"
                           },
@@ -2823,15 +2823,15 @@
                   "children": [
                     {
                       "ƒ.Node": {
-                        "name": "CameraTranslation",
+                        "name": "Rotate",
                         "active": true,
                         "components": {
                           "ComponentTransform": [
                             {
                               "ƒ.ComponentTransform": {
                                 "local": {
-                                  "translation": "[0, 71, -70]",
-                                  "rotation": "[0, 0, 0]",
+                                  "translation": "[0, 0, 0]",
+                                  "rotation": "[35, 0, 0]",
                                   "scaling": "[1, 1, 1]"
                                 },
                                 "Component": {
@@ -2844,15 +2844,15 @@
                         "children": [
                           {
                             "ƒ.Node": {
-                              "name": "ReAnker",
+                              "name": "Translate",
                               "active": true,
                               "components": {
                                 "ComponentTransform": [
                                   {
                                     "ƒ.ComponentTransform": {
                                       "local": {
-                                        "translation": "[0, 0, 0]",
-                                        "rotation": "[60, 0, 0]",
+                                        "translation": "[0, 7.5, -80]",
+                                        "rotation": "[0, 0, 0]",
                                         "scaling": "[1, 1, 1]"
                                       },
                                       "Component": {
@@ -2873,7 +2873,7 @@
                                           "ƒ.ComponentTransform": {
                                             "local": {
                                               "translation": "[0, 0, 0]",
-                                              "rotation": "[-18, 0, 0]",
+                                              "rotation": "[0, 0, 0]",
                                               "scaling": "[1, 1, 1]"
                                             },
                                             "Component": {
@@ -2895,7 +2895,7 @@
                                             "projection": "central",
                                             "fieldOfView": 20,
                                             "direction": 2,
-                                            "aspect": 2.0536480686695278,
+                                            "aspect": 1.6416309012875536,
                                             "pivot": {
                                               "translation": "[0, 0, 0]",
                                               "rotation": "[0, 0, 0]",

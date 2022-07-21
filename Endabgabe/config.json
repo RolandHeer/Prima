@@ -1,13 +1,15 @@
 {
-    "speedDivider": 40, 
+    "speedDivider": 40,
     "turnDivider": 40,
     "policeDivider": 35,
     "policeTurn": 45,
-    "fontHeight": 40,
-    "margin": 30,
     "maxTurn": 6,
     "accelTurn": 200,
+    "gazSub": 0.1,
     "camDelay": 12,
     "maxCoinCluster": 6,
-    "maxCans": 3
+    "maxCans": 3,
+    "fontHeight": 40,
+    "margin": 30,
+    "speedometerHeight": 0.3
 }

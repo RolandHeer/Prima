@@ -5,13 +5,15 @@ namespace Endabgabe {
   export interface Config {
     speedDivider: number;
     turnDivider: number;
-    fontHeight: number;
-    margin: number;
     maxTurn: number;
     accelTurn: number;
+    gazSub: number;
     camDelay: number;
     maxCoinCluster: number;
     maxCans: number;
+    fontHeight: number;
+    margin: number;
+    speedometerHeight: number;
     [key: string]: number | string | Config;
   }
 
@@ -43,6 +45,9 @@ namespace Endabgabe {
   //       DATA      \\\
   let speedImg: HTMLImageElement = new Image;
   speedImg.src = "././Img/speedometer.png";
+
+  let needleImg: HTMLImageElement = new Image;
+  needleImg.src = "././Img/needle.png";
 
   /// RUNTIME VALUES \\\
   let jirkaMode: boolean = false;
@@ -129,10 +134,20 @@ namespace Endabgabe {
     // Speedometer
     crc2.save();
     crc2.resetTransform();
-    crc2.drawImage(speedImg, canvas.width - speedImg.width, canvas.height - speedImg.height);
-    crc2.translate(canvas.width - 200, canvas.height - 30);
-    crc2.rotate((Math.abs(car.getSpeedPercent()) * 180) * Math.PI / 180);
-    crc2.fillRect(-100, -5, 105, 10)
+    let s: number = canvas.height * config.speedometerHeight;
+    crc2.fillStyle = "#000";
+    crc2.fillRect(canvas.width - s * 0.8, canvas.height - s * 0.7, s * 0.5, s * 0.5);
+    crc2.fillStyle = "#444";
+    crc2.fillRect(canvas.width - s * 0.69, canvas.height - s * 0.6, s * 0.3 * (car.getGazPercent() / 100), s * 0.2);      //Tankanzeigebalken
+    crc2.drawImage(speedImg, canvas.width - s, canvas.height - s, s, s);
+    crc2.translate(canvas.width - s * 0.53, canvas.height - s * 0.34);
+    let x1: number = 0;
+    let x2: number = -45;
+    let y1: number = 180;
+    let y2: number = 225;
+    let rot: number = (Math.abs(car.getSpeedPercent()) * 180 - x1) * (y2 - x2) / (y1 - x1) + x2;
+    crc2.rotate(rot * Math.PI / 180);
+    crc2.drawImage(needleImg, -s * 0.45, -s / 16, s / 2, s / 8);
     crc2.restore();
   }
 

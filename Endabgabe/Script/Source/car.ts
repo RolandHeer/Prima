@@ -32,7 +32,7 @@ namespace Endabgabe {
         public abstract update(): void;
 
         public getSpeedPercent(): number {
-            return this.currentSpeed / 0.03;
+            return this.currentSpeed / 0.025;
         }
 
         protected updateDriving(_inputDrive: number): number {  //PROBLEM: MAN MUSS FESTSTELLEN OB SICH DER WAGEN NACH VORN ODER HINTEN BEWEGT allerdings hat es sich noch nicht bewegt... menno
