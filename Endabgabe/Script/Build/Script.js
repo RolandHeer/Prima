@@ -326,6 +326,7 @@ var Endabgabe;
         // Speedometer
         crc2.save();
         crc2.resetTransform();
+        crc2.drawImage(speedImg, canvas.width - speedImg.width, canvas.height - speedImg.height);
         crc2.translate(canvas.width - 200, canvas.height - 30);
         crc2.rotate((Math.abs(car.getSpeedPercent()) * 180) * Math.PI / 180);
         crc2.fillRect(-100, -5, 105, 10);
