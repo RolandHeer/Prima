@@ -252,6 +252,8 @@ var Endabgabe;
     speedImg.src = "././Img/speedometer.png";
     let needleImg = new Image;
     needleImg.src = "././Img/needle.png";
+    let coinImg = new Image;
+    coinImg.src = "././Img/coin.png";
     /// RUNTIME VALUES \\\
     let jirkaMode = false;
     window.addEventListener("load", init);
@@ -318,17 +320,19 @@ var Endabgabe;
     }
     function renderVUI() {
         // Coins
+        let s = canvas.height * config.speedometerHeight;
         crc2.fillStyle = "#fff";
-        crc2.font = config.fontHeight + "px Arial";
+        crc2.font = s * 0.2 + "px AGENCYB";
         if (!jirkaMode) {
-            crc2.fillText("Coins: " + car.getScore(), config.margin, config.margin * 2);
+            crc2.drawImage(coinImg, s / 4, canvas.height - s * 0.46, s / 3, s / 3);
+            crc2.font = s * 0.2 + "px AGENCYB";
+            crc2.lineWidth = s * 0.05;
+            crc2.strokeText("" + car.getScore(), s * 0.5, canvas.height - s * 0.1);
+            crc2.fillText("" + car.getScore(), s * 0.5, canvas.height - s * 0.1);
         }
-        // Gaz
-        crc2.fillText("Gaz: " + Math.round(car.getGazPercent()) + "%", config.margin, config.margin * 4);
-        // Speedometer
+        // Speedometer and Gaz
         crc2.save();
         crc2.resetTransform();
-        let s = canvas.height * config.speedometerHeight;
         crc2.fillStyle = "#000";
         crc2.fillRect(canvas.width - s * 0.8, canvas.height - s * 0.7, s * 0.5, s * 0.5);
         crc2.fillStyle = "#444";

@@ -76,8 +76,6 @@ declare namespace Endabgabe {
         camDelay: number;
         maxCoinCluster: number;
         maxCans: number;
-        fontHeight: number;
-        margin: number;
         speedometerHeight: number;
         [key: string]: number | string | Config;
     }

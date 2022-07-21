@@ -9,7 +9,5 @@
     "camDelay": 12,
     "maxCoinCluster": 6,
     "maxCans": 3,
-    "fontHeight": 40,
-    "margin": 30,
     "speedometerHeight": 0.3
 }

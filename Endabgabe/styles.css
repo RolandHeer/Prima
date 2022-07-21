@@ -28,3 +28,8 @@ canvas.fullscreen {
   align-items: center;
   margin-bottom: 5px;
 }
+
+@font-face {
+  font-family: 'AGENCYB';
+  src: url('./font/AGENCYB.TTF');
+}
