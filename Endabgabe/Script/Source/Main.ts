@@ -42,7 +42,7 @@ namespace Endabgabe {
 
   //       DATA      \\\
   let speedImg: HTMLImageElement = new Image;
-  speedImg.src = "./Img/speedometer.png";
+  speedImg.src = "././Img/speedometer.png";
 
   /// RUNTIME VALUES \\\
   let jirkaMode: boolean = false;

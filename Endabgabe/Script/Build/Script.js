@@ -249,7 +249,7 @@ var Endabgabe;
     let gamestate;
     //       DATA      \\\
     let speedImg = new Image;
-    speedImg.src = "./Img/speedometer.png";
+    speedImg.src = "././Img/speedometer.png";
     /// RUNTIME VALUES \\\
     let jirkaMode = false;
     window.addEventListener("load", init);
