@@ -13,6 +13,7 @@ namespace Endabgabe {
             super();
             this.config = _config;
             this.player = _player;
+            this.isPolice = true;
 
             this.carNode = _carNode;
             this.main = _carNode.getChildren()[0];
@@ -40,7 +41,6 @@ namespace Endabgabe {
             let dir: ƒ.Vector2 = this.getDir();
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
-            this.setSpeed();
             this.updatePos();
         }
 

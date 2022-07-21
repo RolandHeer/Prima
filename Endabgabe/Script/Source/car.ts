@@ -27,10 +27,12 @@ namespace Endabgabe {
         protected currentSpeed: number = 0;
         protected gripFactor: number = 0.8;               // 0 = no grip, 1 = full grip
 
+        protected isPolice: boolean = false;
+
         public abstract update(): void;
 
         public getSpeedPercent(): number {
-            return this.currentSpeed / 0.022;
+            return this.currentSpeed / 0.03;
         }
 
         protected updateDriving(_inputDrive: number): number {  //PROBLEM: MAN MUSS FESTSTELLEN OB SICH DER WAGEN NACH VORN ODER HINTEN BEWEGT allerdings hat es sich noch nicht bewegt... menno
@@ -55,15 +57,16 @@ namespace Endabgabe {
             if (_inputDrive < 0 && forward <= 0) {
                 _inputDrive = _inputDrive / 3;
             }
+            let f: number = ƒ.Loop.timeFrameGame / this.config.speedDivider;
             if (forward >= 0) {
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor));
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor)));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor) * f));
             } else {
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor));
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor)));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor) * f));
             }
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150));
-            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2)));//ehemals Loop Frame Time
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150 * f));
+            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f));//ehemals Loop Frame Time
             if (forward > 0) {
                 return this.getSpeedPercent();
             } else {
@@ -72,8 +75,9 @@ namespace Endabgabe {
         }
 
         protected updateTurning(_drive: number, _turnInput: number): void {
+            let f: number = this.config.turnDivider / ƒ.Loop.fpsGameAverage;
             this.ctrlTurn.setInput(_turnInput);
-            this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive)));
+            this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * f));
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
         }
@@ -85,10 +89,11 @@ namespace Endabgabe {
         protected updatePos(): void {
             this.velocity = ƒ.Vector3.DIFFERENCE(this.mainRB.getPosition(), this.pos);
             this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
+            this.setSpeed();
         }
 
         protected setSpeed(): void {
-            this.currentSpeed = this.pos.getDistance(this.mainRB.getPosition()) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
+            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
         }
 
         protected updateTilt(_drive: number, _turn: number): void {
@@ -124,7 +129,7 @@ namespace Endabgabe {
             this.ctrlTurn.setDelay(_config.accelTurn);
         }
 
-        protected manageAudio(): void{
+        protected manageAudio(): void {
             let ant: ƒ.AUDIO_NODE_TYPE;
             let audioNode: AudioNode = this.engineSoundComponent.getAudioNode(ant);
             //audioNode.

@@ -3,12 +3,10 @@ namespace Endabgabe {
   ƒ.Debug.info("Main Program Template running!");
 
   export interface Config {
+    speedDivider: number;
+    turnDivider: number;
     fontHeight: number;
     margin: number;
-    maxSpeed: number;
-    accelSpeed: number;
-    pMaxSpeed: number;
-    pAccelSpeed: number;
     maxTurn: number;
     accelTurn: number;
     camDelay: number;
@@ -41,6 +39,10 @@ namespace Endabgabe {
   let cam: Cam;
   let world: World;
   let gamestate: GameState;
+
+  //       DATA      \\\
+  let speedImg: HTMLImageElement = new Image;
+  speedImg.src = "./Img/speedometer.png";
 
   /// RUNTIME VALUES \\\
   let jirkaMode: boolean = false;
@@ -103,7 +105,8 @@ namespace Endabgabe {
     world.update();
     car.update();
     policeCar.update();
-    cam.update(car.getCamPos());
+    //cam.update(car.getCamPos());
+    cam.update(car.getPosition(), car.getCamPos());
     ƒ.Physics.simulate();  // if physics is included and used
     ƒ.AudioManager.default.update();
     renderScreen();
@@ -172,12 +175,10 @@ namespace Endabgabe {
   }
 
   function setupCam(): void {
-    camNode = graph.getChildrenByName("Cam")[0];
-    cameraNode = camNode.getChildren()[0].getChildrenByName("Camera")[0];
-    cameraTranslatorNode = cameraNode.getChildren()[0];
-    viewport.camera = cmpCamera = cameraTranslatorNode.getComponent(ƒ.ComponentCamera);
-    //viewport.camera = cmpCamera = carNode.getChildrenByName("Main")[0].getChildrenByName("testcam")[0].getComponent(ƒ.ComponentCamera);
-    cam = new Cam(camNode);
+    //viewport.camera = cmpCamera = carNode.getChildrenByName("PlayerMain")[0].getChildrenByName("testcam")[0].getComponent(ƒ.ComponentCamera);
+    camNode = graph.getChildrenByName("NewCam")[0];
+    viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
+    cam = new Cam(camNode, car.getPosition(), config);
   }
 
   function setupAudio(): void {

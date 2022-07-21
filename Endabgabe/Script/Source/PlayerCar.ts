@@ -40,7 +40,6 @@ namespace Endabgabe {
             //this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]));
             this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
             this.pinToGround();
-            this.setSpeed();
             this.updateCamPosArray();
             this.updatePos();
             this.updateEngineSound();
@@ -70,6 +69,10 @@ namespace Endabgabe {
             return ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
         }
 
+        public getRotation(): ƒ.Vector3 {
+            return ƒ.Vector3.SCALE(this.main.mtxLocal.getEulerAngles(), 1);
+        }
+
         private hndCollision = (_event: ƒ.EventPhysics): void => {
             let graph: ƒ.GraphInstance = <ƒ.GraphInstance>_event.cmpRigidbody.node;
             if (graph.idSource == World.coinGraphID || graph.idSource == World.canGraphID) {
@@ -83,7 +86,7 @@ namespace Endabgabe {
 
         private setupEngineSound(): void {
             this.audio.play();
-            this.audio.volume = 0.2;
+            this.audio.volume = 0.1;
             this.audio.loop = true;
             if ("preservesPitch" in this.audio) {
                 this.audio.preservesPitch = false;
@@ -104,6 +107,7 @@ namespace Endabgabe {
 
         private updateEngineSound() {
             this.audio.playbackRate = 1 + this.getSpeedPercent();
+            this.audio.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9));
         }
     }
 }

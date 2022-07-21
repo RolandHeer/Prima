@@ -2,12 +2,36 @@
 var Endabgabe;
 (function (Endabgabe) {
     class Cam {
+        config;
+        centerRB;
+        main;
+        mainRB;
+        reAnker;
         camNode;
-        constructor(_camNode) {
+        constructor(_camNode, _carPos, _config) {
+            this.config = _config;
             this.camNode = _camNode;
+            //this.centerRB = this.camNode.getComponent(ƒ.ComponentRigidbody);
+            //this.main = this.camNode.getChildren()[0];
+            //this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            //let sphericalJoint: ƒ.JointSpherical = new ƒ.JointSpherical(this.centerRB, this.mainRB);
+            //sphericalJoint.springFrequency = 0;
+            //this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_2;
+            //this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_2;
+            //this.reAnker = this.main.getChildren()[0].getChildren()[0];
+            //this.camNode.addComponent(sphericalJoint);
         }
-        update(_newPos) {
-            this.camNode.mtxLocal.rotation = _newPos;
+        update(_newDestPos, _newDestRot) {
+            this.camNode.mtxLocal.rotation = _newDestRot;
+            /*
+            let f: number = ƒ.Loop.timeFrameGame / this.config.speedDivider;
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(ƒ.Vector3.DIFFERENCE(_newDestPos, this.mainRB.getPosition()), 50 * f));//Force into new Position
+            this.pinToGround();
+            this.mainRB.setRotation(_newDestRot);
+           // this.reAnker.mtxLocal.lookAt(new ƒ.Vector3(0.01, 0.01, 0.01), this.main.mtxLocal.getY(), true);*/
+        }
+        pinToGround() {
+            //this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 53)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
         }
     }
     Endabgabe.Cam = Cam;
@@ -37,8 +61,9 @@ var Endabgabe;
         gaz = 100;
         currentSpeed = 0;
         gripFactor = 0.8; // 0 = no grip, 1 = full grip
+        isPolice = false;
         getSpeedPercent() {
-            return this.currentSpeed / 0.022;
+            return this.currentSpeed / 0.03;
         }
         updateDriving(_inputDrive) {
             let forward;
@@ -65,16 +90,17 @@ var Endabgabe;
             if (_inputDrive < 0 && forward <= 0) {
                 _inputDrive = _inputDrive / 3;
             }
+            let f = ƒ.Loop.timeFrameGame / this.config.speedDivider;
             if (forward >= 0) {
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor));
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor)));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor) * f));
             }
             else {
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor));
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor)));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor) * f));
             }
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150));
-            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2))); //ehemals Loop Frame Time
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150 * f));
+            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f)); //ehemals Loop Frame Time
             if (forward > 0) {
                 return this.getSpeedPercent();
             }
@@ -83,8 +109,9 @@ var Endabgabe;
             }
         }
         updateTurning(_drive, _turnInput) {
+            let f = this.config.turnDivider / ƒ.Loop.fpsGameAverage;
             this.ctrlTurn.setInput(_turnInput);
-            this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive)));
+            this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * f));
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
         }
@@ -94,9 +121,10 @@ var Endabgabe;
         updatePos() {
             this.velocity = ƒ.Vector3.DIFFERENCE(this.mainRB.getPosition(), this.pos);
             this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
+            this.setSpeed();
         }
         setSpeed() {
-            this.currentSpeed = this.pos.getDistance(this.mainRB.getPosition()) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
+            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
         }
         updateTilt(_drive, _turn) {
             if (_drive > 0) {
@@ -219,6 +247,9 @@ var Endabgabe;
     let cam;
     let world;
     let gamestate;
+    //       DATA      \\\
+    let speedImg = new Image;
+    speedImg.src = "./Img/speedometer.png";
     /// RUNTIME VALUES \\\
     let jirkaMode = false;
     window.addEventListener("load", init);
@@ -273,7 +304,8 @@ var Endabgabe;
         world.update();
         car.update();
         policeCar.update();
-        cam.update(car.getCamPos());
+        //cam.update(car.getCamPos());
+        cam.update(car.getPosition(), car.getCamPos());
         ƒ.Physics.simulate(); // if physics is included and used
         ƒ.AudioManager.default.update();
         renderScreen();
@@ -333,12 +365,10 @@ var Endabgabe;
         policeCar = new Endabgabe.PoliceCar(config, policeCarNode, car);
     }
     function setupCam() {
-        camNode = graph.getChildrenByName("Cam")[0];
-        cameraNode = camNode.getChildren()[0].getChildrenByName("Camera")[0];
-        cameraTranslatorNode = cameraNode.getChildren()[0];
-        viewport.camera = cmpCamera = cameraTranslatorNode.getComponent(ƒ.ComponentCamera);
-        //viewport.camera = cmpCamera = carNode.getChildrenByName("Main")[0].getChildrenByName("testcam")[0].getComponent(ƒ.ComponentCamera);
-        cam = new Endabgabe.Cam(camNode);
+        //viewport.camera = cmpCamera = carNode.getChildrenByName("PlayerMain")[0].getChildrenByName("testcam")[0].getComponent(ƒ.ComponentCamera);
+        camNode = graph.getChildrenByName("NewCam")[0];
+        viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
+        cam = new Endabgabe.Cam(camNode, car.getPosition(), config);
     }
     function setupAudio() {
         ƒ.AudioManager.default.listenTo(graph);
@@ -380,7 +410,6 @@ var Endabgabe;
             //this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]));
             this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
             this.pinToGround();
-            this.setSpeed();
             this.updateCamPosArray();
             this.updatePos();
             this.updateEngineSound();
@@ -403,6 +432,9 @@ var Endabgabe;
         getPosition() {
             return ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
         }
+        getRotation() {
+            return ƒ.Vector3.SCALE(this.main.mtxLocal.getEulerAngles(), 1);
+        }
         hndCollision = (_event) => {
             let graph = _event.cmpRigidbody.node;
             if (graph.idSource == Endabgabe.World.coinGraphID || graph.idSource == Endabgabe.World.canGraphID) {
@@ -414,7 +446,7 @@ var Endabgabe;
         }
         setupEngineSound() {
             this.audio.play();
-            this.audio.volume = 0.2;
+            this.audio.volume = 0.1;
             this.audio.loop = true;
             if ("preservesPitch" in this.audio) {
                 this.audio.preservesPitch = false;
@@ -433,6 +465,7 @@ var Endabgabe;
         }
         updateEngineSound() {
             this.audio.playbackRate = 1 + this.getSpeedPercent();
+            this.audio.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9));
         }
     }
     Endabgabe.PlayerCar = PlayerCar;
@@ -451,6 +484,7 @@ var Endabgabe;
             super();
             this.config = _config;
             this.player = _player;
+            this.isPolice = true;
             this.carNode = _carNode;
             this.main = _carNode.getChildren()[0];
             this.body = this.main.getChildrenByName("Body")[0];
@@ -473,7 +507,6 @@ var Endabgabe;
             let dir = this.getDir();
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
-            this.setSpeed();
             this.updatePos();
         }
         updateGaz(_factor) {
@@ -697,7 +730,7 @@ var Endabgabe;
                     let coinCluster = this.doomedCollect[0].getParent().getParent();
                     if (coinCluster.getChildren().length == 1) {
                         coinCluster.getParent().removeChild(coinCluster);
-                        this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1);
+                        this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1, 0);
                     }
                     else {
                         coinCluster.removeChild(this.doomedCollect[0].getParent());

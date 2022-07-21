@@ -85,7 +85,7 @@ namespace Endabgabe {
                     let coinCluster: ƒ.Node = this.doomedCollect[0].getParent().getParent();
                     if (coinCluster.getChildren().length == 1) {
                         coinCluster.getParent().removeChild(coinCluster);
-                        this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1);
+                        this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1, 0);
                     } else {
                         coinCluster.removeChild(this.doomedCollect[0].getParent());
                     }

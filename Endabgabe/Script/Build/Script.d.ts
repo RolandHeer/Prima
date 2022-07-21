@@ -1,9 +1,15 @@
 declare namespace Endabgabe {
     import ƒ = FudgeCore;
     class Cam {
+        private config;
+        private centerRB;
+        private main;
+        private mainRB;
+        private reAnker;
         private camNode;
-        constructor(_camNode: ƒ.Node);
-        update(_newPos: ƒ.Vector3): void;
+        constructor(_camNode: ƒ.Node, _carPos: ƒ.Vector3, _config: Config);
+        update(_newDestPos: ƒ.Vector3, _newDestRot: ƒ.Vector3): void;
+        private pinToGround;
     }
 }
 declare namespace Endabgabe {
@@ -26,6 +32,7 @@ declare namespace Endabgabe {
         protected gaz: number;
         protected currentSpeed: number;
         protected gripFactor: number;
+        protected isPolice: boolean;
         abstract update(): void;
         getSpeedPercent(): number;
         protected updateDriving(_inputDrive: number): number;
@@ -61,12 +68,10 @@ declare namespace Script {
 }
 declare namespace Endabgabe {
     interface Config {
+        speedDivider: number;
+        turnDivider: number;
         fontHeight: number;
         margin: number;
-        maxSpeed: number;
-        accelSpeed: number;
-        pMaxSpeed: number;
-        pAccelSpeed: number;
         maxTurn: number;
         accelTurn: number;
         camDelay: number;
@@ -89,6 +94,7 @@ declare namespace Endabgabe {
         getGazPercent(): number;
         getScore(): number;
         getPosition(): ƒ.Vector3;
+        getRotation(): ƒ.Vector3;
         private hndCollision;
         protected updateGaz(_factor: number): void;
         private setupEngineSound;
