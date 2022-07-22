@@ -1,0 +1,14 @@
+{
+    "captureTime": 5999,
+    "speedDivider": 40,
+    "turnDivider": 40,
+    "policeDivider": 35,
+    "policeTurn": 45,
+    "maxTurn": 6,
+    "accelTurn": 200,
+    "fuelConsumption": 0.15,
+    "camDelay": 12,
+    "maxCoinCluster": 6,
+    "maxCans": 2,
+    "speedometerHeight": 0.3
+}
