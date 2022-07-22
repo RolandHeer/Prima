@@ -50,7 +50,7 @@ namespace Endabgabe {
         }
 
         public hasHim(): boolean {
-            if (this.countdown < 0) {
+            if (this.getCountdown() == 0) {
                 return true;
             }
             return false;

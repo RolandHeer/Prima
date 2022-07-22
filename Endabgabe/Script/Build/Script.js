@@ -514,7 +514,7 @@ var Endabgabe;
             }
         };
         updateGaz(_factor) {
-            this.gaz = Math.max(0, this.gaz - this.config.gazSub * Math.abs(_factor));
+            this.gaz = Math.max(0, this.gaz - this.config.fuelConsumption * Math.abs(_factor));
         }
         setupEngineSound() {
             this.audio.play();
@@ -586,7 +586,7 @@ var Endabgabe;
             this.updateCountdown();
         }
         hasHim() {
-            if (this.countdown < 0) {
+            if (this.getCountdown() == 0) {
                 return true;
             }
             return false;

@@ -88,7 +88,7 @@ namespace Endabgabe {
         }
 
         protected updateGaz(_factor: number): void {
-            this.gaz = Math.max(0, this.gaz - this.config.gazSub * Math.abs(_factor));
+            this.gaz = Math.max(0, this.gaz - this.config.fuelConsumption * Math.abs(_factor));
         }
 
         private setupEngineSound(): void {

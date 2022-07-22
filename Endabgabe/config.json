@@ -6,7 +6,7 @@
     "policeTurn": 45,
     "maxTurn": 6,
     "accelTurn": 200,
-    "gazSub": 0.1,
+    "fuelConsumption": 0.15,
     "camDelay": 12,
     "maxCoinCluster": 6,
     "maxCans": 2,

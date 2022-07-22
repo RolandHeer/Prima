@@ -8,7 +8,7 @@ namespace Endabgabe {
     turnDivider: number;
     maxTurn: number;
     accelTurn: number;
-    gazSub: number;
+    fuelConsumption: number;
     camDelay: number;
     maxCoinCluster: number;
     maxCans: number;
