@@ -1,4 +1,5 @@
 {
+    "captureTime": 5999,
     "speedDivider": 40,
     "turnDivider": 40,
     "policeDivider": 35,
@@ -8,6 +9,6 @@
     "gazSub": 0.1,
     "camDelay": 12,
     "maxCoinCluster": 6,
-    "maxCans": 3,
+    "maxCans": 2,
     "speedometerHeight": 0.3
 }

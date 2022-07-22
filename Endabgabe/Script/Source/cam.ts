@@ -22,7 +22,7 @@ namespace Endabgabe {
             //this.camNode.addComponent(sphericalJoint);
         }
 
-        public update(_newDestPos: ƒ.Vector3, _newDestRot: ƒ.Vector3) {
+        public update(_newDestRot: ƒ.Vector3) {
             this.camNode.mtxLocal.rotation = _newDestRot;
             /*
             let f: number = ƒ.Loop.timeFrameGame / this.config.speedDivider;

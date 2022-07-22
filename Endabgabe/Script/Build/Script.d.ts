@@ -8,7 +8,7 @@ declare namespace Endabgabe {
         private reAnker;
         private camNode;
         constructor(_camNode: ƒ.Node, _carPos: ƒ.Vector3, _config: Config);
-        update(_newDestPos: ƒ.Vector3, _newDestRot: ƒ.Vector3): void;
+        update(_newDestRot: ƒ.Vector3): void;
         private pinToGround;
     }
 }
@@ -68,6 +68,7 @@ declare namespace Script {
 }
 declare namespace Endabgabe {
     interface Config {
+        captureTime: number;
         speedDivider: number;
         turnDivider: number;
         maxTurn: number;
@@ -92,6 +93,7 @@ declare namespace Endabgabe {
         fillTank(): void;
         getCamPos(): ƒ.Vector3;
         getGazPercent(): number;
+        isOutOfFuel(): boolean;
         getScore(): number;
         getPosition(): ƒ.Vector3;
         getRotation(): ƒ.Vector3;
@@ -106,10 +108,16 @@ declare namespace Endabgabe {
     import ƒ = FudgeCore;
     class PoliceCar extends Car {
         private player;
+        private countdown;
+        private counting;
         gottchaEvent: CustomEvent;
         constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar);
         update(): void;
+        hasHim(): boolean;
+        isCounting(): boolean;
+        getCountdown(): number;
         protected updateGaz(_factor: number): void;
+        private updateCountdown;
         private hndCollision;
         private getDir;
     }

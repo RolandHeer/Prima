@@ -61,6 +61,13 @@ namespace Endabgabe {
             return this.gaz;
         }
 
+        public isOutOfFuel(): boolean {
+            if (this.gaz == 0 && this.getSpeedPercent() < 0.01) {
+                return true;
+            }
+            return false;
+        }
+
         public getScore(): number {
             return this.score;
         }
