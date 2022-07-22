@@ -1,15 +1,9 @@
 declare namespace Endabgabe {
     import ƒ = FudgeCore;
     class Cam {
-        private config;
-        private centerRB;
-        private main;
-        private mainRB;
-        private reAnker;
         private camNode;
         constructor(_camNode: ƒ.Node, _carPos: ƒ.Vector3, _config: Config);
         update(_newDestRot: ƒ.Vector3): void;
-        private pinToGround;
     }
 }
 declare namespace Endabgabe {
@@ -45,7 +39,6 @@ declare namespace Endabgabe {
         protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2;
         protected abstract updateGaz(_factor: number): void;
         protected setupControls(_config: Config): void;
-        protected manageAudio(): void;
     }
 }
 declare namespace Endabgabe {

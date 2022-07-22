@@ -2,14 +2,14 @@
 var Endabgabe;
 (function (Endabgabe) {
     class Cam {
-        config;
-        centerRB;
-        main;
-        mainRB;
-        reAnker;
+        /*private config: Config;
+        private centerRB: ƒ.ComponentRigidbody;
+        private main: ƒ.Node;
+        private mainRB: ƒ.ComponentRigidbody;
+        private reAnker: ƒ.Node;*/
         camNode;
         constructor(_camNode, _carPos, _config) {
-            this.config = _config;
+            //this.config = _config;
             this.camNode = _camNode;
             //this.centerRB = this.camNode.getComponent(ƒ.ComponentRigidbody);
             //this.main = this.camNode.getChildren()[0];
@@ -29,9 +29,6 @@ var Endabgabe;
             this.pinToGround();
             this.mainRB.setRotation(_newDestRot);
            // this.reAnker.mtxLocal.lookAt(new ƒ.Vector3(0.01, 0.01, 0.01), this.main.mtxLocal.getY(), true);*/
-        }
-        pinToGround() {
-            //this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 53)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
         }
     }
     Endabgabe.Cam = Cam;
@@ -155,11 +152,6 @@ var Endabgabe;
             this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, 0 /* PROPORTIONAL */);
             this.ctrlTurn.setDelay(_config.accelTurn);
         }
-        manageAudio() {
-            let ant;
-            let audioNode = this.engineSoundComponent.getAudioNode(ant);
-            //audioNode.
-        }
     }
     Endabgabe.Car = Car;
 })(Endabgabe || (Endabgabe = {}));
@@ -232,8 +224,6 @@ var Endabgabe;
     let graph;
     let viewport;
     let camNode;
-    let cameraNode;
-    let cameraTranslatorNode;
     let cmpCamera;
     let carNode;
     let policeCarNode;

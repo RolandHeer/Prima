@@ -129,10 +129,5 @@ namespace Endabgabe {
             this.ctrlTurn.setDelay(_config.accelTurn);
         }
 
-        protected manageAudio(): void {
-            let ant: ƒ.AUDIO_NODE_TYPE;
-            let audioNode: AudioNode = this.engineSoundComponent.getAudioNode(ant);
-            //audioNode.
-        }
     }
 }

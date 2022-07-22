@@ -22,8 +22,6 @@ namespace Endabgabe {
   let graph: ƒ.Node;
   let viewport: ƒ.Viewport;
   let camNode: ƒ.Node;
-  let cameraNode: ƒ.Node;
-  let cameraTranslatorNode: ƒ.Node;
   let cmpCamera: ƒ.ComponentCamera;
   let carNode: ƒ.Node;
   let policeCarNode: ƒ.Node;
