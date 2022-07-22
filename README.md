@@ -12,7 +12,7 @@ Repository for the module PRIMA (Prototyping interactive media-applications and 
 - Docent: Prof. Dipl.-Ing. Jirka R. Dell'Oro-Friedl, HFU
 - Click here for the [Game](https://rolandheer.github.io/Prima/Endabgabe/index.html)
 - Click here for the [source Code](https://github.com/RolandHeer/Prima/tree/main/Endabgabe)
-- Link to the design document:
+- Link to the [design document](https://github.com/RolandHeer/Prima/tree/main/Endabgabe/Documentation/designDocument.pdf): 
 
 ### Checklist
 
