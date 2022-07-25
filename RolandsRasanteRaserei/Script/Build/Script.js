@@ -298,6 +298,7 @@ var Raserei;
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
+        console.log(Raserei.averageDeltaTime);
         updateDeltaTime();
         world.update();
         if (state == 1) {

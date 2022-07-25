@@ -111,6 +111,7 @@ namespace Raserei {
   }
 
   function update(_event: Event): void {
+    console.log(averageDeltaTime);
     updateDeltaTime();
     world.update();
     if (state == 1) {
