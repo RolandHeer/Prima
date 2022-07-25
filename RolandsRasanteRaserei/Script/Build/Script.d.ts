@@ -61,6 +61,7 @@ declare namespace Script {
 }
 declare namespace Raserei {
     interface Config {
+        averageCount: number;
         captureTime: number;
         speedDivider: number;
         turnDivider: number;
@@ -73,6 +74,7 @@ declare namespace Raserei {
         speedometerHeight: number;
         [key: string]: number | string | Config;
     }
+    let averageDeltaTime: number;
 }
 declare namespace Raserei {
     import ƒ = FudgeCore;

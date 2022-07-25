@@ -3,6 +3,7 @@ namespace Raserei {
   ƒ.Debug.info("Main Program Template running!");
 
   export interface Config {
+    averageCount: number;
     captureTime: number;
     speedDivider: number;
     turnDivider: number;
@@ -52,6 +53,8 @@ namespace Raserei {
 
   /// RUNTIME VALUES \\\
   let jirkaMode: boolean = false;
+  let DeltaTimeArray: number[] = [];
+  export let averageDeltaTime: number = 50;
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
@@ -108,6 +111,7 @@ namespace Raserei {
   }
 
   function update(_event: Event): void {
+    updateDeltaTime();
     world.update();
     if (state == 1) {
       car.update();
@@ -131,6 +135,19 @@ namespace Raserei {
       state = 3;
       console.log("He is dry lads!");
     }
+  }
+
+  function updateDeltaTime(): void {
+    DeltaTimeArray.push(ƒ.Loop.timeFrameGame);
+    if (DeltaTimeArray.length > config.averageCount) {
+      DeltaTimeArray.splice(0,1);
+    }
+    let tempAverage: number = 0;
+    for (let i: number = 0; i < DeltaTimeArray.length; i++) {
+      tempAverage += DeltaTimeArray[i];
+    }
+    tempAverage = tempAverage / Math.max(DeltaTimeArray.length - 1, 1);
+    averageDeltaTime = tempAverage;
   }
 
   function renderScreen(): void {
@@ -185,9 +202,9 @@ namespace Raserei {
   function drawMenu(f: number): void {
     if (state > 1) {
       let heading: string;
-      if(state == 2){
+      if (state == 2) {
         heading = "YOU HAVE BEEN CAUGHT";
-      }else if(state == 3){
+      } else if (state == 3) {
         heading = "YOUR TANK HAS RUN DRY";
       }
       crc2.textAlign = "center";

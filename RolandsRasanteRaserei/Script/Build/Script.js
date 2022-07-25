@@ -106,8 +106,7 @@ var Raserei;
             }
         }
         updateTurning(_drive, _turnInput) {
-            let f = this.config.turnDivider / ƒ.Loop.fpsGameAverage;
-            f = 1.5;
+            let f = Raserei.averageDeltaTime / this.config.turnDivider;
             this.ctrlTurn.setInput(_turnInput);
             this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * f));
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
@@ -248,6 +247,8 @@ var Raserei;
     coinImg.src = "././Img/coin.png";
     /// RUNTIME VALUES \\\
     let jirkaMode = false;
+    let DeltaTimeArray = [];
+    Raserei.averageDeltaTime = 50;
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
     let dialog;
@@ -297,6 +298,7 @@ var Raserei;
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
+        updateDeltaTime();
         world.update();
         if (state == 1) {
             car.update();
@@ -319,6 +321,18 @@ var Raserei;
             state = 3;
             console.log("He is dry lads!");
         }
+    }
+    function updateDeltaTime() {
+        DeltaTimeArray.push(ƒ.Loop.timeFrameGame);
+        if (DeltaTimeArray.length > config.averageCount) {
+            DeltaTimeArray.splice(0, 1);
+        }
+        let tempAverage = 0;
+        for (let i = 0; i < DeltaTimeArray.length; i++) {
+            tempAverage += DeltaTimeArray[i];
+        }
+        tempAverage = tempAverage / Math.max(DeltaTimeArray.length - 1, 1);
+        Raserei.averageDeltaTime = tempAverage;
     }
     function renderScreen() {
         viewport.draw();

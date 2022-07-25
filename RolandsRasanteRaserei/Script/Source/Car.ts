@@ -75,8 +75,7 @@ namespace Raserei {
         }
 
         protected updateTurning(_drive: number, _turnInput: number): void {
-            let f: number = this.config.turnDivider / ƒ.Loop.fpsGameAverage;
-            f = 1.5;
+            let f: number = averageDeltaTime / this.config.turnDivider;
             this.ctrlTurn.setInput(_turnInput);
             this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * f));
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
