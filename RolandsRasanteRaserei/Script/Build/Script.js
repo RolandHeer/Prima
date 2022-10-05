@@ -121,7 +121,7 @@ var Raserei;
             this.setSpeed();
         }
         setSpeed() {
-            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
+            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / Raserei.averageDeltaTime; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
         }
         updateTilt(_drive, _turn) {
             if (_drive > 0) {
@@ -232,6 +232,7 @@ var Raserei;
     let state = 1; //0=menue; 1=game running; 2=police got you; 3=no fuel
     ///     VALUES     \\\
     let config;
+    let highscore = getHighscore();
     ///     OBJECTS    \\\
     let car;
     let policeCar;
@@ -255,13 +256,22 @@ var Raserei;
     function init(_event) {
         dialog = document.querySelector("dialog");
         dialog.querySelector("h1").textContent = document.title;
-        dialog.addEventListener("click", function (_event) {
-            // @ts-ignore until HTMLDialog is implemented by all browsers and available in dom.d.ts
-            dialog.close();
-            startInteractiveViewport();
-        });
+        window.addEventListener("keydown", startViewport);
         //@ts-ignore
         dialog.showModal();
+    }
+    function startViewport() {
+        dialog.close();
+        startInteractiveViewport();
+        window.removeEventListener("keydown", startViewport);
+    }
+    function getHighscore() {
+        const x = document.cookie;
+        let tmp = x.split('; ').find((row) => row.startsWith("highscore" + '='))?.split('=')[1];
+        if (tmp != null) {
+            return parseInt(tmp);
+        }
+        return 0;
     }
     async function startInteractiveViewport() {
         // load resources referenced in the link-tag
@@ -298,7 +308,7 @@ var Raserei;
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        console.log(Raserei.averageDeltaTime);
+        //console.log(averageDeltaTime);
         updateDeltaTime();
         world.update();
         if (state == 1) {
@@ -389,6 +399,10 @@ var Raserei;
             else if (state == 3) {
                 heading = "YOUR TANK HAS RUN DRY";
             }
+            if (car.getScore() > highscore) {
+                setHighscore(car.getScore());
+                heading = "NEW HIGHSCORE!";
+            }
             crc2.textAlign = "center";
             crc2.fillStyle = "#000";
             crc2.globalAlpha = 0.7;
@@ -398,10 +412,20 @@ var Raserei;
             crc2.font = f * 0.25 + "px AGENCYB";
             crc2.fillText(heading, canvas.width / 2, canvas.height * 0.35);
             crc2.font = f * 0.2 + "px AGENCYB";
-            crc2.fillText("Score: " + car.getScore(), canvas.width / 2, canvas.height * 0.45);
+            if (heading == "NEW HIGHSCORE!") {
+                crc2.fillText("Score: " + car.getScore(), canvas.width / 2, canvas.height * 0.45);
+                crc2.fillText("old highscore: " + highscore, canvas.width / 2, canvas.height * 0.55);
+            }
+            else {
+                crc2.fillText("HIGHSCORE: " + highscore, canvas.width / 2, canvas.height * 0.45);
+                crc2.fillText("Your score: " + car.getScore(), canvas.width / 2, canvas.height * 0.55);
+            }
             crc2.font = f * 0.15 + "px AGENCYB";
             crc2.fillText("Thanks for Playing! Press F5 to restart 0:)", canvas.width / 2, canvas.height * 0.65);
         }
+    }
+    function setHighscore(_score) {
+        document.cookie = "highscore=" + _score + "; expires=Thu, 1 Dec 4711 12:00:00 UTC";
     }
     function enterPointerLock() {
         canvas.requestPointerLock();

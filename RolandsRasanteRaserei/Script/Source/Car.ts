@@ -93,7 +93,7 @@ namespace Raserei {
         }
 
         protected setSpeed(): void {
-            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / 50; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
+            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / averageDeltaTime; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
         }
 
         protected updateTilt(_drive: number, _turn: number): void {

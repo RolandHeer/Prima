@@ -33,6 +33,7 @@ namespace Raserei {
 
   ///     VALUES     \\\
   let config: Config;
+  let highscore: number = getHighscore();
 
   ///     OBJECTS    \\\
   let car: PlayerCar;
@@ -63,13 +64,24 @@ namespace Raserei {
   function init(_event: Event): void {
     dialog = document.querySelector("dialog");
     dialog.querySelector("h1").textContent = document.title;
-    dialog.addEventListener("click", function (_event) {
-      // @ts-ignore until HTMLDialog is implemented by all browsers and available in dom.d.ts
-      dialog.close();
-      startInteractiveViewport();
-    });
+    window.addEventListener("keydown", startViewport);
     //@ts-ignore
     dialog.showModal();
+  }
+
+  function startViewport(): void {
+    dialog.close();
+    startInteractiveViewport();
+    window.removeEventListener("keydown", startViewport);
+  }
+
+  function getHighscore(): number {
+    const x = document.cookie;
+    let tmp = x.split('; ').find((row) => row.startsWith("highscore" + '='))?.split('=')[1];
+    if (tmp != null) {
+      return parseInt(tmp);
+    }
+    return 0;
   }
 
   async function startInteractiveViewport(): Promise<void> {
@@ -111,7 +123,7 @@ namespace Raserei {
   }
 
   function update(_event: Event): void {
-    console.log(averageDeltaTime);
+    //console.log(averageDeltaTime);
     updateDeltaTime();
     world.update();
     if (state == 1) {
@@ -141,7 +153,7 @@ namespace Raserei {
   function updateDeltaTime(): void {
     DeltaTimeArray.push(ƒ.Loop.timeFrameGame);
     if (DeltaTimeArray.length > config.averageCount) {
-      DeltaTimeArray.splice(0,1);
+      DeltaTimeArray.splice(0, 1);
     }
     let tempAverage: number = 0;
     for (let i: number = 0; i < DeltaTimeArray.length; i++) {
@@ -208,6 +220,10 @@ namespace Raserei {
       } else if (state == 3) {
         heading = "YOUR TANK HAS RUN DRY";
       }
+      if (car.getScore() > highscore) {
+        setHighscore(car.getScore());
+        heading = "NEW HIGHSCORE!"
+      }
       crc2.textAlign = "center";
       crc2.fillStyle = "#000";
       crc2.globalAlpha = 0.7;
@@ -217,10 +233,20 @@ namespace Raserei {
       crc2.font = f * 0.25 + "px AGENCYB";
       crc2.fillText(heading, canvas.width / 2, canvas.height * 0.35);
       crc2.font = f * 0.2 + "px AGENCYB";
-      crc2.fillText("Score: " + car.getScore(), canvas.width / 2, canvas.height * 0.45);
+      if (heading == "NEW HIGHSCORE!") {
+        crc2.fillText("Score: " + car.getScore(), canvas.width / 2, canvas.height * 0.45);
+        crc2.fillText("old highscore: " + highscore, canvas.width / 2, canvas.height * 0.55);
+      } else {
+        crc2.fillText("HIGHSCORE: " + highscore, canvas.width / 2, canvas.height * 0.45);
+        crc2.fillText("Your score: " + car.getScore(), canvas.width / 2, canvas.height * 0.55);
+      }
       crc2.font = f * 0.15 + "px AGENCYB";
       crc2.fillText("Thanks for Playing! Press F5 to restart 0:)", canvas.width / 2, canvas.height * 0.65);
     }
+  }
+
+  function setHighscore(_score: number): void {
+    document.cookie = "highscore=" + _score + "; expires=Thu, 1 Dec 4711 12:00:00 UTC";
   }
 
   function enterPointerLock(): void {
