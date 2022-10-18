@@ -253,16 +253,10 @@ var Raserei;
     Raserei.averageDeltaTime = 50;
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
-    let dialog;
     function init(_event) {
-        dialog = document.querySelector("dialog");
-        dialog.querySelector("h1").textContent = document.title;
         window.addEventListener("keydown", startViewport);
-        //@ts-ignore
-        dialog.showModal();
     }
     function startViewport() {
-        dialog.close();
         startInteractiveViewport();
         window.removeEventListener("keydown", startViewport);
     }
