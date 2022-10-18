@@ -27,7 +27,7 @@ declare namespace Raserei {
         protected currentSpeed: number;
         protected gripFactor: number;
         protected isPolice: boolean;
-        abstract update(): void;
+        abstract update(_driving: boolean): void;
         getSpeedPercent(): number;
         protected updateDriving(_inputDrive: number): number;
         protected updateTurning(_drive: number, _turnInput: number): void;
@@ -83,7 +83,7 @@ declare namespace Raserei {
         private camPosArray;
         private audio;
         constructor(_config: Config, _car: ƒ.Node, _world: World);
-        update(): void;
+        update(_playing: boolean): void;
         incScore(): void;
         fillTank(): void;
         getCamPos(): ƒ.Vector3;
@@ -105,9 +105,10 @@ declare namespace Raserei {
         private player;
         private countdown;
         private counting;
+        private sirenSoundComponent;
         gottchaEvent: CustomEvent;
         constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar);
-        update(): void;
+        update(_playing: boolean): void;
         hasHim(): boolean;
         isCounting(): boolean;
         getCountdown(): number;

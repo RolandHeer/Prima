@@ -22,14 +22,17 @@ canvas.fullscreen {
   font-size: 20px;
   visibility: hidden;
 }
+@font-face {
+  font-family: 'AGENCYB';
+  src: url('./font/AGENCYB.TTF');
+}
+
+#dialog {
+  font-family: 'AGENCYB';
+}
 
 .element {
   display: flex;
   align-items: center;
   margin-bottom: 5px;
-}
-
-@font-face {
-  font-family: 'AGENCYB';
-  src: url('./font/AGENCYB.TTF');
 }

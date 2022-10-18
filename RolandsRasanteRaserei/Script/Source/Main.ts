@@ -52,9 +52,11 @@ namespace Raserei {
   let coinImg: HTMLImageElement = new Image;
   coinImg.src = "././Img/coin.png";
 
+  let music: HTMLAudioElement = new Audio("audio/Slider.mp3");
+
   /// RUNTIME VALUES \\\
-  let jirkaMode: boolean = false;
   let DeltaTimeArray: number[] = [];
+  let countIn: number = 0;
   export let averageDeltaTime: number = 50;
 
   window.addEventListener("load", init);
@@ -108,6 +110,8 @@ namespace Raserei {
 
 
   async function start(_event: CustomEvent): Promise<void> {
+    music.loop = true;
+    music.play();
     let response: Response = await fetch("config.json");
     config = await response.json();
     initValues();
@@ -127,10 +131,21 @@ namespace Raserei {
     updateDeltaTime();
     world.update();
     if (state == 1) {
-      car.update();
+      car.update(true);
     }
     if (state != 0) {
-      policeCar.update();
+      if (state != 1) {
+        policeCar.update(false);
+      } else {
+        policeCar.update(true);
+      }
+      car.update(false);
+    }
+    if (state > 1) {
+      music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 7000), 0);
+      if (music.volume == 0) {
+        document.location.reload();
+      }
     }
     cam.update(car.getCamPos());
     updateGameState();
@@ -169,18 +184,43 @@ namespace Raserei {
   }
 
   function renderVUI(): void {
-    // Coins
     let f: number = canvas.height * config.speedometerHeight;
+    //CountIN
+    if (countIn < 3000) {
+      crc2.fillStyle = "#fff";
+      crc2.font = f * 0.5 + "px AGENCYB";
+      crc2.lineWidth = f * 0.1;
+      crc2.textAlign = "center";
+      if (countIn < 700) {
+        crc2.strokeText("5", canvas.width / 2, canvas.height / 2);
+        crc2.fillText("5", canvas.width / 2, canvas.height / 2);
+      } else if (countIn < 1150) {
+        crc2.strokeText("4", canvas.width / 2, canvas.height / 2);
+        crc2.fillText("4", canvas.width / 2, canvas.height / 2);
+      } else if (countIn < 1500) {
+        crc2.strokeText("3", canvas.width / 2, canvas.height / 2);
+        crc2.fillText("3", canvas.width / 2, canvas.height / 2);
+      } else if (countIn < 1850) {
+        crc2.strokeText("2", canvas.width / 2, canvas.height / 2);
+        crc2.fillText("2", canvas.width / 2, canvas.height / 2);
+      } else if (countIn < 2200) {
+        crc2.strokeText("1", canvas.width / 2, canvas.height / 2);
+        crc2.fillText("1", canvas.width / 2, canvas.height / 2);
+      } else if (countIn < 2550) {
+        crc2.strokeText("0", canvas.width / 2, canvas.height / 2);
+        crc2.fillText("0", canvas.width / 2, canvas.height / 2);
+      }
+      countIn += ƒ.Loop.timeFrameGame;
+    }
+    // Coins
     crc2.textAlign = "left";
     crc2.fillStyle = "#fff";
     crc2.font = f * 0.2 + "px AGENCYB";
-    if (!jirkaMode) {
-      crc2.drawImage(coinImg, f / 4, canvas.height - f * 0.46, f / 3, f / 3);
-      crc2.font = f * 0.2 + "px AGENCYB";
-      crc2.lineWidth = f * 0.05;
-      crc2.strokeText("" + car.getScore(), f * 0.5, canvas.height - f * 0.1);
-      crc2.fillText("" + car.getScore(), f * 0.5, canvas.height - f * 0.1);
-    }
+    crc2.drawImage(coinImg, f / 4, canvas.height - f * 0.46, f / 3, f / 3);
+    crc2.font = f * 0.2 + "px AGENCYB";
+    crc2.lineWidth = f * 0.05;
+    crc2.strokeText("" + car.getScore(), f * 0.5, canvas.height - f * 0.1);
+    crc2.fillText("" + car.getScore(), f * 0.5, canvas.height - f * 0.1);
     // Speedometer and Gaz
     crc2.save();
     crc2.resetTransform();
@@ -218,7 +258,7 @@ namespace Raserei {
       if (state == 2) {
         heading = "YOU HAVE BEEN CAUGHT";
       } else if (state == 3) {
-        heading = "YOUR TANK HAS RUN DRY";
+        heading = "YOUR GAS TANK HAS RUN DRY";
       }
       if (car.getScore() > highscore) {
         setHighscore(car.getScore());
@@ -260,13 +300,6 @@ namespace Raserei {
         lockMode = true;
         document.exitPointerLock();
         break;
-      case "KeyJ":
-        jirkaMode = !jirkaMode;
-        if (jirkaMode) {
-          document.getElementById("vui").style.visibility = "visible";
-        } else {
-          document.getElementById("vui").style.visibility = "hidden";
-        }
     }
   }
 

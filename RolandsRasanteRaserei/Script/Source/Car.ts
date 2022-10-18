@@ -29,7 +29,7 @@ namespace Raserei {
 
         protected isPolice: boolean = false;
 
-        public abstract update(): void;
+        public abstract update(_driving: boolean): void;
 
         public getSpeedPercent(): number {
             return this.currentSpeed / 0.025;

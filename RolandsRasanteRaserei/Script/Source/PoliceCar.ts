@@ -5,6 +5,7 @@ namespace Raserei {
         private player: PlayerCar;
         private countdown: number;
         private counting: boolean = true;
+        private sirenSoundComponent: ƒ.ComponentAudio;
         public gottchaEvent: CustomEvent = new CustomEvent("gottcha", {
             detail: {
                 message: "I got him lads!"
@@ -32,6 +33,7 @@ namespace Raserei {
             this.mainRB.setRotation(new ƒ.Vector3(-90, 0, 0));
 
             this.engineSoundComponent = <ƒ.ComponentAudio>this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
+            this.sirenSoundComponent = <ƒ.ComponentAudio>this.main.getChildrenByName("Audio")[0].getAllComponents()[1];
 
             this.pos = this.mainRB.getPosition();
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
@@ -41,12 +43,16 @@ namespace Raserei {
             this.countdown = this.config.captureTime;
         }
 
-        public update(): void {
+        public update(_playing: boolean): void {
             let dir: ƒ.Vector2 = this.getDir();
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
             this.updatePos();
             this.updateCountdown();
+            if(!_playing){
+                this.engineSoundComponent.volume = Math.max(this.engineSoundComponent.volume - 0.01, 0);
+                this.sirenSoundComponent.volume = Math.max(this.sirenSoundComponent.volume - 0.01, 0);
+            }
         }
 
         public hasHim(): boolean {

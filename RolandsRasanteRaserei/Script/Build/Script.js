@@ -246,9 +246,10 @@ var Raserei;
     needleImg.src = "././Img/needle.png";
     let coinImg = new Image;
     coinImg.src = "././Img/coin.png";
+    let music = new Audio("audio/Slider.mp3");
     /// RUNTIME VALUES \\\
-    let jirkaMode = false;
     let DeltaTimeArray = [];
+    let countIn = 0;
     Raserei.averageDeltaTime = 50;
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
@@ -295,6 +296,8 @@ var Raserei;
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     }
     async function start(_event) {
+        music.loop = true;
+        music.play();
         let response = await fetch("config.json");
         config = await response.json();
         initValues();
@@ -312,10 +315,22 @@ var Raserei;
         updateDeltaTime();
         world.update();
         if (state == 1) {
-            car.update();
+            car.update(true);
         }
         if (state != 0) {
-            policeCar.update();
+            if (state != 1) {
+                policeCar.update(false);
+            }
+            else {
+                policeCar.update(true);
+            }
+            car.update(false);
+        }
+        if (state > 1) {
+            music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 7000), 0);
+            if (music.volume == 0) {
+                document.location.reload();
+            }
         }
         cam.update(car.getCamPos());
         updateGameState();
@@ -350,18 +365,48 @@ var Raserei;
         renderVUI();
     }
     function renderVUI() {
-        // Coins
         let f = canvas.height * config.speedometerHeight;
+        //CountIN
+        if (countIn < 3000) {
+            crc2.fillStyle = "#fff";
+            crc2.font = f * 0.5 + "px AGENCYB";
+            crc2.lineWidth = f * 0.1;
+            crc2.textAlign = "center";
+            if (countIn < 700) {
+                crc2.strokeText("5", canvas.width / 2, canvas.height / 2);
+                crc2.fillText("5", canvas.width / 2, canvas.height / 2);
+            }
+            else if (countIn < 1150) {
+                crc2.strokeText("4", canvas.width / 2, canvas.height / 2);
+                crc2.fillText("4", canvas.width / 2, canvas.height / 2);
+            }
+            else if (countIn < 1500) {
+                crc2.strokeText("3", canvas.width / 2, canvas.height / 2);
+                crc2.fillText("3", canvas.width / 2, canvas.height / 2);
+            }
+            else if (countIn < 1850) {
+                crc2.strokeText("2", canvas.width / 2, canvas.height / 2);
+                crc2.fillText("2", canvas.width / 2, canvas.height / 2);
+            }
+            else if (countIn < 2200) {
+                crc2.strokeText("1", canvas.width / 2, canvas.height / 2);
+                crc2.fillText("1", canvas.width / 2, canvas.height / 2);
+            }
+            else if (countIn < 2550) {
+                crc2.strokeText("0", canvas.width / 2, canvas.height / 2);
+                crc2.fillText("0", canvas.width / 2, canvas.height / 2);
+            }
+            countIn += ƒ.Loop.timeFrameGame;
+        }
+        // Coins
         crc2.textAlign = "left";
         crc2.fillStyle = "#fff";
         crc2.font = f * 0.2 + "px AGENCYB";
-        if (!jirkaMode) {
-            crc2.drawImage(coinImg, f / 4, canvas.height - f * 0.46, f / 3, f / 3);
-            crc2.font = f * 0.2 + "px AGENCYB";
-            crc2.lineWidth = f * 0.05;
-            crc2.strokeText("" + car.getScore(), f * 0.5, canvas.height - f * 0.1);
-            crc2.fillText("" + car.getScore(), f * 0.5, canvas.height - f * 0.1);
-        }
+        crc2.drawImage(coinImg, f / 4, canvas.height - f * 0.46, f / 3, f / 3);
+        crc2.font = f * 0.2 + "px AGENCYB";
+        crc2.lineWidth = f * 0.05;
+        crc2.strokeText("" + car.getScore(), f * 0.5, canvas.height - f * 0.1);
+        crc2.fillText("" + car.getScore(), f * 0.5, canvas.height - f * 0.1);
         // Speedometer and Gaz
         crc2.save();
         crc2.resetTransform();
@@ -397,7 +442,7 @@ var Raserei;
                 heading = "YOU HAVE BEEN CAUGHT";
             }
             else if (state == 3) {
-                heading = "YOUR TANK HAS RUN DRY";
+                heading = "YOUR GAS TANK HAS RUN DRY";
             }
             if (car.getScore() > highscore) {
                 setHighscore(car.getScore());
@@ -437,14 +482,6 @@ var Raserei;
                 lockMode = true;
                 document.exitPointerLock();
                 break;
-            case "KeyJ":
-                jirkaMode = !jirkaMode;
-                if (jirkaMode) {
-                    document.getElementById("vui").style.visibility = "visible";
-                }
-                else {
-                    document.getElementById("vui").style.visibility = "hidden";
-                }
         }
     }
     function initValues() {
@@ -502,13 +539,14 @@ var Raserei;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
         }
-        update() {
-            //this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]));
-            this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
-            this.pinToGround();
-            this.updateCamPosArray();
-            this.updatePos();
-            this.updateEngineSound();
+        update(_playing) {
+            if (_playing) {
+                this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
+                this.pinToGround();
+                this.updateCamPosArray();
+                this.updatePos();
+            }
+            this.updateEngineSound(_playing);
         }
         incScore() {
             this.score++;
@@ -565,9 +603,14 @@ var Raserei;
                 this.camPosArray.splice(0, 1);
             }
         }
-        updateEngineSound() {
-            this.audio.playbackRate = 1 + this.getSpeedPercent();
-            this.audio.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9));
+        updateEngineSound(_playing) {
+            if (_playing) {
+                this.audio.playbackRate = 1 + this.getSpeedPercent();
+                this.audio.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9));
+            }
+            else {
+                this.audio.volume = Math.max(this.audio.volume - 0.01, 0);
+            }
         }
     }
     Raserei.PlayerCar = PlayerCar;
@@ -579,6 +622,7 @@ var Raserei;
         player;
         countdown;
         counting = true;
+        sirenSoundComponent;
         gottchaEvent = new CustomEvent("gottcha", {
             detail: {
                 message: "I got him lads!"
@@ -602,18 +646,23 @@ var Raserei;
             this.mainRB.setPosition(new ƒ.Vector3(0, 0, -50.5));
             this.mainRB.setRotation(new ƒ.Vector3(-90, 0, 0));
             this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
+            this.sirenSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[1];
             this.pos = this.mainRB.getPosition();
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
             this.countdown = this.config.captureTime;
         }
-        update() {
+        update(_playing) {
             let dir = this.getDir();
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
             this.updatePos();
             this.updateCountdown();
+            if (!_playing) {
+                this.engineSoundComponent.volume = Math.max(this.engineSoundComponent.volume - 0.01, 0);
+                this.sirenSoundComponent.volume = Math.max(this.sirenSoundComponent.volume - 0.01, 0);
+            }
         }
         hasHim() {
             if (this.getCountdown() == 0) {

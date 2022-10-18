@@ -36,13 +36,14 @@ namespace Raserei {
             this.setupControls(_config);
         }
 
-        public update(): void {
-            //this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]));
-            this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
-            this.pinToGround();
-            this.updateCamPosArray();
-            this.updatePos();
-            this.updateEngineSound();
+        public update(_playing: boolean): void {
+            if (_playing) {
+                this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
+                this.pinToGround();
+                this.updateCamPosArray();
+                this.updatePos();
+            }
+            this.updateEngineSound(_playing);
         }
 
         public incScore(): void {
@@ -112,9 +113,13 @@ namespace Raserei {
             }
         }
 
-        private updateEngineSound() {
-            this.audio.playbackRate = 1 + this.getSpeedPercent();
-            this.audio.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9));
+        private updateEngineSound(_playing: boolean) {
+            if (_playing) {
+                this.audio.playbackRate = 1 + this.getSpeedPercent();
+                this.audio.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9));
+            } else {
+                this.audio.volume = Math.max(this.audio.volume - 0.01, 0);
+            }
         }
     }
 }
