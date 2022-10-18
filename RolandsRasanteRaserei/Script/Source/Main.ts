@@ -61,18 +61,18 @@ namespace Raserei {
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
-  let dialog: HTMLDialogElement;
+  let div: HTMLDivElement;
 
   function init(_event: Event): void {
-    dialog = document.querySelector("dialog");
-    dialog.querySelector("h1").textContent = document.title;
+    div = document.querySelector("div");
+    div.querySelector("h1").textContent = document.title;
     window.addEventListener("keydown", startViewport);
     //@ts-ignore
-    dialog.showModal();
+    div.showModal();
   }
 
   function startViewport(): void {
-    dialog.close();
+    div.remove();
     startInteractiveViewport();
     window.removeEventListener("keydown", startViewport);
   }
@@ -127,7 +127,6 @@ namespace Raserei {
   }
 
   function update(_event: Event): void {
-    //console.log(averageDeltaTime);
     updateDeltaTime();
     world.update();
     if (state == 1) {
@@ -143,8 +142,9 @@ namespace Raserei {
     }
     if (state > 1) {
       music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 7000), 0);
-      if (music.volume == 0) {
-        document.location.reload();
+      if (music.volume < 0.9) {
+        history.go(0);
+        return;
       }
     }
     cam.update(car.getCamPos());

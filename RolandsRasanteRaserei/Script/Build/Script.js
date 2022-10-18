@@ -253,16 +253,16 @@ var Raserei;
     Raserei.averageDeltaTime = 50;
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
-    let dialog;
+    let div;
     function init(_event) {
-        dialog = document.querySelector("dialog");
-        dialog.querySelector("h1").textContent = document.title;
+        div = document.querySelector("div");
+        div.querySelector("h1").textContent = document.title;
         window.addEventListener("keydown", startViewport);
         //@ts-ignore
-        dialog.showModal();
+        div.showModal();
     }
     function startViewport() {
-        dialog.close();
+        div.remove();
         startInteractiveViewport();
         window.removeEventListener("keydown", startViewport);
     }
@@ -311,7 +311,6 @@ var Raserei;
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
-        //console.log(averageDeltaTime);
         updateDeltaTime();
         world.update();
         if (state == 1) {
@@ -328,8 +327,9 @@ var Raserei;
         }
         if (state > 1) {
             music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 7000), 0);
-            if (music.volume == 0) {
-                document.location.reload();
+            if (music.volume < 0.9) {
+                history.go(0);
+                return;
             }
         }
         cam.update(car.getCamPos());
