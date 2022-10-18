@@ -61,18 +61,18 @@ namespace Raserei {
 
   window.addEventListener("load", init);
   document.addEventListener("interactiveViewportStarted", <EventListener><unknown>start);
-  let div: HTMLDivElement;
+  let dialog: HTMLDialogElement;
 
   function init(_event: Event): void {
-    div = document.querySelector("div");
-    div.querySelector("h1").textContent = document.title;
+    dialog = document.querySelector("dialog");
+    dialog.querySelector("h1").textContent = document.title;
     window.addEventListener("keydown", startViewport);
     //@ts-ignore
-    div.showModal();
+    dialog.showModal();
   }
 
   function startViewport(): void {
-    div.remove();
+    dialog.close();
     startInteractiveViewport();
     window.removeEventListener("keydown", startViewport);
   }

@@ -4,20 +4,15 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: url("./Img/TitleScreen.png") no-repeat center center fixed;
-  -webkit-background-size: cover;
+ background: url("./Img/TitleScreen.png") no-repeat center center fixed;
+ -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
 }
 
-div { 
-  color: #fff;
-  text-align: center;
-}
-
-h1 {
-  font-size: 500%;
+dialog { 
+  text-align: center; 
 }
 
 canvas.fullscreen { 
