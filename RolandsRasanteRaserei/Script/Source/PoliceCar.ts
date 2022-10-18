@@ -4,7 +4,7 @@ namespace Raserei {
 
         private player: PlayerCar;
         private countdown: number;
-        private counting: boolean = true;
+        private counting: boolean = false;
         private sirenSoundComponent: ƒ.ComponentAudio;
         public gottchaEvent: CustomEvent = new CustomEvent("gottcha", {
             detail: {

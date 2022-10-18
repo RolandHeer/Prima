@@ -11,9 +11,6 @@ html, body {
   background-size: cover;
 }
 
-dialog { 
-  text-align: center; 
-}
 
 canvas.fullscreen { 
   width: 100vw; 
@@ -31,9 +28,10 @@ canvas.fullscreen {
   font-family: 'AGENCYB';
   src: url('./font/AGENCYB.TTF');
 }
-
-#dialog {
-  font-family: 'AGENCYB';
+p { 
+  visibility: hidden;
+  position: absolute;
+  font-family: 'AGENCYB'; 
 }
 
 .element {

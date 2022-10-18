@@ -250,6 +250,7 @@ var Raserei;
     /// RUNTIME VALUES \\\
     let DeltaTimeArray = [];
     let countIn = 0;
+    let counting = true;
     Raserei.averageDeltaTime = 50;
     window.addEventListener("load", init);
     document.addEventListener("interactiveViewportStarted", start);
@@ -308,16 +309,20 @@ var Raserei;
         updateDeltaTime();
         world.update();
         if (state == 1) {
-            car.update(true);
+            if (!counting) {
+                car.update(true);
+            }
         }
         if (state != 0) {
-            if (state != 1) {
-                policeCar.update(false);
+            if (!counting) {
+                if (state != 1) {
+                    policeCar.update(false);
+                }
+                else {
+                    policeCar.update(true);
+                }
+                car.update(false);
             }
-            else {
-                policeCar.update(true);
-            }
-            car.update(false);
         }
         if (state > 1) {
             music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 7000), 0);
@@ -387,6 +392,7 @@ var Raserei;
                 crc2.fillText("1", canvas.width / 2, canvas.height / 2);
             }
             else if (countIn < 2550) {
+                counting = false;
                 crc2.strokeText("0", canvas.width / 2, canvas.height / 2);
                 crc2.fillText("0", canvas.width / 2, canvas.height / 2);
             }
@@ -460,7 +466,7 @@ var Raserei;
                 crc2.fillText("Your score: " + car.getScore(), canvas.width / 2, canvas.height * 0.55);
             }
             crc2.font = f * 0.15 + "px AGENCYB";
-            crc2.fillText("Thanks for Playing! Press F5 to restart 0:)", canvas.width / 2, canvas.height * 0.65);
+            crc2.fillText("Thanks for Playing!", canvas.width / 2, canvas.height * 0.65);
         }
     }
     function setHighscore(_score) {
@@ -615,7 +621,7 @@ var Raserei;
     class PoliceCar extends Raserei.Car {
         player;
         countdown;
-        counting = true;
+        counting = false;
         sirenSoundComponent;
         gottchaEvent = new CustomEvent("gottcha", {
             detail: {
