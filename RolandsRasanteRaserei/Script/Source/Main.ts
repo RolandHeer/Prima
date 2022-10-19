@@ -106,6 +106,7 @@ namespace Raserei {
 
   async function start(_event: CustomEvent): Promise<void> {
     music.loop = true;
+    music.volume = 0.7;
     music.play();
     let response: Response = await fetch("config.json");
     config = await response.json();
@@ -140,8 +141,8 @@ namespace Raserei {
       }
     }
     if (state > 1) {
-      music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 7000), 0);
-      if (music.volume < 0.9) {
+      music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 8000), 0);
+      if (music.volume < 0.3) {
         history.go(0);
         return;
       }

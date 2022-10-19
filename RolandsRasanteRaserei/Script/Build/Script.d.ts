@@ -81,7 +81,9 @@ declare namespace Raserei {
     class PlayerCar extends Car {
         private score;
         private camPosArray;
-        private audio;
+        private engineSound;
+        private coinSound;
+        private canSound;
         constructor(_config: Config, _car: ƒ.Node, _world: World);
         update(_playing: boolean): void;
         incScore(): void;

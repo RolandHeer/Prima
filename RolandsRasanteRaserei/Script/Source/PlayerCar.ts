@@ -6,7 +6,9 @@ namespace Raserei {
         // Runtime Values 
         private score: number = 0;
         private camPosArray: ƒ.Vector3[] = [];
-        private audio: any = new Audio("audio/2cv.mp3");
+        private engineSound: any = new Audio("audio/2cv.mp3");
+        private coinSound: HTMLAudioElement = new Audio("audio/coin.wav");
+        private canSound: HTMLAudioElement = new Audio("audio/can.wav");
 
         constructor(_config: Config, _car: ƒ.Node, _world: World) {
             super();
@@ -34,6 +36,8 @@ namespace Raserei {
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
+            this.coinSound.volume = 0.2;
+            this.canSound.volume = 0.8;
         }
 
         public update(_playing: boolean): void {
@@ -47,10 +51,14 @@ namespace Raserei {
         }
 
         public incScore(): void {
+            this.coinSound.currentTime = 0;
+            this.coinSound.play();
             this.score++;
         }
 
         public fillTank(): void {
+            this.canSound.currentTime = 0;
+            this.canSound.play();
             this.gaz = 100;
         }
 
@@ -93,13 +101,13 @@ namespace Raserei {
         }
 
         private setupEngineSound(): void {
-            this.audio.play();
-            this.audio.volume = 0.1;
-            this.audio.loop = true;
-            if ("preservesPitch" in this.audio) {
-                this.audio.preservesPitch = false;
-            } else if ("mozPreservesPitch" in this.audio) {
-                this.audio.mozPreservesPitch = false;
+            this.engineSound.play();
+            this.engineSound.volume = 0.1;
+            this.engineSound.loop = true;
+            if ("preservesPitch" in this.engineSound) {
+                this.engineSound.preservesPitch = false;
+            } else if ("mozPreservesPitch" in this.engineSound) {
+                this.engineSound.mozPreservesPitch = false;
             }
         }
 
@@ -115,10 +123,10 @@ namespace Raserei {
 
         private updateEngineSound(_playing: boolean) {
             if (_playing) {
-                this.audio.playbackRate = 1 + this.getSpeedPercent();
-                this.audio.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9));
+                this.engineSound.playbackRate = 1 + this.getSpeedPercent();
+                this.engineSound.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9) * 0.2); 
             } else {
-                this.audio.volume = Math.max(this.audio.volume - 0.01, 0);
+                this.engineSound.volume = Math.max(this.engineSound.volume - 0.01, 0);
             }
         }
     }

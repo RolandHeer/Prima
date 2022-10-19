@@ -292,6 +292,7 @@ var Raserei;
     }
     async function start(_event) {
         music.loop = true;
+        music.volume = 0.7;
         music.play();
         let response = await fetch("config.json");
         config = await response.json();
@@ -325,8 +326,8 @@ var Raserei;
             }
         }
         if (state > 1) {
-            music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 7000), 0);
-            if (music.volume < 0.9) {
+            music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 8000), 0);
+            if (music.volume < 0.3) {
                 history.go(0);
                 return;
             }
@@ -515,7 +516,9 @@ var Raserei;
         // Runtime Values 
         score = 0;
         camPosArray = [];
-        audio = new Audio("audio/2cv.mp3");
+        engineSound = new Audio("audio/2cv.mp3");
+        coinSound = new Audio("audio/coin.wav");
+        canSound = new Audio("audio/can.wav");
         constructor(_config, _car, _world) {
             super();
             this.config = _config;
@@ -538,6 +541,8 @@ var Raserei;
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.setupControls(_config);
+            this.coinSound.volume = 0.2;
+            this.canSound.volume = 0.8;
         }
         update(_playing) {
             if (_playing) {
@@ -549,9 +554,13 @@ var Raserei;
             this.updateEngineSound(_playing);
         }
         incScore() {
+            this.coinSound.currentTime = 0;
+            this.coinSound.play();
             this.score++;
         }
         fillTank() {
+            this.canSound.currentTime = 0;
+            this.canSound.play();
             this.gaz = 100;
         }
         getCamPos() {
@@ -585,14 +594,14 @@ var Raserei;
             this.gaz = Math.max(0, this.gaz - this.config.fuelConsumption * Math.abs(_factor));
         }
         setupEngineSound() {
-            this.audio.play();
-            this.audio.volume = 0.1;
-            this.audio.loop = true;
-            if ("preservesPitch" in this.audio) {
-                this.audio.preservesPitch = false;
+            this.engineSound.play();
+            this.engineSound.volume = 0.1;
+            this.engineSound.loop = true;
+            if ("preservesPitch" in this.engineSound) {
+                this.engineSound.preservesPitch = false;
             }
-            else if ("mozPreservesPitch" in this.audio) {
-                this.audio.mozPreservesPitch = false;
+            else if ("mozPreservesPitch" in this.engineSound) {
+                this.engineSound.mozPreservesPitch = false;
             }
         }
         updateCamPosArray() {
@@ -605,11 +614,11 @@ var Raserei;
         }
         updateEngineSound(_playing) {
             if (_playing) {
-                this.audio.playbackRate = 1 + this.getSpeedPercent();
-                this.audio.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9));
+                this.engineSound.playbackRate = 1 + this.getSpeedPercent();
+                this.engineSound.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9) * 0.2);
             }
             else {
-                this.audio.volume = Math.max(this.audio.volume - 0.01, 0);
+                this.engineSound.volume = Math.max(this.engineSound.volume - 0.01, 0);
             }
         }
     }
