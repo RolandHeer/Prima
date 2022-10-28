@@ -72,6 +72,7 @@ declare namespace Raserei {
         maxCoinCluster: number;
         maxCans: number;
         speedometerHeight: number;
+        gasprice: number;
         [key: string]: number | string | Config;
     }
     let averageDeltaTime: number;
@@ -87,6 +88,7 @@ declare namespace Raserei {
         constructor(_config: Config, _car: ƒ.Node, _world: World);
         update(_playing: boolean): void;
         incScore(): void;
+        payForGas(): void;
         fillTank(): void;
         getCamPos(): ƒ.Vector3;
         getGazPercent(): number;

@@ -56,6 +56,10 @@ namespace Raserei {
             this.score++;
         }
 
+        public payForGas(): void{
+            this.score -= this.config.gasprice;
+        }
+
         public fillTank(): void {
             this.canSound.currentTime = 0;
             this.canSound.play();

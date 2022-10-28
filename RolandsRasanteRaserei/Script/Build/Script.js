@@ -558,6 +558,9 @@ var Raserei;
             this.coinSound.play();
             this.score++;
         }
+        payForGas() {
+            this.score -= this.config.gasprice;
+        }
         fillTank() {
             this.canSound.currentTime = 0;
             this.canSound.play();
@@ -909,6 +912,7 @@ var Raserei;
             }
         }
         spliceDoomed() {
+            let splice = true;
             if (this.doomedCollect.length > 0) {
                 if (this.doomedCollect[0].idSource == World.coinGraphID) {
                     this.playerCar.incScore();
@@ -923,11 +927,16 @@ var Raserei;
                     }
                 }
                 else {
-                    this.playerCar.fillTank();
-                    this.doomedCollect[0].getParent().getParent().removeChild(this.doomedCollect[0].getParent());
-                    this.generateCans(1);
+                    if (this.playerCar.getScore() - this.config.gasprice >= 0) {
+                        this.playerCar.payForGas();
+                        this.playerCar.fillTank();
+                        this.doomedCollect[0].getParent().getParent().removeChild(this.doomedCollect[0].getParent());
+                        this.generateCans(1);
+                    }
                 }
-                this.doomedCollect.splice(0, 1);
+                if (splice) {
+                    this.doomedCollect.splice(0, 1);
+                }
             }
         }
         async addGraphToNode(_node, _id) {

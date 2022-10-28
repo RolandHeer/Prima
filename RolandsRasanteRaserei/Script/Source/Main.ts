@@ -14,6 +14,7 @@ namespace Raserei {
     maxCoinCluster: number;
     maxCans: number;
     speedometerHeight: number;
+    gasprice: number;
     [key: string]: number | string | Config;
   }
 

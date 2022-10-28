@@ -11,5 +11,6 @@
     "camDelay": 12,
     "maxCoinCluster": 6,
     "maxCans": 2,
-    "speedometerHeight": 0.3
+    "speedometerHeight": 0.3,
+    "gasprice": 3
 }

@@ -78,6 +78,7 @@ namespace Raserei {
         }
 
         private spliceDoomed(): void {
+            let splice: boolean = true;
             if (this.doomedCollect.length > 0) {
                 if (this.doomedCollect[0].idSource == World.coinGraphID) {
                     this.playerCar.incScore();
@@ -90,11 +91,16 @@ namespace Raserei {
                         coinCluster.removeChild(this.doomedCollect[0].getParent());
                     }
                 } else {
-                    this.playerCar.fillTank();
-                    this.doomedCollect[0].getParent().getParent().removeChild(this.doomedCollect[0].getParent());
-                    this.generateCans(1);
+                    if (this.playerCar.getScore() - this.config.gasprice >= 0) {
+                        this.playerCar.payForGas();
+                        this.playerCar.fillTank();
+                        this.doomedCollect[0].getParent().getParent().removeChild(this.doomedCollect[0].getParent());
+                        this.generateCans(1);
+                    }
                 }
-                this.doomedCollect.splice(0, 1);
+                if(splice){
+                    this.doomedCollect.splice(0, 1);
+                }
             }
         }
 
