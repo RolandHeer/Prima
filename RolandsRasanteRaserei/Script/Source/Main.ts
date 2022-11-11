@@ -143,7 +143,7 @@ namespace Raserei {
     }
     if (state > 1) {
       music.volume = Math.max(music.volume - (ƒ.Loop.timeFrameGame / 8000), 0);
-      if (music.volume < 0.3) {
+      if (music.volume < 0.1) {
         history.go(0);
         return;
       }
