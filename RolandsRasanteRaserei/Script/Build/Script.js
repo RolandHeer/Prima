@@ -106,9 +106,8 @@ var Raserei;
             }
         }
         updateTurning(_drive, _turnInput) {
-            let f = Raserei.averageDeltaTime / this.config.turnDivider;
             this.ctrlTurn.setInput(_turnInput);
-            this.mainRB.rotateBody(ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * f));
+            this.mainRB.rotateBody((ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), (this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * Raserei.averageDeltaTime) / this.config.turnDivider)));
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
         }
