@@ -107,6 +107,7 @@ declare namespace Raserei {
     import ƒ = FudgeCore;
     class PoliceCar extends Car {
         private player;
+        private distPlayer;
         private countdown;
         private counting;
         private sirenSoundComponent;
@@ -120,6 +121,8 @@ declare namespace Raserei {
         private updateCountdown;
         private hndCollision;
         private getDir;
+        private evalDir;
+        private setupPoliceCar;
     }
 }
 declare namespace Script {

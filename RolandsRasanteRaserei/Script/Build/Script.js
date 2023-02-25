@@ -631,6 +631,7 @@ var Raserei;
     var ƒ = FudgeCore;
     class PoliceCar extends Raserei.Car {
         player;
+        distPlayer; //Distance to Player Car in Meter
         countdown;
         counting = false;
         sirenSoundComponent;
@@ -644,27 +645,10 @@ var Raserei;
             this.config = _config;
             this.player = _player;
             this.isPolice = true;
-            this.carNode = _carNode;
-            this.main = _carNode.getChildren()[0];
-            this.body = this.main.getChildrenByName("Body")[0];
-            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
-            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
-            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
-            this.sphericalJoint.springFrequency = 0;
-            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.mainRB.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.hndCollision);
-            this.mainRB.setPosition(new ƒ.Vector3(0, 0, -50.5));
-            this.mainRB.setRotation(new ƒ.Vector3(-90, 0, 0));
-            this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
-            this.sirenSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[1];
-            this.pos = this.mainRB.getPosition();
-            this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.setupControls(_config);
-            this.countdown = this.config.captureTime;
+            this.setupPoliceCar(_config, _carNode);
         }
         update(_playing) {
+            this.distPlayer = this.mainRB.getPosition().getDistance(this.player.getPosition());
             let dir = this.getDir();
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
@@ -690,7 +674,7 @@ var Raserei;
         updateGaz(_factor) {
         }
         updateCountdown() {
-            if (this.mainRB.getPosition().getDistance(this.player.getPosition()) > 10) {
+            if (this.distPlayer > 10) {
                 this.counting = false;
                 this.countdown = this.config.captureTime;
             }
@@ -708,8 +692,36 @@ var Raserei;
         getDir() {
             let vDir = ƒ.Vector3.DIFFERENCE(this.player.getPosition(), this.mainRB.getPosition());
             vDir.normalize();
-            return this.getRelative2Dvector(vDir, this.main.mtxLocal.getEulerAngles());
-            ;
+            return this.evalDir(this.getRelative2Dvector(vDir, this.main.mtxLocal.getEulerAngles()));
+        }
+        evalDir(vDir) {
+            if (this.distPlayer > 20 && vDir.y <= 0) {
+                vDir.set(vDir.x, -vDir.y);
+                console.log("reverse!");
+            }
+            console.log("x: " + Math.round(vDir.x * 100) / 100 + ", y: " + Math.round(vDir.y * 100) / 100);
+            return vDir;
+        }
+        setupPoliceCar(_config, _carNode) {
+            this.carNode = _carNode;
+            this.main = _carNode.getChildren()[0];
+            this.body = this.main.getChildrenByName("Body")[0];
+            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
+            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
+            this.sphericalJoint.springFrequency = 0;
+            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.mainRB.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.hndCollision);
+            this.mainRB.setPosition(new ƒ.Vector3(0, 0, -50.5));
+            this.mainRB.setRotation(new ƒ.Vector3(-90, 0, 0));
+            this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
+            this.sirenSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[1];
+            this.pos = this.mainRB.getPosition();
+            this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.setupControls(_config);
+            this.countdown = this.config.captureTime;
         }
     }
     Raserei.PoliceCar = PoliceCar;
