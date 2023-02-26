@@ -80,9 +80,8 @@ namespace Raserei {
         private evalDir(vDir: ƒ.Vector2): ƒ.Vector2 {
             if (this.distPlayer > 20 && vDir.y <= 0) {
                 vDir.set(vDir.x, -vDir.y);
-                console.log("reverse!");
             }
-            console.log("x: " + Math.round(vDir.x * 100) / 100 + ", y: " + Math.round(vDir.y * 100) / 100);
+            //console.log("x: " + Math.round(vDir.x * 100) / 100 + ", y: " + Math.round(vDir.y * 100) / 100);
             return vDir;
         }
 

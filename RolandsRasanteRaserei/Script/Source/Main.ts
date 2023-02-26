@@ -73,15 +73,6 @@ namespace Raserei {
     window.removeEventListener("keydown", startViewport);
   }
 
-  function getHighscore(): number {
-    const x = document.cookie;
-    let tmp = x.split('; ').find((row) => row.startsWith("highscore" + '='))?.split('=')[1];
-    if (tmp != null) {
-      return parseInt(tmp);
-    }
-    return 0;
-  }
-
   async function startInteractiveViewport(): Promise<void> {
     // load resources referenced in the link-tag
     await FudgeCore.Project.loadResourcesFromHTML();
@@ -100,8 +91,10 @@ namespace Raserei {
     viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
     canvas.addEventListener("mousedown", enterPointerLock);
     window.addEventListener("keydown", hndKeydown);
+    window.addEventListener("keyup", hndKeyup);
     viewport.draw();
     canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
+    document.getElementById("Startscreen").style.display = "none";
   }
 
 
@@ -153,6 +146,15 @@ namespace Raserei {
     ƒ.Physics.simulate();  // if physics is included and used
     ƒ.AudioManager.default.update();
     renderScreen();
+  }
+  
+  function getHighscore(): number {
+    const x = document.cookie;
+    let tmp = x.split('; ').find((row) => row.startsWith("highscore" + '='))?.split('=')[1];
+    if (tmp != null) {
+      return parseInt(tmp);
+    }
+    return 0;
   }
 
   function updateGameState(): void {
@@ -302,6 +304,18 @@ namespace Raserei {
         lockMode = true;
         document.exitPointerLock();
         break;
+      case "KeyC":
+        cam.toggle();
+        break;
+      case "ShiftLeft":
+        cam.reverse(true);
+    }
+  }
+
+  function hndKeyup(_key: KeyboardEvent): void{
+    switch (_key.code){
+      case "ShiftLeft":
+        cam.reverse(false);
     }
   }
 
@@ -324,10 +338,9 @@ namespace Raserei {
   }
 
   function setupCam(): void {
-    //viewport.camera = cmpCamera = carNode.getChildrenByName("PlayerMain")[0].getChildrenByName("testcam")[0].getComponent(ƒ.ComponentCamera);
-    camNode = graph.getChildrenByName("NewCam")[0];
-    viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
-    cam = new Cam(camNode, car.getPosition(), config);
+    camNode = graph.getChildrenByName("Camera")[0];
+    viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
+    cam = new Cam(camNode, carNode.getChildren()[0].getChildrenByName("Body")[0],viewport);
   }
 
   function setupAudio(): void {

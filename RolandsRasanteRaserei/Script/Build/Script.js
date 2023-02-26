@@ -1,34 +1,41 @@
 "use strict";
 var Raserei;
 (function (Raserei) {
+    var ƒ = FudgeCore;
     class Cam {
-        /*private config: Config;
-        private centerRB: ƒ.ComponentRigidbody;
-        private main: ƒ.Node;
-        private mainRB: ƒ.ComponentRigidbody;
-        private reAnker: ƒ.Node;*/
+        viewport;
         camNode;
-        constructor(_camNode, _carPos, _config) {
-            //this.config = _config;
+        //Cameras
+        activeCam = 0;
+        camArray = [];
+        camRear;
+        constructor(_camNode, _carBodyNode, _viewport) {
+            this.viewport = _viewport;
             this.camNode = _camNode;
-            //this.centerRB = this.camNode.getComponent(ƒ.ComponentRigidbody);
-            //this.main = this.camNode.getChildren()[0];
-            //this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
-            //let sphericalJoint: ƒ.JointSpherical = new ƒ.JointSpherical(this.centerRB, this.mainRB);
-            //sphericalJoint.springFrequency = 0;
-            //this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_2;
-            //this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_2;
-            //this.reAnker = this.main.getChildren()[0].getChildren()[0];
-            //this.camNode.addComponent(sphericalJoint);
+            let cams = this.camNode.getChildren()[0];
+            this.camArray.push(cams.getChildren()[0].getComponent(ƒ.ComponentCamera), cams.getChildren()[1].getComponent(ƒ.ComponentCamera), _carBodyNode.getChildrenByName("cam2")[0].getComponent(ƒ.ComponentCamera), _carBodyNode.getChildrenByName("cam3")[0].getComponent(ƒ.ComponentCamera));
+            this.camRear = this.camNode.getChildren()[0].getChildren()[2].getComponent(ƒ.ComponentCamera);
         }
         update(_newDestRot) {
             this.camNode.mtxLocal.rotation = _newDestRot;
-            /*
-            let f: number = ƒ.Loop.timeFrameGame / this.config.speedDivider;
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(ƒ.Vector3.DIFFERENCE(_newDestPos, this.mainRB.getPosition()), 50 * f));//Force into new Position
-            this.pinToGround();
-            this.mainRB.setRotation(_newDestRot);
-           // this.reAnker.mtxLocal.lookAt(new ƒ.Vector3(0.01, 0.01, 0.01), this.main.mtxLocal.getY(), true);*/
+        }
+        toggle() {
+            this.camArray[this.activeCam].activate(false);
+            this.activeCam = (this.activeCam + 1) % 4;
+            this.camArray[this.activeCam].activate(true);
+            this.viewport.camera = this.camArray[this.activeCam];
+        }
+        reverse(_bool) {
+            if (_bool) {
+                this.camArray[this.activeCam].activate(false);
+                this.camRear.activate(true);
+                this.viewport.camera = this.camRear;
+            }
+            else {
+                this.camRear.activate(false);
+                this.camArray[this.activeCam].activate(true);
+                this.viewport.camera = this.camArray[this.activeCam];
+            }
         }
     }
     Raserei.Cam = Cam;
@@ -157,13 +164,10 @@ var Raserei;
 var Raserei;
 (function (Raserei) {
     var ƒ = FudgeCore;
-    var ƒUi = FudgeUserInterface;
     class GameState extends ƒ.Mutable {
         coins = 0;
         constructor() {
             super();
-            const domVui = document.querySelector("div#vui");
-            console.log("Vui-Controller", new ƒUi.Controller(this, domVui));
         }
         reduceMutator(_mutator) { }
     }
@@ -260,14 +264,6 @@ var Raserei;
         startInteractiveViewport();
         window.removeEventListener("keydown", startViewport);
     }
-    function getHighscore() {
-        const x = document.cookie;
-        let tmp = x.split('; ').find((row) => row.startsWith("highscore" + '='))?.split('=')[1];
-        if (tmp != null) {
-            return parseInt(tmp);
-        }
-        return 0;
-    }
     async function startInteractiveViewport() {
         // load resources referenced in the link-tag
         await FudgeCore.Project.loadResourcesFromHTML();
@@ -286,8 +282,10 @@ var Raserei;
         viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
         canvas.addEventListener("mousedown", enterPointerLock);
         window.addEventListener("keydown", hndKeydown);
+        window.addEventListener("keyup", hndKeyup);
         viewport.draw();
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
+        document.getElementById("Startscreen").style.display = "none";
     }
     async function start(_event) {
         music.loop = true;
@@ -336,6 +334,14 @@ var Raserei;
         ƒ.Physics.simulate(); // if physics is included and used
         ƒ.AudioManager.default.update();
         renderScreen();
+    }
+    function getHighscore() {
+        const x = document.cookie;
+        let tmp = x.split('; ').find((row) => row.startsWith("highscore" + '='))?.split('=')[1];
+        if (tmp != null) {
+            return parseInt(tmp);
+        }
+        return 0;
     }
     function updateGameState() {
         if (policeCar.hasHim() && state == 1) {
@@ -482,6 +488,17 @@ var Raserei;
                 lockMode = true;
                 document.exitPointerLock();
                 break;
+            case "KeyC":
+                cam.toggle();
+                break;
+            case "ShiftLeft":
+                cam.reverse(true);
+        }
+    }
+    function hndKeyup(_key) {
+        switch (_key.code) {
+            case "ShiftLeft":
+                cam.reverse(false);
         }
     }
     function initValues() {
@@ -498,10 +515,9 @@ var Raserei;
         policeCar = new Raserei.PoliceCar(config, policeCarNode, car);
     }
     function setupCam() {
-        //viewport.camera = cmpCamera = carNode.getChildrenByName("PlayerMain")[0].getChildrenByName("testcam")[0].getComponent(ƒ.ComponentCamera);
-        camNode = graph.getChildrenByName("NewCam")[0];
-        viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
-        cam = new Raserei.Cam(camNode, car.getPosition(), config);
+        camNode = graph.getChildrenByName("Camera")[0];
+        viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
+        cam = new Raserei.Cam(camNode, carNode.getChildren()[0].getChildrenByName("Body")[0], viewport);
     }
     function setupAudio() {
         ƒ.AudioManager.default.listenTo(graph);
@@ -697,9 +713,8 @@ var Raserei;
         evalDir(vDir) {
             if (this.distPlayer > 20 && vDir.y <= 0) {
                 vDir.set(vDir.x, -vDir.y);
-                console.log("reverse!");
             }
-            console.log("x: " + Math.round(vDir.x * 100) / 100 + ", y: " + Math.round(vDir.y * 100) / 100);
+            //console.log("x: " + Math.round(vDir.x * 100) / 100 + ", y: " + Math.round(vDir.y * 100) / 100);
             return vDir;
         }
         setupPoliceCar(_config, _carNode) {

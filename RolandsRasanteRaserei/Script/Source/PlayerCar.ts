@@ -56,7 +56,7 @@ namespace Raserei {
             this.score++;
         }
 
-        public payForGas(): void{
+        public payForGas(): void {
             this.score -= this.config.gasprice;
         }
 
@@ -128,7 +128,7 @@ namespace Raserei {
         private updateEngineSound(_playing: boolean) {
             if (_playing) {
                 this.engineSound.playbackRate = 1 + this.getSpeedPercent();
-                this.engineSound.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9) * 0.2); 
+                this.engineSound.volume = Math.min(0.1 + (this.getSpeedPercent() * 0.9, 0.9) * 0.2);
             } else {
                 this.engineSound.volume = Math.max(this.engineSound.volume - 0.01, 0);
             }

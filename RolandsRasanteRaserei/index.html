@@ -6,15 +6,19 @@
     <link rel="stylesheet" href="styles.css" />
 
     <!--Editor settings of this project-->
-    <meta type="settings" autoview="Graph|2022-05-18T20:10:05.727Z|72077" project="{'name':'Rolands rasante Raserei','includeAutoViewScript':false,'graphAutoView':'Graph|2022-05-18T20:10:05.727Z|72077'}" panels="[{'type':'PanelProject','state':{}},{'type':'PanelGraph','state':{'graph':'Graph|2022-05-18T20:10:05.727Z|72077'}}]" />
+    <meta type="settings" autoview="Graph|2022-05-18T20:10:05.727Z|72077" project="{'name':'Rolands rasante Raserei','graphAutoView':'Graph|2022-05-18T20:10:05.727Z|72077'}" panels="[{'type':'PanelProject','state':{}},{'type':'PanelGraph','state':{'graph':'Graph|2022-05-18T20:10:05.727Z|72077'}}]" />
 
     <!--Activate the following line to include the FUDGE-version of Oimo-Physics. You may want to download a local copy to work offline and be independent from future changes!-->
     <script type="text/javascript" src="Script/FUDGE/OimoPhysics.js"></script>
 
     <!--Load FUDGE. You may want to download local copies to work offline and be independent from future changes! Developers working on FUDGE itself may want to create symlinks-->
+    <script type="text/javascript" src="https://jirkadelloro.github.io/FUDGE/Core/Build/FudgeCore.js"></script>
+    <script type="text/javascript" src="https://jirkadelloro.github.io/FUDGE/Aid/Build/FudgeAid.js"></script>
+
+    <!--
     <script type="text/javascript" src="Script/FUDGE/FudgeCore.js"></script>
     <script type="text/javascript" src="Script/FUDGE/FudgeAid.js"></script>
-    <script type="text/javascript" src="Script/FUDGE/FudgeUserInterface.js"></script>
+    -->
 
     <!--Link internal resources. The editor only loads the first, but at runtime, multiple files can contribute-->
     <link type="resources" src="Internal.json" />
@@ -25,16 +29,24 @@
 </head>
 <body>
     <!--Dialog shown at startup only-->
-    <p>immer dieses CSS</p>
+    <div id="Startscreen">
+        <h1>Rolands</h1>
+        <h3>rasante</h3>
+        <h2>Raserei</h2>
+        <p>Space to start <br> WASD to drive <br> Shift for rearview <br> C to switch camera</p>
+        <p>Collect as many <br> Coins as you can!</p>
+
+    </div>
     <!--Canvas for FUDGE to render to-->
     <canvas class="fullscreen">
     </canvas>
-    <div id="vui">
-        <div class="element">
-            <span>Coins:</span>
-            <input type="text" key="coins" value="0" min="0" max="1000" step="1" disabled="" />
-        </div>
-    </div>
+
+
+
+
+
+
+
 
 
 

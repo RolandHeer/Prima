@@ -1,3 +1,7 @@
+@font-face {
+  font-family: 'AGENCYB';
+  src: url('./font/AGENCYB.TTF');
+}
 html, body {
   padding: 0px;
   margin: 0px;
@@ -9,33 +13,41 @@ html, body {
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
-}
-
-
-canvas.fullscreen { 
-  width: 100vw; 
-  height: 100vh; 
-}
-
-#vui {
-  position: absolute;
-  top: 20px;
-  padding: 20px;
-  font-size: 20px;
-  visibility: hidden;
-}
-@font-face {
   font-family: 'AGENCYB';
   src: url('./font/AGENCYB.TTF');
-}
-p { 
-  visibility: hidden;
-  position: absolute;
-  font-family: 'AGENCYB'; 
 }
 
 .element {
   display: flex;
   align-items: center;
   margin-bottom: 5px;
+}
+
+div{
+  width: 40%;
+  color: white;
+  filter: drop-shadow(0 0 10px black);
+  text-align: center;
+}
+h1{
+  translate: 0% 20%;
+  font-size: 900%;
+  margin: 0%;
+}
+h2{
+  translate: 0% -30%;
+  font-size: 1150%;
+  margin: 0%;
+}
+h3{
+  font-size: 500%;
+  margin: 0%;
+}
+p{
+  translate: 0% -30%;
+  font-size: 300%;
+}
+canvas.fullscreen { 
+  width: 100vw; 
+  height: 100vh; 
 }

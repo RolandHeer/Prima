@@ -1,9 +1,15 @@
 declare namespace Raserei {
     import ƒ = FudgeCore;
     class Cam {
+        private viewport;
         private camNode;
-        constructor(_camNode: ƒ.Node, _carPos: ƒ.Vector3, _config: Config);
+        private activeCam;
+        private camArray;
+        private camRear;
+        constructor(_camNode: ƒ.Node, _carBodyNode: ƒ.Node, _viewport: ƒ.Viewport);
         update(_newDestRot: ƒ.Vector3): void;
+        toggle(): void;
+        reverse(_bool: boolean): void;
     }
 }
 declare namespace Raserei {
