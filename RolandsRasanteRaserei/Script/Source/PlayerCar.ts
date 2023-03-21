@@ -22,15 +22,24 @@ namespace Raserei {
 
             this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
             this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.bumperRB = this.main.getChildrenByName("RigidBodies")[0].getChildren()[0].getComponent(ƒ.ComponentRigidbody);
+
+            this.bumperWeld = new ƒ.JointWelding(this.mainRB, this.bumperRB);
+            this.main.addComponent(this.bumperWeld);
+
             this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
             this.sphericalJoint.springFrequency = 0;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.carNode.addComponent(this.sphericalJoint);
             this.mainRB.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
+            this.bumperRB.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
 
             this.engineSoundComponent = <ƒ.ComponentAudio>this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
             this.setupEngineSound();
+
+            //this.centerRB.rotateBody(new ƒ.Vector3(-90, 0, 0));
 
             this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;

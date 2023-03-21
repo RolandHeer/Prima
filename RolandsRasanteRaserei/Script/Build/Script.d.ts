@@ -22,7 +22,9 @@ declare namespace Raserei {
         protected body: ƒ.Node;
         protected centerRB: ƒ.ComponentRigidbody;
         protected mainRB: ƒ.ComponentRigidbody;
+        protected bumperRB: ƒ.ComponentRigidbody;
         protected sphericalJoint: ƒ.JointSpherical;
+        protected bumperWeld: ƒ.JointWelding;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
         protected engineSoundComponent: ƒ.ComponentAudio;

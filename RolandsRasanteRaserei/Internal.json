@@ -322,9 +322,9 @@
                           "isTrigger": false,
                           "id": 2,
                           "pivot": {
-                            "translation": "[0, 0.5, 0.09999999403953552]",
+                            "translation": "[0, 0.5, -0.20000000298023224]",
                             "rotation": "[0, 0, 0]",
-                            "scaling": "[1.4499999284744263, 0.7999999523162842, 3.5999999046325684]"
+                            "scaling": "[1.4499999284744263, 0.7999999523162842, 3]"
                           },
                           "Component": {
                             "active": true
@@ -1217,68 +1217,20 @@
                             {
                               "ƒ.ComponentRigidbody": {
                                 "initialization": "TO_PIVOT",
-                                "friction": 1,
+                                "friction": 0.2,
                                 "restitution": 0.2,
                                 "mass": 1,
-                                "dampTranslation": 1,
-                                "dampRotation": 1,
+                                "dampTranslation": 0.1,
+                                "dampRotation": 0.1,
                                 "effectGravity": 0,
-                                "typeBody": "DYNAMIC",
+                                "typeBody": "KINEMATIC",
                                 "typeCollider": "CUBE",
                                 "isTrigger": false,
                                 "id": 3,
                                 "pivot": {
-                                  "translation": "[0, 1.0499998331069946, -0.30000001192092896]",
+                                  "translation": "[0, 1.21999990940094, -0.30000001192092896]",
                                   "rotation": "[0, 0, 0]",
-                                  "scaling": "[1.0999999046325684, 0.9000000357627869, 1.9999998807907104]"
-                                },
-                                "Component": {
-                                  "active": false
-                                }
-                              }
-                            }
-                          ]
-                        },
-                        "children": []
-                      }
-                    },
-                    {
-                      "ƒ.Node": {
-                        "name": "testcam",
-                        "active": true,
-                        "components": {
-                          "ComponentTransform": [
-                            {
-                              "ƒ.ComponentTransform": {
-                                "local": {
-                                  "translation": "[0, 30, -42]",
-                                  "rotation": "[29, 0, 0]",
-                                  "scaling": "[1, 1, 1]"
-                                },
-                                "Component": {
-                                  "active": true
-                                }
-                              }
-                            }
-                          ],
-                          "ComponentCamera": [
-                            {
-                              "ƒ.ComponentCamera": {
-                                "backgroundColor": {
-                                  "r": 0,
-                                  "g": 0,
-                                  "b": 0,
-                                  "a": 1
-                                },
-                                "backgroundEnabled": true,
-                                "projection": "central",
-                                "fieldOfView": 30,
-                                "direction": 2,
-                                "aspect": 1.7682403433476395,
-                                "pivot": {
-                                  "translation": "[0, 0, 0]",
-                                  "rotation": "[0, 0, 0]",
-                                  "scaling": "[1, 1, 1]"
+                                  "scaling": "[1.0999999046325684, 0.6000000834465027, 2]"
                                 },
                                 "Component": {
                                   "active": true
@@ -1287,7 +1239,56 @@
                             }
                           ]
                         },
-                        "children": []
+                        "children": [
+                          {
+                            "ƒ.Node": {
+                              "name": "Bumper",
+                              "active": true,
+                              "components": {
+                                "ComponentTransform": [
+                                  {
+                                    "ƒ.ComponentTransform": {
+                                      "local": {
+                                        "translation": "[0, 0, 0]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[1, 1, 1]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentRigidbody": [
+                                  {
+                                    "ƒ.ComponentRigidbody": {
+                                      "initialization": "TO_PIVOT",
+                                      "friction": 0.02,
+                                      "restitution": 0,
+                                      "mass": 0.1,
+                                      "dampTranslation": 1,
+                                      "dampRotation": 1,
+                                      "effectGravity": 0,
+                                      "typeBody": "DYNAMIC",
+                                      "typeCollider": "CYLINDER",
+                                      "isTrigger": false,
+                                      "id": 1,
+                                      "pivot": {
+                                        "translation": "[0, 0.5, 1.3000000715255737]",
+                                        "rotation": "[0, 0, 0]",
+                                        "scaling": "[1.459999918937683, 0.800000011920929, 1.459999918937683]"
+                                      },
+                                      "Component": {
+                                        "active": true
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "children": []
+                            }
+                          }
+                        ]
                       }
                     },
                     {
@@ -1476,7 +1477,7 @@
                               "ƒ.ComponentTransform": {
                                 "local": {
                                   "translation": "[0, 0, 0]",
-                                  "rotation": "[4, 0, 5]",
+                                  "rotation": "[0, 0, 0]",
                                   "scaling": "[1, 1, 1]"
                                 },
                                 "Component": {
@@ -1496,7 +1497,7 @@
                                   {
                                     "ƒ.ComponentTransform": {
                                       "local": {
-                                        "translation": "[0, 50, 0]",
+                                        "translation": "[0, 60, 0]",
                                         "rotation": "[0, 0, 0]",
                                         "scaling": "[1, 1, 1]"
                                       },
@@ -1507,132 +1508,7 @@
                                   }
                                 ]
                               },
-                              "children": [
-                                {
-                                  "ƒ.Node": {
-                                    "name": "Tire0",
-                                    "active": true,
-                                    "components": {
-                                      "ComponentTransform": [
-                                        {
-                                          "ƒ.ComponentTransform": {
-                                            "local": {
-                                              "translation": "[0, 0, 0]",
-                                              "rotation": "[0, 0, 90]",
-                                              "scaling": "[1, 1, 1]"
-                                            },
-                                            "Component": {
-                                              "active": true
-                                            }
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    "children": [
-                                      {
-                                        "ƒ.GraphInstance": {
-                                          "deserializeFromSource": true,
-                                          "name": "TireGraph",
-                                          "idSource": "Graph|2022-06-13T22:52:37.498Z|91425"
-                                        }
-                                      }
-                                    ]
-                                  }
-                                },
-                                {
-                                  "ƒ.Node": {
-                                    "name": "Tire1",
-                                    "active": true,
-                                    "components": {
-                                      "ComponentTransform": [
-                                        {
-                                          "ƒ.ComponentTransform": {
-                                            "local": {
-                                              "translation": "[0, 0.20000076293945312, 0]",
-                                              "rotation": "[0, 0, 90]",
-                                              "scaling": "[1, 1, 1]"
-                                            },
-                                            "Component": {
-                                              "active": true
-                                            }
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    "children": [
-                                      {
-                                        "ƒ.GraphInstance": {
-                                          "deserializeFromSource": true,
-                                          "name": "TireGraph",
-                                          "idSource": "Graph|2022-06-13T22:52:37.498Z|91425"
-                                        }
-                                      }
-                                    ]
-                                  }
-                                },
-                                {
-                                  "ƒ.Node": {
-                                    "name": "Tire2",
-                                    "active": true,
-                                    "components": {
-                                      "ComponentTransform": [
-                                        {
-                                          "ƒ.ComponentTransform": {
-                                            "local": {
-                                              "translation": "[0, 0.40000075101852417, 0]",
-                                              "rotation": "[0, 0, 90]",
-                                              "scaling": "[1, 1, 1]"
-                                            },
-                                            "Component": {
-                                              "active": true
-                                            }
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    "children": [
-                                      {
-                                        "ƒ.GraphInstance": {
-                                          "deserializeFromSource": true,
-                                          "name": "TireGraph",
-                                          "idSource": "Graph|2022-06-13T22:52:37.498Z|91425"
-                                        }
-                                      }
-                                    ]
-                                  }
-                                },
-                                {
-                                  "ƒ.Node": {
-                                    "name": "Tire3",
-                                    "active": true,
-                                    "components": {
-                                      "ComponentTransform": [
-                                        {
-                                          "ƒ.ComponentTransform": {
-                                            "local": {
-                                              "translation": "[0, 0.60000079870224, 0]",
-                                              "rotation": "[0, 0, 90]",
-                                              "scaling": "[1, 1, 1]"
-                                            },
-                                            "Component": {
-                                              "active": true
-                                            }
-                                          }
-                                        }
-                                      ]
-                                    },
-                                    "children": [
-                                      {
-                                        "ƒ.GraphInstance": {
-                                          "deserializeFromSource": true,
-                                          "name": "TireGraph",
-                                          "idSource": "Graph|2022-06-13T22:52:37.498Z|91425"
-                                        }
-                                      }
-                                    ]
-                                  }
-                                }
-                              ]
+                              "children": []
                             }
                           }
                         ]
@@ -2343,7 +2219,7 @@
                 "scaling": "[0.6000000238418579, 0.20000001788139343, 0.6000000238418579]"
               },
               "Component": {
-                "active": true
+                "active": false
               }
             }
           }
@@ -2604,9 +2480,9 @@
                     "isTrigger": false,
                     "id": 2,
                     "pivot": {
-                      "translation": "[0, 0.5, 0.09999999403953552]",
+                      "translation": "[0, 0.5, -0.19999998807907104]",
                       "rotation": "[0, 0, 0]",
-                      "scaling": "[1.4499999284744263, 0.800000011920929, 3.5999999046325684]"
+                      "scaling": "[1.4499999284744263, 0.800000011920929, 3]"
                     },
                     "Component": {
                       "active": true
@@ -3403,29 +3279,78 @@
                       {
                         "ƒ.ComponentRigidbody": {
                           "initialization": "TO_PIVOT",
-                          "friction": 1,
+                          "friction": 0.2,
                           "restitution": 0.2,
                           "mass": 1,
-                          "dampTranslation": 1,
-                          "dampRotation": 1,
+                          "dampTranslation": 0.1,
+                          "dampRotation": 0.1,
                           "effectGravity": 0,
                           "typeBody": "KINEMATIC",
                           "typeCollider": "CUBE",
                           "isTrigger": false,
                           "id": 3,
                           "pivot": {
-                            "translation": "[0, 1.0499998331069946, -0.30000001192092896]",
+                            "translation": "[0, 1.2199997901916504, -0.30000001192092896]",
                             "rotation": "[0, 0, 0]",
-                            "scaling": "[1.0999999046325684, 0.9000000357627869, 1.9999998807907104]"
+                            "scaling": "[1.0999999046325684, 0.6000000238418579, 1.9999998807907104]"
                           },
                           "Component": {
-                            "active": false
+                            "active": true
                           }
                         }
                       }
                     ]
                   },
-                  "children": []
+                  "children": [
+                    {
+                      "ƒ.Node": {
+                        "name": "Bumper",
+                        "active": true,
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[0, 0, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentRigidbody": [
+                            {
+                              "ƒ.ComponentRigidbody": {
+                                "initialization": "TO_PIVOT",
+                                "friction": 0.02,
+                                "restitution": 0,
+                                "mass": 0.1,
+                                "dampTranslation": 1,
+                                "dampRotation": 1,
+                                "effectGravity": 0,
+                                "typeBody": "DYNAMIC",
+                                "typeCollider": "CYLINDER",
+                                "isTrigger": false,
+                                "id": 0,
+                                "pivot": {
+                                  "translation": "[0, 0.5, 1.2999999523162842]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1.459999918937683, 0.800000011920929, 1.459999918937683]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "children": []
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -3462,6 +3387,86 @@
         }
       ],
       "idResource": "Graph|2023-02-25T23:17:55.331Z|44711",
+      "type": "Graph"
+    }
+  },
+  "MeshObj|2023-02-28T00:48:37.687Z|37702": {
+    "ƒ.MeshObj": {
+      "idResource": "MeshObj|2023-02-28T00:48:37.687Z|37702",
+      "name": "smokeCloud",
+      "type": "MeshObj",
+      "url": "obj\\smokeCloud.obj"
+    }
+  },
+  "Material|2023-02-28T00:51:59.120Z|85015": {
+    "ƒ.Material": {
+      "name": "smokeMat",
+      "idResource": "Material|2023-02-28T00:51:59.120Z|85015",
+      "shader": "ShaderGouraud",
+      "coat": {
+        "ƒ.CoatRemissive": {
+          "color": "[0.6980392156862745, 0.796078431372549, 0.803921568627451, 1]",
+          "diffuse": 1,
+          "specular": 0
+        }
+      }
+    }
+  },
+  "Graph|2023-02-28T00:53:28.192Z|47604": {
+    "ƒ.Graph": {
+      "name": "SmokeCloudGraph",
+      "active": true,
+      "components": {
+        "ComponentTransform": [
+          {
+            "ƒ.ComponentTransform": {
+              "local": {
+                "translation": "[0, 0, 0]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[1, 1, 1]"
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          }
+        ],
+        "ComponentMesh": [
+          {
+            "ƒ.ComponentMesh": {
+              "idMesh": "MeshObj|2023-02-28T00:48:37.687Z|37702",
+              "pivot": {
+                "translation": "[0, 0, 0]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[1, 1, 1]"
+              },
+              "Component": {
+                "active": true
+              }
+            }
+          }
+        ],
+        "ComponentMaterial": [
+          {
+            "ƒ.ComponentMaterial": {
+              "sortForAlpha": false,
+              "clrPrimary": "[1, 1, 1, 1]",
+              "clrSecondary": "[1, 1, 1, 1]",
+              "pivot": {
+                "translation": "[0, 0]",
+                "rotation": 0,
+                "scaling": "[1, 1]"
+              },
+              "Component": {
+                "active": true
+              },
+              "idMaterial": "Material|2023-02-28T00:51:59.120Z|85015"
+            }
+          }
+        ]
+      },
+      "children": [],
+      "idResource": "Graph|2023-02-28T00:53:28.192Z|47604",
       "type": "Graph"
     }
   }

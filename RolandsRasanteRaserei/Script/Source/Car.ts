@@ -14,7 +14,9 @@ namespace Raserei {
         //REFERENCES
         protected centerRB: ƒ.ComponentRigidbody;
         protected mainRB: ƒ.ComponentRigidbody;
+        protected bumperRB: ƒ.ComponentRigidbody;
         protected sphericalJoint: ƒ.JointSpherical;
+        protected bumperWeld: ƒ.JointWelding;
         protected mtxTireL: ƒ.Matrix4x4;
         protected mtxTireR: ƒ.Matrix4x4;
         protected engineSoundComponent: ƒ.ComponentAudio;
@@ -65,6 +67,7 @@ namespace Raserei {
                 this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
                 this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor) * f));
             }
+            
             this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150 * f));
             this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f));//ehemals Loop Frame Time
             if (forward > 0) {
@@ -82,7 +85,7 @@ namespace Raserei {
         }
 
         protected pinToGround(): void {
-            this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 50.45)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
+            this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 50.50)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
         }
 
         protected updatePos(): void {
@@ -107,6 +110,10 @@ namespace Raserei {
             let tempV: ƒ.Vector3 = new ƒ.Vector3(0, _turn * 4, -_turn * 2);
             this.mtxTireL.rotation = tempV;
             this.mtxTireR.rotation = tempV;
+        }
+
+        protected updateSmoke(): void{
+            this.world.addSmoke(this.pos);
         }
 
         protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2 {

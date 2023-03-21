@@ -54,7 +54,9 @@ var Raserei;
         //REFERENCES
         centerRB;
         mainRB;
+        bumperRB;
         sphericalJoint;
+        bumperWeld;
         mtxTireL;
         mtxTireR;
         engineSoundComponent;
@@ -119,7 +121,7 @@ var Raserei;
             this.updateWheels(this.ctrlTurn.getOutput());
         }
         pinToGround() {
-            this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 50.45)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
+            this.mainRB.setPosition(ƒ.Vector3.NORMALIZATION(this.mainRB.getPosition(), 50.50)); //setzt den Abstand zur Weltmitte auf genau 50.4 (weltradius 50 plus abstand rigid body);
         }
         updatePos() {
             this.velocity = ƒ.Vector3.DIFFERENCE(this.mainRB.getPosition(), this.pos);
@@ -352,6 +354,7 @@ var Raserei;
             state = 3;
             console.log("He is dry lads!");
         }
+        state = 1;
     }
     function updateDeltaTime() {
         DeltaTimeArray.push(ƒ.Loop.timeFrameGame);
@@ -544,14 +547,20 @@ var Raserei;
             this.body = this.main.getChildrenByName("Body")[0];
             this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
             this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.bumperRB = this.main.getChildrenByName("RigidBodies")[0].getChildren()[0].getComponent(ƒ.ComponentRigidbody);
+            this.bumperWeld = new ƒ.JointWelding(this.mainRB, this.bumperRB);
+            this.main.addComponent(this.bumperWeld);
             this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
             this.sphericalJoint.springFrequency = 0;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.carNode.addComponent(this.sphericalJoint);
             this.mainRB.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
+            this.bumperRB.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
             this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
             this.setupEngineSound();
+            //this.centerRB.rotateBody(new ƒ.Vector3(-90, 0, 0));
             this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
             this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
             this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
@@ -723,13 +732,15 @@ var Raserei;
             this.body = this.main.getChildrenByName("Body")[0];
             this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
             this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.bumperRB = this.main.getChildrenByName("RigidBodies")[0].getChildren()[0].getComponent(ƒ.ComponentRigidbody);
+            this.bumperWeld = new ƒ.JointWelding(this.mainRB, this.bumperRB);
+            this.main.addComponent(this.bumperWeld);
             this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
             this.sphericalJoint.springFrequency = 0;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.hndCollision);
-            this.mainRB.setPosition(new ƒ.Vector3(0, 0, -50.5));
-            this.mainRB.setRotation(new ƒ.Vector3(-90, 0, 0));
             this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
             this.sirenSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[1];
             this.pos = this.mainRB.getPosition();
@@ -896,7 +907,16 @@ var Raserei;
             this.spliceDoomed();
         }
         addToDoomedCollectables(_graph) {
-            this.doomedCollect.push(_graph);
+            let inStack = false;
+            for (let i = 0; i < this.doomedCollect.length; i++) {
+                if (_graph == this.doomedCollect[0]) {
+                    console.log("already in progress");
+                    inStack = true;
+                }
+            }
+            if (!inStack) {
+                this.doomedCollect.push(_graph);
+            }
         }
         setPlayerCar(_car) {
             this.playerCar = _car;
@@ -944,12 +964,14 @@ var Raserei;
                     this.playerCar.incScore();
                     this.gameState.coins += 1;
                     let coinCluster = this.doomedCollect[0].getParent().getParent();
-                    if (coinCluster.getChildren().length == 1) {
-                        coinCluster.getParent().removeChild(coinCluster);
-                        this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1, 0);
-                    }
-                    else {
-                        coinCluster.removeChild(this.doomedCollect[0].getParent());
+                    if (coinCluster != null) {
+                        if (coinCluster.getChildren().length == 1) {
+                            coinCluster.getParent().removeChild(coinCluster);
+                            this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1, 0);
+                        }
+                        else {
+                            coinCluster.removeChild(this.doomedCollect[0].getParent());
+                        }
                     }
                 }
                 else {

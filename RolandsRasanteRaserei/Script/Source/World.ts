@@ -9,6 +9,7 @@ namespace Raserei {
         static canGraphID: string;
         private trees: ƒ.Node;
         static treeGraphID: string;
+        private smoke: Smoke[] = [];
         private doomedCollect: ƒ.GraphInstance[] = [];
         private playerCar: PlayerCar;
         private gameState: GameState;
@@ -32,7 +33,16 @@ namespace Raserei {
         }
 
         public addToDoomedCollectables(_graph: ƒ.GraphInstance): void {
-            this.doomedCollect.push(_graph);
+            let inStack: boolean = false;
+            for (let i: number = 0; i < this.doomedCollect.length; i++) {
+                if (_graph == this.doomedCollect[0]) {
+                    console.log("already in progress");
+                    inStack = true;
+                }
+            }
+            if (!inStack) {
+                this.doomedCollect.push(_graph);
+            }
         }
 
         public setPlayerCar(_car: PlayerCar): void {
@@ -84,11 +94,13 @@ namespace Raserei {
                     this.playerCar.incScore();
                     this.gameState.coins += 1;
                     let coinCluster: ƒ.Node = this.doomedCollect[0].getParent().getParent();
-                    if (coinCluster.getChildren().length == 1) {
-                        coinCluster.getParent().removeChild(coinCluster);
-                        this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1, 0);
-                    } else {
-                        coinCluster.removeChild(this.doomedCollect[0].getParent());
+                    if (coinCluster != null) {
+                        if (coinCluster.getChildren().length == 1) {
+                            coinCluster.getParent().removeChild(coinCluster);
+                            this.generateGraphCluster(World.coinGraphID, this.coins, 1, 10, 0.1, 0);
+                        } else {
+                            coinCluster.removeChild(this.doomedCollect[0].getParent());
+                        }
                     }
                 } else {
                     if (this.playerCar.getScore() - this.config.gasprice >= 0) {
@@ -98,7 +110,7 @@ namespace Raserei {
                         this.generateCans(1);
                     }
                 }
-                if(splice){
+                if (splice) {
                     this.doomedCollect.splice(0, 1);
                 }
             }
