@@ -166,7 +166,6 @@ namespace Raserei {
       state = 3;
       console.log("He is dry lads!");
     }
-    state = 1;
   }
 
   function updateDeltaTime(): void {

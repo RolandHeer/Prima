@@ -113,7 +113,7 @@ namespace Raserei {
         }
 
         protected updateSmoke(): void{
-            this.world.addSmoke(this.pos);
+            //this.world.addSmoke(this.pos);
         }
 
         protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2 {

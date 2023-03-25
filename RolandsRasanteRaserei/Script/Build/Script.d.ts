@@ -44,6 +44,7 @@ declare namespace Raserei {
         protected setSpeed(): void;
         protected updateTilt(_drive: number, _turn: number): void;
         protected updateWheels(_turn: number): void;
+        protected updateSmoke(): void;
         protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2;
         protected abstract updateGaz(_factor: number): void;
         protected setupControls(_config: Config): void;
@@ -145,6 +146,17 @@ declare namespace Script {
     }
 }
 declare namespace Raserei {
+    import ƒ = FudgeCore;
+    class Smoke {
+        private smokeNode;
+        static smokeCloudID: string;
+        private smokeCloudInstance;
+        private size;
+        constructor(_pos: ƒ.Vector3, _size: number, _smokeNode: ƒ.Node);
+        private addGraphToNode;
+    }
+}
+declare namespace Raserei {
     class Vector {
         x: number;
         y: number;
@@ -175,6 +187,7 @@ declare namespace Raserei {
         static canGraphID: string;
         private trees;
         static treeGraphID: string;
+        private smoke;
         private doomedCollect;
         private playerCar;
         private gameState;

@@ -57,6 +57,7 @@ namespace Raserei {
                 this.updatePos();
             }
             this.updateEngineSound(_playing);
+            this.updateSmoke();
         }
 
         public incScore(): void {

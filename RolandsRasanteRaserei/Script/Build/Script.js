@@ -144,6 +144,9 @@ var Raserei;
             this.mtxTireL.rotation = tempV;
             this.mtxTireR.rotation = tempV;
         }
+        updateSmoke() {
+            //this.world.addSmoke(this.pos);
+        }
         getRelative2Dvector(_vDir, _vRot) {
             let mtx = new ƒ.Matrix4x4();
             let refMtx = new ƒ.Matrix4x4();
@@ -354,7 +357,6 @@ var Raserei;
             state = 3;
             console.log("He is dry lads!");
         }
-        state = 1;
     }
     function updateDeltaTime() {
         DeltaTimeArray.push(ƒ.Loop.timeFrameGame);
@@ -576,6 +578,7 @@ var Raserei;
                 this.updatePos();
             }
             this.updateEngineSound(_playing);
+            this.updateSmoke();
         }
         incScore() {
             this.coinSound.currentTime = 0;
@@ -799,6 +802,33 @@ var Script;
 })(Script || (Script = {}));
 var Raserei;
 (function (Raserei) {
+    var ƒ = FudgeCore;
+    class Smoke {
+        smokeNode;
+        static smokeCloudID;
+        smokeCloudInstance;
+        size;
+        constructor(_pos, _size, _smokeNode) {
+            this.size = _size;
+            this.smokeNode = _smokeNode;
+            Smoke.smokeCloudID = "Graph|2023-02-28T00:53:28.192Z|47604";
+            let tempSmokeNode = new ƒ.Node("Smoke");
+            let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
+            tempSmokeNode.addComponent(cmpTransform);
+            this.addGraphToNode(tempSmokeNode, Smoke.smokeCloudID);
+            tempSmokeNode.mtxLocal.translation = _pos;
+            this.smokeNode.addChild(tempSmokeNode);
+        }
+        async addGraphToNode(_node, _id) {
+            const graph = await ƒ.Project.createGraphInstance(ƒ.Project.resources[_id]);
+            this.smokeCloudInstance = graph;
+            _node.addChild(graph);
+        }
+    }
+    Raserei.Smoke = Smoke;
+})(Raserei || (Raserei = {}));
+var Raserei;
+(function (Raserei) {
     class Vector {
         x;
         y;
@@ -887,6 +917,7 @@ var Raserei;
         static canGraphID;
         trees;
         static treeGraphID;
+        smoke = [];
         doomedCollect = [];
         playerCar;
         gameState;
