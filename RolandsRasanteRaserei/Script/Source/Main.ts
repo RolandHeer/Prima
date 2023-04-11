@@ -338,7 +338,7 @@ namespace Raserei {
   }
 
   function setupCam(): void {
-    camNode = graph.getChildrenByName("Camera")[0];
+    camNode = graph.getChildrenByName("Car")[0].getChildrenByName("Camera")[0];
     viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
     cam = new Cam(camNode, carNode.getChildren()[0].getChildrenByName("Body")[0],viewport);
   }

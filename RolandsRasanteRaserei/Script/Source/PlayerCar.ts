@@ -10,43 +10,13 @@ namespace Raserei {
         private coinSound: HTMLAudioElement = new Audio("audio/coin.wav");
         private canSound: HTMLAudioElement = new Audio("audio/can.wav");
 
-        constructor(_config: Config, _car: ƒ.Node, _world: World) {
-            super();
+        constructor(_config: Config, _carNode: ƒ.Node, _world: World) {
+            super(_carNode);
             this.config = _config;
             this.world = _world;
             this.world.setPlayerCar(this);
 
-            this.carNode = _car;
-            this.main = _car.getChildren()[0];
-            this.body = this.main.getChildrenByName("Body")[0];
-
-            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
-            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
-            this.bumperRB = this.main.getChildrenByName("RigidBodies")[0].getChildren()[0].getComponent(ƒ.ComponentRigidbody);
-
-            this.bumperWeld = new ƒ.JointWelding(this.mainRB, this.bumperRB);
-            this.main.addComponent(this.bumperWeld);
-
-            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
-            this.sphericalJoint.springFrequency = 0;
-            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.carNode.addComponent(this.sphericalJoint);
-            this.mainRB.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
-            this.bumperRB.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
-
-            this.engineSoundComponent = <ƒ.ComponentAudio>this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
-            this.setupEngineSound();
-
-            //this.centerRB.rotateBody(new ƒ.Vector3(-90, 0, 0));
-
-            this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
-            this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.setupControls(_config);
-            this.coinSound.volume = 0.2;
-            this.canSound.volume = 0.8;
+            this.setupPlayerCar(_config, _carNode);
         }
 
         public update(_playing: boolean): void {
@@ -142,6 +112,38 @@ namespace Raserei {
             } else {
                 this.engineSound.volume = Math.max(this.engineSound.volume - 0.01, 0);
             }
+        }
+
+        private setupPlayerCar(_config: Config, _carNode: ƒ.Node) {
+            this.carNode = _carNode;
+            this.main = _carNode.getChildren()[0];
+            this.body = this.main.getChildrenByName("Body")[0];
+
+            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
+            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.bumperRB = this.main.getChildrenByName("RigidBodies")[0].getChildren()[0].getComponent(ƒ.ComponentRigidbody);
+
+            this.bumperWeld = new ƒ.JointWelding(this.mainRB, this.bumperRB);
+            this.main.addComponent(this.bumperWeld);
+
+            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
+            this.sphericalJoint.springFrequency = 0;
+            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.carNode.addComponent(this.sphericalJoint);
+            this.mainRB.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
+            this.bumperRB.addEventListener(ƒ.EVENT_PHYSICS.TRIGGER_ENTER, this.hndCollision);
+
+            this.engineSoundComponent = <ƒ.ComponentAudio>this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
+            this.setupEngineSound();
+
+            this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
+            this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.setupControls(_config);
+            this.coinSound.volume = 0.2;
+            this.canSound.volume = 0.8;
         }
     }
 }

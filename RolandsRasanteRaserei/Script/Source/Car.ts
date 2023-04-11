@@ -12,6 +12,8 @@ namespace Raserei {
         protected body: ƒ.Node;
 
         //REFERENCES
+        protected initTransform: ƒ.Matrix4x4;
+        protected initAngles: ƒ.Vector3;
         protected centerRB: ƒ.ComponentRigidbody;
         protected mainRB: ƒ.ComponentRigidbody;
         protected bumperRB: ƒ.ComponentRigidbody;
@@ -31,6 +33,11 @@ namespace Raserei {
 
         protected isPolice: boolean = false;
 
+        constructor(_carMainNode: ƒ.Node) {
+            this.initTransform = _carMainNode.mtxLocal;             //The Local Matrix of the Main RB-Object is used to determine all sorts of stuff. It is altered however, if we change the transform of its parents. This unfortunately is needed to easily place the car anywhere in the world. To counteract the transform of the parent object is stored to base the calculations on.
+            this.initAngles = this.initTransform.getEulerAngles();
+        }
+
         public abstract update(_driving: boolean): void;
 
         public getSpeedPercent(): number {
@@ -38,38 +45,25 @@ namespace Raserei {
         }
 
         protected updateDriving(_inputDrive: number): number {  //PROBLEM: MAN MUSS FESTSTELLEN OB SICH DER WAGEN NACH VORN ODER HINTEN BEWEGT allerdings hat es sich noch nicht bewegt... menno
+            let f: number = Math.min(ƒ.Loop.timeFrameGame / this.config.speedDivider, 3);   //factor that calculations are based on, to decouple them from the time used to generate the Frame. It is clipped to 3 to avoid unwanted behaviour when the Window is minimized during the game.
             let forward: number;
-            if (this.getRelative2Dvector(this.velocity, this.main.mtxLocal.getEulerAngles()).y > 0) {
-                forward = 1;
-            } else if (this.getRelative2Dvector(this.velocity, this.main.mtxLocal.getEulerAngles()).y < 0) {
-                forward = -1;
-            } else {
-                forward = 0;
+            let mtxLocal: ƒ.Matrix4x4 = this.main.mtxLocal;
+
+            let relativeZ: ƒ.Vector3 = mtxLocal.getZ();
+            relativeZ.transform(this.initTransform);
+
+            forward = this.getForward(relativeZ);
+            _inputDrive = this.evalInputDrive(_inputDrive, forward);
+
+            if(this.isPolice){
+                //console.log(forward);
             }
 
-            if (this.gaz == 0) {
-                if (forward == 1 && _inputDrive >= 0) {         //Driving Forward
-                    _inputDrive = 0;                            //Disable Speedup without gaz while still beeing able to break
-                } else if (forward == -1 && _inputDrive < 0) {  //Driving Backward
-                    _inputDrive = 0;                            //Disable Speedup without gaz while still beeing able to break
-                } else if (forward == 0) {                      //Standing Still
-                    _inputDrive = 0;                            //Disable Speedup without gaz
-                }
-            }
-            if (_inputDrive < 0 && forward <= 0) {
-                _inputDrive = _inputDrive / 3;
-            }
-            let f: number = ƒ.Loop.timeFrameGame / this.config.speedDivider;
-            if (forward >= 0) {
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor) * f));
-            } else {
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor) * f));
-            }
-            
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150 * f));
-            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f));//ehemals Loop Frame Time
+            this.handleGrip(forward, relativeZ, f);
+
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(relativeZ, _inputDrive * 150 * f));
+            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f));
+
             if (forward > 0) {
                 return this.getSpeedPercent();
             } else {
@@ -78,8 +72,11 @@ namespace Raserei {
         }
 
         protected updateTurning(_drive: number, _turnInput: number): void {
+            let relativeY: ƒ.Vector3 = this.main.mtxLocal.getY();
+            relativeY.transform(this.initTransform);
+
             this.ctrlTurn.setInput(_turnInput);
-            this.mainRB.rotateBody((ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), (this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * averageDeltaTime) / this.config.turnDivider)));
+            this.mainRB.rotateBody((ƒ.Vector3.SCALE(relativeY, (this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * averageDeltaTime) / this.config.turnDivider)));
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
         }
@@ -112,20 +109,36 @@ namespace Raserei {
             this.mtxTireR.rotation = tempV;
         }
 
-        protected updateSmoke(): void{
+        protected handleGrip(_forward: number, _relativeZ: ƒ.Vector3, _f: number): void {
+            //The initial velocity is removed (while considering the gripFactor) and then the velocity strength is added to the direction the car is actually facing
+            if (_forward >= 0) {
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * _f));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(_relativeZ, ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor) * _f));
+            } else {
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * _f));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(_relativeZ, ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor) * _f));
+            }
+        }
+
+        protected updateSmoke(): void {
             //this.world.addSmoke(this.pos);
         }
 
-        protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2 {
+        protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3, _vInitRot: ƒ.Vector3): ƒ.Vector2 {
             let mtx: ƒ.Matrix4x4 = new ƒ.Matrix4x4();
-            let refMtx: ƒ.Matrix4x4 = new ƒ.Matrix4x4();
             let vRot: ƒ.Vector3 = ƒ.Vector3.SCALE(_vRot, -1);
+            let vInitRot: ƒ.Vector3 = ƒ.Vector3.SCALE(_vInitRot, -1);
             let vDir: ƒ.Vector3 = ƒ.Vector3.SCALE(_vDir, 1);
+            
             mtx.rotateX(vRot.x);
             mtx.rotateY(vRot.y);
             mtx.rotateZ(vRot.z);
+
+            mtx.rotateX(vInitRot.x);
+            mtx.rotateY(vInitRot.y);
+            mtx.rotateZ(vInitRot.z);
             mtx.translate(vDir, true);
-            mtx.getTranslationTo(refMtx);
+
             return new ƒ.Vector2(mtx.translation.x, mtx.translation.z);
         }
 
@@ -133,6 +146,33 @@ namespace Raserei {
         protected setupControls(_config: Config): void {
             this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, ƒ.CONTROL_TYPE.PROPORTIONAL);
             this.ctrlTurn.setDelay(_config.accelTurn);
+        }
+
+        protected getForward(_relativeZ: ƒ.Vector3): number {
+            let dot: number = ƒ.Vector3.DOT(this.velocity, _relativeZ);
+            if (dot > 0) {
+                return 1;
+            } else if (dot < 0) {
+                return -1;
+            }
+            return 0;
+        }
+
+        protected evalInputDrive(_inputDrive: number, _forward: number): number {
+            if (this.gaz == 0) {
+                if (_forward == 1 && _inputDrive >= 0) {         //Driving Forward
+                    _inputDrive = 0;                            //Disable Speedup without gaz while still beeing able to break
+                } else if (_forward == -1 && _inputDrive < 0) {  //Driving Backward
+                    _inputDrive = 0;                            //Disable Speedup without gaz while still beeing able to break
+                } else if (_forward == 0) {                      //Standing Still
+                    _inputDrive = 0;                            //Disable Speedup without gaz
+                }
+            }
+
+            if (_inputDrive < 0 && _forward <= 0) {              //Reduce speed while driving backwards
+                _inputDrive = _inputDrive / 3;
+            }
+            return _inputDrive;
         }
 
     }

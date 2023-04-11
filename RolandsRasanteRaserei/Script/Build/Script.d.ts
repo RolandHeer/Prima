@@ -20,6 +20,8 @@ declare namespace Raserei {
         protected carNode: ƒ.Node;
         protected main: ƒ.Node;
         protected body: ƒ.Node;
+        protected initTransform: ƒ.Matrix4x4;
+        protected initAngles: ƒ.Vector3;
         protected centerRB: ƒ.ComponentRigidbody;
         protected mainRB: ƒ.ComponentRigidbody;
         protected bumperRB: ƒ.ComponentRigidbody;
@@ -35,6 +37,7 @@ declare namespace Raserei {
         protected currentSpeed: number;
         protected gripFactor: number;
         protected isPolice: boolean;
+        constructor(_carMainNode: ƒ.Node);
         abstract update(_driving: boolean): void;
         getSpeedPercent(): number;
         protected updateDriving(_inputDrive: number): number;
@@ -44,10 +47,13 @@ declare namespace Raserei {
         protected setSpeed(): void;
         protected updateTilt(_drive: number, _turn: number): void;
         protected updateWheels(_turn: number): void;
+        protected handleGrip(_forward: number, _relativeZ: ƒ.Vector3, _f: number): void;
         protected updateSmoke(): void;
-        protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3): ƒ.Vector2;
+        protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3, _vInitRot: ƒ.Vector3): ƒ.Vector2;
         protected abstract updateGaz(_factor: number): void;
         protected setupControls(_config: Config): void;
+        protected getForward(_relativeZ: ƒ.Vector3): number;
+        protected evalInputDrive(_inputDrive: number, _forward: number): number;
     }
 }
 declare namespace Raserei {
@@ -94,7 +100,7 @@ declare namespace Raserei {
         private engineSound;
         private coinSound;
         private canSound;
-        constructor(_config: Config, _car: ƒ.Node, _world: World);
+        constructor(_config: Config, _carNode: ƒ.Node, _world: World);
         update(_playing: boolean): void;
         incScore(): void;
         payForGas(): void;
@@ -110,6 +116,7 @@ declare namespace Raserei {
         private setupEngineSound;
         private updateCamPosArray;
         private updateEngineSound;
+        private setupPlayerCar;
     }
 }
 declare namespace Raserei {

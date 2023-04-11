@@ -52,6 +52,8 @@ var Raserei;
         main;
         body;
         //REFERENCES
+        initTransform;
+        initAngles;
         centerRB;
         mainRB;
         bumperRB;
@@ -68,45 +70,27 @@ var Raserei;
         currentSpeed = 0;
         gripFactor = 0.8; // 0 = no grip, 1 = full grip
         isPolice = false;
+        constructor(_carMainNode) {
+            this.initTransform = _carMainNode.mtxLocal; //The Local Matrix of the Main RB-Object is used to determine all sorts of stuff. It is altered however, if we change the transform of its parents. This unfortunately is needed to easily place the car anywhere in the world. To counteract the transform of the parent object is stored to base the calculations on.
+            this.initAngles = this.initTransform.getEulerAngles();
+        }
         getSpeedPercent() {
             return this.currentSpeed / 0.025;
         }
         updateDriving(_inputDrive) {
+            let f = Math.min(ƒ.Loop.timeFrameGame / this.config.speedDivider, 3); //factor that calculations are based on, to decouple them from the time used to generate the Frame. It is clipped to 3 to avoid unwanted behaviour when the Window is minimized during the game.
             let forward;
-            if (this.getRelative2Dvector(this.velocity, this.main.mtxLocal.getEulerAngles()).y > 0) {
-                forward = 1;
+            let mtxLocal = this.main.mtxLocal;
+            let relativeZ = mtxLocal.getZ();
+            relativeZ.transform(this.initTransform);
+            forward = this.getForward(relativeZ);
+            _inputDrive = this.evalInputDrive(_inputDrive, forward);
+            if (this.isPolice) {
+                //console.log(forward);
             }
-            else if (this.getRelative2Dvector(this.velocity, this.main.mtxLocal.getEulerAngles()).y < 0) {
-                forward = -1;
-            }
-            else {
-                forward = 0;
-            }
-            if (this.gaz == 0) {
-                if (forward == 1 && _inputDrive >= 0) { //Driving Forward
-                    _inputDrive = 0; //Disable Speedup without gaz while still beeing able to break
-                }
-                else if (forward == -1 && _inputDrive < 0) { //Driving Backward
-                    _inputDrive = 0; //Disable Speedup without gaz while still beeing able to break
-                }
-                else if (forward == 0) { //Standing Still
-                    _inputDrive = 0; //Disable Speedup without gaz
-                }
-            }
-            if (_inputDrive < 0 && forward <= 0) {
-                _inputDrive = _inputDrive / 3;
-            }
-            let f = ƒ.Loop.timeFrameGame / this.config.speedDivider;
-            if (forward >= 0) {
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor) * f));
-            }
-            else {
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * f));
-                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor) * f));
-            }
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(this.main.mtxLocal.getZ(), _inputDrive * 150 * f));
-            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f)); //ehemals Loop Frame Time
+            this.handleGrip(forward, relativeZ, f);
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(relativeZ, _inputDrive * 150 * f));
+            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f));
             if (forward > 0) {
                 return this.getSpeedPercent();
             }
@@ -115,8 +99,10 @@ var Raserei;
             }
         }
         updateTurning(_drive, _turnInput) {
+            let relativeY = this.main.mtxLocal.getY();
+            relativeY.transform(this.initTransform);
             this.ctrlTurn.setInput(_turnInput);
-            this.mainRB.rotateBody((ƒ.Vector3.SCALE(this.main.mtxLocal.getY(), (this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * Raserei.averageDeltaTime) / this.config.turnDivider)));
+            this.mainRB.rotateBody((ƒ.Vector3.SCALE(relativeY, (this.ctrlTurn.getOutput() * Math.min(0.3, _drive) * Raserei.averageDeltaTime) / this.config.turnDivider)));
             this.updateTilt(_drive, this.ctrlTurn.getOutput());
             this.updateWheels(this.ctrlTurn.getOutput());
         }
@@ -144,24 +130,64 @@ var Raserei;
             this.mtxTireL.rotation = tempV;
             this.mtxTireR.rotation = tempV;
         }
+        handleGrip(_forward, _relativeZ, _f) {
+            //The initial velocity is removed (while considering the gripFactor) and then the velocity strength is added to the direction the car is actually facing
+            if (_forward >= 0) {
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * _f));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(_relativeZ, ƒ.Vector3.ZERO().getDistance(this.velocity) * (1100 * this.gripFactor) * _f));
+            }
+            else {
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(this.velocity, -1000 * this.gripFactor * _f));
+                this.mainRB.applyForce(ƒ.Vector3.SCALE(_relativeZ, ƒ.Vector3.ZERO().getDistance(this.velocity) * (-1100 * this.gripFactor) * _f));
+            }
+        }
         updateSmoke() {
             //this.world.addSmoke(this.pos);
         }
-        getRelative2Dvector(_vDir, _vRot) {
+        getRelative2Dvector(_vDir, _vRot, _vInitRot) {
             let mtx = new ƒ.Matrix4x4();
-            let refMtx = new ƒ.Matrix4x4();
             let vRot = ƒ.Vector3.SCALE(_vRot, -1);
+            let vInitRot = ƒ.Vector3.SCALE(_vInitRot, -1);
             let vDir = ƒ.Vector3.SCALE(_vDir, 1);
             mtx.rotateX(vRot.x);
             mtx.rotateY(vRot.y);
             mtx.rotateZ(vRot.z);
+            mtx.rotateX(vInitRot.x);
+            mtx.rotateY(vInitRot.y);
+            mtx.rotateZ(vInitRot.z);
             mtx.translate(vDir, true);
-            mtx.getTranslationTo(refMtx);
             return new ƒ.Vector2(mtx.translation.x, mtx.translation.z);
         }
         setupControls(_config) {
-            this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, 0 /* PROPORTIONAL */);
+            this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, 0 /* ƒ.CONTROL_TYPE.PROPORTIONAL */);
             this.ctrlTurn.setDelay(_config.accelTurn);
+        }
+        getForward(_relativeZ) {
+            let dot = ƒ.Vector3.DOT(this.velocity, _relativeZ);
+            if (dot > 0) {
+                return 1;
+            }
+            else if (dot < 0) {
+                return -1;
+            }
+            return 0;
+        }
+        evalInputDrive(_inputDrive, _forward) {
+            if (this.gaz == 0) {
+                if (_forward == 1 && _inputDrive >= 0) { //Driving Forward
+                    _inputDrive = 0; //Disable Speedup without gaz while still beeing able to break
+                }
+                else if (_forward == -1 && _inputDrive < 0) { //Driving Backward
+                    _inputDrive = 0; //Disable Speedup without gaz while still beeing able to break
+                }
+                else if (_forward == 0) { //Standing Still
+                    _inputDrive = 0; //Disable Speedup without gaz
+                }
+            }
+            if (_inputDrive < 0 && _forward <= 0) { //Reduce speed while driving backwards
+                _inputDrive = _inputDrive / 3;
+            }
+            return _inputDrive;
         }
     }
     Raserei.Car = Car;
@@ -194,27 +220,27 @@ var Script;
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
             // Listen to this component being added to or removed from a node
-            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
+            this.addEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
+            this.addEventListener("nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */, this.hndEvent);
         }
         // Activate the functions of this component as response to events
         hndEvent = (_event) => {
             switch (_event.type) {
-                case "componentAdd" /* COMPONENT_ADD */:
+                case "componentAdd" /* ƒ.EVENT.COMPONENT_ADD */:
                     //ƒ.Debug.log(this.message, this.node);
                     break;
-                case "componentRemove" /* COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                case "componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
                     break;
-                case "renderPrepare" /* RENDER_PREPARE */:
+                case "renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */:
                     let v = this.rigid.getPosition();
                     this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.2));
                     break;
-                case "nodeDeserialized" /* NODE_DESERIALIZED */:
+                case "nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */:
                     this.rigid = this.node.getComponent(ƒ.ComponentRigidbody);
-                    this.node.addEventListener("renderPrepare" /* RENDER_PREPARE */, this.hndEvent);
+                    this.node.addEventListener("renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */, this.hndEvent);
                     // if deserialized the node is now fully reconstructed and access to all its components and children is possible
                     break;
             }
@@ -305,7 +331,7 @@ var Raserei;
         setupPolice();
         setupCam();
         setupAudio();
-        ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
+        ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
@@ -520,7 +546,7 @@ var Raserei;
         policeCar = new Raserei.PoliceCar(config, policeCarNode, car);
     }
     function setupCam() {
-        camNode = graph.getChildrenByName("Camera")[0];
+        camNode = graph.getChildrenByName("Car")[0].getChildrenByName("Camera")[0];
         viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
         cam = new Raserei.Cam(camNode, carNode.getChildren()[0].getChildrenByName("Body")[0], viewport);
     }
@@ -539,36 +565,12 @@ var Raserei;
         engineSound = new Audio("audio/2cv.mp3");
         coinSound = new Audio("audio/coin.wav");
         canSound = new Audio("audio/can.wav");
-        constructor(_config, _car, _world) {
-            super();
+        constructor(_config, _carNode, _world) {
+            super(_carNode);
             this.config = _config;
             this.world = _world;
             this.world.setPlayerCar(this);
-            this.carNode = _car;
-            this.main = _car.getChildren()[0];
-            this.body = this.main.getChildrenByName("Body")[0];
-            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
-            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
-            this.bumperRB = this.main.getChildrenByName("RigidBodies")[0].getChildren()[0].getComponent(ƒ.ComponentRigidbody);
-            this.bumperWeld = new ƒ.JointWelding(this.mainRB, this.bumperRB);
-            this.main.addComponent(this.bumperWeld);
-            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
-            this.sphericalJoint.springFrequency = 0;
-            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.carNode.addComponent(this.sphericalJoint);
-            this.mainRB.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
-            this.bumperRB.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
-            this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
-            this.setupEngineSound();
-            //this.centerRB.rotateBody(new ƒ.Vector3(-90, 0, 0));
-            this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
-            this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
-            this.setupControls(_config);
-            this.coinSound.volume = 0.2;
-            this.canSound.volume = 0.8;
+            this.setupPlayerCar(_config, _carNode);
         }
         update(_playing) {
             if (_playing) {
@@ -651,6 +653,32 @@ var Raserei;
                 this.engineSound.volume = Math.max(this.engineSound.volume - 0.01, 0);
             }
         }
+        setupPlayerCar(_config, _carNode) {
+            this.carNode = _carNode;
+            this.main = _carNode.getChildren()[0];
+            this.body = this.main.getChildrenByName("Body")[0];
+            this.centerRB = this.carNode.getComponent(ƒ.ComponentRigidbody);
+            this.mainRB = this.main.getComponent(ƒ.ComponentRigidbody);
+            this.bumperRB = this.main.getChildrenByName("RigidBodies")[0].getChildren()[0].getComponent(ƒ.ComponentRigidbody);
+            this.bumperWeld = new ƒ.JointWelding(this.mainRB, this.bumperRB);
+            this.main.addComponent(this.bumperWeld);
+            this.sphericalJoint = new ƒ.JointSpherical(this.centerRB, this.mainRB);
+            this.sphericalJoint.springFrequency = 0;
+            this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
+            this.carNode.addComponent(this.sphericalJoint);
+            this.mainRB.addEventListener("TriggerEnteredCollision" /* ƒ.EVENT_PHYSICS.TRIGGER_ENTER */, this.hndCollision);
+            this.bumperRB.addEventListener("TriggerEnteredCollision" /* ƒ.EVENT_PHYSICS.TRIGGER_ENTER */, this.hndCollision);
+            this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
+            this.setupEngineSound();
+            this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
+            this.mtxTireL = this.main.getChildrenByName("TireFL")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.mtxTireR = this.main.getChildrenByName("TireFR")[0].getComponent(ƒ.ComponentTransform).mtxLocal;
+            this.setupControls(_config);
+            this.coinSound.volume = 0.2;
+            this.canSound.volume = 0.8;
+        }
     }
     Raserei.PlayerCar = PlayerCar;
 })(Raserei || (Raserei = {}));
@@ -669,7 +697,7 @@ var Raserei;
             }
         });
         constructor(_config, _carNode, _player) {
-            super();
+            super(_carNode);
             this.config = _config;
             this.player = _player;
             this.isPolice = true;
@@ -678,6 +706,7 @@ var Raserei;
         update(_playing) {
             this.distPlayer = this.mainRB.getPosition().getDistance(this.player.getPosition());
             let dir = this.getDir();
+            console.log("x: " + Math.round(dir.x * 30) + ", y: " + Math.round(dir.y * 30));
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
             this.updatePos();
@@ -720,7 +749,8 @@ var Raserei;
         getDir() {
             let vDir = ƒ.Vector3.DIFFERENCE(this.player.getPosition(), this.mainRB.getPosition());
             vDir.normalize();
-            return this.evalDir(this.getRelative2Dvector(vDir, this.main.mtxLocal.getEulerAngles()));
+            let vRot = this.main.mtxLocal.getEulerAngles();
+            return this.evalDir(this.getRelative2Dvector(vDir, vRot, this.initAngles));
         }
         evalDir(vDir) {
             if (this.distPlayer > 20 && vDir.y <= 0) {
@@ -743,7 +773,7 @@ var Raserei;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.mainRB.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.hndCollision);
+            this.mainRB.addEventListener("ColliderEnteredCollision" /* ƒ.EVENT_PHYSICS.COLLISION_ENTER */, this.hndCollision);
             this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
             this.sirenSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[1];
             this.pos = this.mainRB.getPosition();
@@ -772,27 +802,27 @@ var Script;
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
             // Listen to this component being added to or removed from a node
-            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
+            this.addEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
+            this.addEventListener("nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */, this.hndEvent);
         }
         // Activate the functions of this component as response to events
         hndEvent = (_event) => {
             switch (_event.type) {
-                case "componentAdd" /* COMPONENT_ADD */:
+                case "componentAdd" /* ƒ.EVENT.COMPONENT_ADD */:
                     //ƒ.Debug.log(this.message, this.node);
                     break;
-                case "componentRemove" /* COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                case "componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
                     break;
-                case "renderPrepare" /* RENDER_PREPARE */:
+                case "renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */:
                     this.mtx.rotate(ƒ.Vector3.Y(this.rotationSpeed));
                     break;
-                case "nodeDeserialized" /* NODE_DESERIALIZED */:
+                case "nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */:
                     this.mtx = this.node.getComponent(ƒ.ComponentMesh).mtxPivot;
                     this.mtx.rotate(ƒ.Vector3.Y(Math.random() * 360));
-                    this.node.addEventListener("renderPrepare" /* RENDER_PREPARE */, this.hndEvent);
+                    this.node.addEventListener("renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */, this.hndEvent);
                     // if deserialized the node is now fully reconstructed and access to all its components and children is possible
                     break;
             }
@@ -941,7 +971,6 @@ var Raserei;
             let inStack = false;
             for (let i = 0; i < this.doomedCollect.length; i++) {
                 if (_graph == this.doomedCollect[0]) {
-                    console.log("already in progress");
                     inStack = true;
                 }
             }

@@ -36,7 +36,6 @@ namespace Raserei {
             let inStack: boolean = false;
             for (let i: number = 0; i < this.doomedCollect.length; i++) {
                 if (_graph == this.doomedCollect[0]) {
-                    console.log("already in progress");
                     inStack = true;
                 }
             }

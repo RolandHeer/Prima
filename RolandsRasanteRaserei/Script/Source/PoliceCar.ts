@@ -14,7 +14,7 @@ namespace Raserei {
         });
 
         constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar) {
-            super();
+            super(_carNode);
             this.config = _config;
             this.player = _player;
             this.isPolice = true;
@@ -25,6 +25,7 @@ namespace Raserei {
         public update(_playing: boolean): void {
             this.distPlayer = this.mainRB.getPosition().getDistance(this.player.getPosition());
             let dir: ƒ.Vector2 = this.getDir();
+            console.log("x: " + Math.round(dir.x * 30) + ", y: " + Math.round(dir.y * 30));
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
             this.updatePos();
@@ -74,7 +75,8 @@ namespace Raserei {
         private getDir(): ƒ.Vector2 {
             let vDir: ƒ.Vector3 = ƒ.Vector3.DIFFERENCE(this.player.getPosition(), this.mainRB.getPosition());
             vDir.normalize();
-            return this.evalDir(this.getRelative2Dvector(vDir, this.main.mtxLocal.getEulerAngles()));
+            let vRot: ƒ.Vector3 = this.main.mtxLocal.getEulerAngles();
+            return this.evalDir(this.getRelative2Dvector(vDir, vRot, this.initAngles));
         }
 
         private evalDir(vDir: ƒ.Vector2): ƒ.Vector2 {
