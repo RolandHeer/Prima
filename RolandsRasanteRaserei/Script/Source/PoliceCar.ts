@@ -25,7 +25,6 @@ namespace Raserei {
         public update(_playing: boolean): void {
             this.distPlayer = this.mainRB.getPosition().getDistance(this.player.getPosition());
             let dir: ƒ.Vector2 = this.getDir();
-            console.log("x: " + Math.round(dir.x * 30) + ", y: " + Math.round(dir.y * 30));
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
             this.updatePos();

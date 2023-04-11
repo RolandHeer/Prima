@@ -706,7 +706,6 @@ var Raserei;
         update(_playing) {
             this.distPlayer = this.mainRB.getPosition().getDistance(this.player.getPosition());
             let dir = this.getDir();
-            console.log("x: " + Math.round(dir.x * 30) + ", y: " + Math.round(dir.y * 30));
             this.updateTurning(this.updateDriving(dir.y), dir.x);
             this.pinToGround();
             this.updatePos();
