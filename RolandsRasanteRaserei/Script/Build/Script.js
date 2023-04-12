@@ -51,6 +51,7 @@ var Raserei;
         carNode;
         main;
         body;
+        smokeEmitter;
         //REFERENCES
         initTransform;
         initAngles;
@@ -69,28 +70,28 @@ var Raserei;
         gaz = 100;
         currentSpeed = 0;
         gripFactor = 0.8; // 0 = no grip, 1 = full grip
+        lastInputDrive;
         isPolice = false;
         constructor(_carMainNode) {
             this.initTransform = _carMainNode.mtxLocal; //The Local Matrix of the Main RB-Object is used to determine all sorts of stuff. It is altered however, if we change the transform of its parents. This unfortunately is needed to easily place the car anywhere in the world. To counteract the transform of the parent object is stored to base the calculations on.
             this.initAngles = this.initTransform.getEulerAngles();
+            this.smokeEmitter = _carMainNode.getChildren()[0].getChildrenByName("SmokeEmitter")[0];
         }
         getSpeedPercent() {
             return this.currentSpeed / 0.025;
         }
-        updateDriving(_inputDrive) {
-            let f = Math.min(ƒ.Loop.timeFrameGame / this.config.speedDivider, 3); //factor that calculations are based on, to decouple them from the time used to generate the Frame. It is clipped to 3 to avoid unwanted behaviour when the Window is minimized during the game.
+        updateDriving(_inputDrive, _f) {
+            _f = Math.min(_f / this.config.speedDivider, 3);
             let forward;
             let mtxLocal = this.main.mtxLocal;
             let relativeZ = mtxLocal.getZ();
             relativeZ.transform(this.initTransform);
             forward = this.getForward(relativeZ);
             _inputDrive = this.evalInputDrive(_inputDrive, forward);
-            if (this.isPolice) {
-                //console.log(forward);
-            }
-            this.handleGrip(forward, relativeZ, f);
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(relativeZ, _inputDrive * 150 * f));
-            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f));
+            this.handleGrip(forward, relativeZ, _f);
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(relativeZ, _inputDrive * 150 * _f));
+            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * _f));
+            this.lastInputDrive = _inputDrive;
             if (forward > 0) {
                 return this.getSpeedPercent();
             }
@@ -142,7 +143,7 @@ var Raserei;
             }
         }
         updateSmoke() {
-            this.world.addSmoke(this.pos);
+            this.world.addSmoke(this.smokeEmitter.mtxWorld.translation, 0.97 - (Math.min(Math.abs(this.lastInputDrive), 1) * 0.1));
         }
         getRelative2Dvector(_vDir, _vRot, _vInitRot) {
             let mtx = new ƒ.Matrix4x4();
@@ -262,7 +263,6 @@ var Raserei;
     let carNode;
     let policeCarNode;
     ///   GAME MODES   \\\
-    let lockMode = true;
     let state = 1; //0=menue; 1=game running; 2=police got you; 3=no fuel
     ///     VALUES     \\\
     let config;
@@ -335,22 +335,23 @@ var Raserei;
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
+        let f = ƒ.Loop.timeFrameGame; //factor that calculations are based on, to decouple them from the time used to generate the Frame. It is clipped to 3 to avoid unwanted behaviour when the Window is minimized during the game.
         updateDeltaTime();
-        world.update();
+        world.update(f);
         if (state == 1) {
             if (!counting) {
-                car.update(true);
+                car.update(true, f);
             }
         }
         if (state != 0) {
             if (!counting) {
                 if (state != 1) {
-                    policeCar.update(false);
+                    policeCar.update(false, f);
                 }
                 else {
-                    policeCar.update(true);
+                    policeCar.update(true, f);
                 }
-                car.update(false);
+                car.update(false, f);
             }
         }
         if (state > 1) {
@@ -511,12 +512,10 @@ var Raserei;
     }
     function enterPointerLock() {
         canvas.requestPointerLock();
-        lockMode = false;
     }
     function hndKeydown(_key) {
         switch (_key.code) {
             case "KeyM":
-                lockMode = true;
                 document.exitPointerLock();
                 break;
             case "KeyC":
@@ -543,7 +542,7 @@ var Raserei;
     function setupPolice() {
         policeCarNode = graph.getChildrenByName("Police")[0].getChildrenByName("Cars")[0].getChildren()[0];
         policeCarNode.addEventListener("gottcha", (_e) => console.log(_e.detail.message));
-        policeCar = new Raserei.PoliceCar(config, policeCarNode, car);
+        policeCar = new Raserei.PoliceCar(config, policeCarNode, car, world);
     }
     function setupCam() {
         camNode = graph.getChildrenByName("Car")[0].getChildrenByName("Camera")[0];
@@ -572,9 +571,9 @@ var Raserei;
             this.world.setPlayerCar(this);
             this.setupPlayerCar(_config, _carNode);
         }
-        update(_playing) {
+        update(_playing, _f) {
             if (_playing) {
-                this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN])), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
+                this.updateTurning(this.updateDriving(ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.W, ƒ.KEYBOARD_CODE.ARROW_UP], [ƒ.KEYBOARD_CODE.S, ƒ.KEYBOARD_CODE.ARROW_DOWN]), _f), ƒ.Keyboard.mapToTrit([ƒ.KEYBOARD_CODE.A, ƒ.KEYBOARD_CODE.ARROW_LEFT], [ƒ.KEYBOARD_CODE.D, ƒ.KEYBOARD_CODE.ARROW_RIGHT]));
                 this.pinToGround();
                 this.updateCamPosArray();
                 this.updatePos();
@@ -696,17 +695,18 @@ var Raserei;
                 message: "I got him lads!"
             }
         });
-        constructor(_config, _carNode, _player) {
+        constructor(_config, _carNode, _player, _world) {
             super(_carNode);
             this.config = _config;
             this.player = _player;
             this.isPolice = true;
+            this.world = _world;
             this.setupPoliceCar(_config, _carNode);
         }
-        update(_playing) {
+        update(_playing, _f) {
             this.distPlayer = this.mainRB.getPosition().getDistance(this.player.getPosition());
             let dir = this.getDir();
-            this.updateTurning(this.updateDriving(dir.y), dir.x);
+            this.updateTurning(this.updateDriving(dir.y, _f), dir.x);
             this.pinToGround();
             this.updatePos();
             this.updateCountdown();
@@ -714,6 +714,7 @@ var Raserei;
                 this.engineSoundComponent.volume = Math.max(this.engineSoundComponent.volume - 0.01, 0);
                 this.sirenSoundComponent.volume = Math.max(this.sirenSoundComponent.volume - 0.01, 0);
             }
+            this.updateSmoke();
         }
         hasHim() {
             if (this.getCountdown() == 0) {
@@ -834,19 +835,44 @@ var Raserei;
     var ƒ = FudgeCore;
     class Smoke {
         smokeNode;
+        smokeCloudNode;
         static smokeCloudID;
         smokeCloudInstance;
+        rotation;
         size;
-        constructor(_pos, _size, _smokeNode) {
-            this.size = _size;
+        riseDir;
+        age = 0;
+        maxAge = 0;
+        constructor(_pos, _smokeNode, _config) {
             this.smokeNode = _smokeNode;
-            Smoke.smokeCloudID = "Graph|2023-02-28T00:53:28.192Z|47604";
-            let tempSmokeNode = new ƒ.Node("Smoke");
+            Smoke.smokeCloudID = "Graph|2023-04-12T12:45:10.840Z|70362";
+            this.smokeCloudNode = new ƒ.Node("Smoke");
             let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
-            tempSmokeNode.addComponent(cmpTransform);
-            this.addGraphToNode(tempSmokeNode, Smoke.smokeCloudID);
-            tempSmokeNode.mtxLocal.translation = _pos;
-            this.smokeNode.addChild(tempSmokeNode);
+            this.smokeCloudNode.addComponent(cmpTransform);
+            this.addGraphToNode(this.smokeCloudNode, Smoke.smokeCloudID);
+            this.smokeCloudNode.mtxLocal.translation = _pos;
+            this.smokeNode.addChild(this.smokeCloudNode);
+            this.rotation = new ƒ.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5);
+            this.size = ((Math.random() * 0.1) + 0.5);
+            this.riseDir = new ƒ.Vector3(_pos.x, _pos.y, _pos.z);
+            this.riseDir.normalize(1);
+            this.maxAge = _config.smokeAge - (Math.random() * (_config.smokeAge / 2));
+        }
+        update(_f) {
+            _f = _f * 0.1;
+            this.smokeCloudInstance.mtxLocal.translate(ƒ.Vector3.SCALE(this.riseDir, 0.003 * _f));
+            this.smokeCloudInstance.getComponent(ƒ.ComponentMesh).mtxPivot.scaling = ƒ.Vector3.ONE(this.size);
+            this.smokeCloudInstance.getComponent(ƒ.ComponentMesh).mtxPivot.rotate(ƒ.Vector3.SCALE(this.rotation, _f * 2));
+            this.size += 0.01 * _f;
+            this.age += _f;
+            //this.smokeCloudInstance.getComponent(ƒ.ComponentMaterial)                         //Hier Alphawert ändern 
+            if (this.age > this.maxAge) {
+                return true;
+            }
+            return false;
+        }
+        removeNode() {
+            this.smokeNode.removeChild(this.smokeCloudNode);
         }
         async addGraphToNode(_node, _id) {
             const graph = await ƒ.Project.createGraphInstance(ƒ.Project.resources[_id]);
@@ -965,8 +991,9 @@ var Raserei;
             this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
         }
-        update() {
-            this.spliceDoomed();
+        update(_f) {
+            this.updateSmoke(_f);
+            this.spliceDoomedCollectables();
         }
         addToDoomedCollectables(_graph) {
             let inStack = false;
@@ -982,9 +1009,17 @@ var Raserei;
         setPlayerCar(_car) {
             this.playerCar = _car;
         }
-        addSmoke(_pos) {
-            if (Math.random() > 0.9 && this.smokeArray.length < this.config.smoke) {
-                this.smokeArray.push(new Raserei.Smoke(_pos, 1, this.smoke));
+        addSmoke(_pos, _probability) {
+            if (Math.random() > _probability && this.smokeArray.length < this.config.maxSmokeAmmount) {
+                this.smokeArray.push(new Raserei.Smoke(_pos, this.smoke, this.config));
+            }
+        }
+        updateSmoke(_f) {
+            for (let i = this.smokeArray.length - 1; i >= 0; i--) {
+                if (this.smokeArray[i].update(_f)) {
+                    this.smokeArray[i].removeNode();
+                    this.smokeArray.splice(i, 1);
+                }
             }
         }
         generateGraphCluster(_graphID, _destNode, _clusterCount, _clusterSize, _spread, _randomScale) {
@@ -1023,7 +1058,7 @@ var Raserei;
                 this.cans.addChild(tempCanNode);
             }
         }
-        spliceDoomed() {
+        spliceDoomedCollectables() {
             let splice = true;
             if (this.doomedCollect.length > 0) {
                 if (this.doomedCollect[0].idSource == World.coinGraphID) {

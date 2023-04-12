@@ -79,15 +79,6 @@
       "url": "obj\\tire.obj"
     }
   },
-  "MeshSphere|2022-06-12T13:51:46.792Z|18589": {
-    "ƒ.MeshSphere": {
-      "idResource": "MeshSphere|2022-06-12T13:51:46.792Z|18589",
-      "name": "UVWorld",
-      "type": "MeshSphere",
-      "longitudes": 128,
-      "latitudes": 64
-    }
-  },
   "MeshObj|2022-06-13T17:57:31.216Z|50158": {
     "ƒ.MeshObj": {
       "idResource": "MeshObj|2022-06-13T17:57:31.216Z|50158",
@@ -1311,6 +1302,29 @@
                             {
                               "ƒ.ComponentAudioListener": {
                                 "active": true
+                              }
+                            }
+                          ]
+                        },
+                        "children": []
+                      }
+                    },
+                    {
+                      "ƒ.Node": {
+                        "name": "SmokeEmitter",
+                        "active": true,
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[0.4050000011920929, 0.2800000309944153, -1.8499999046325684]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
                               }
                             }
                           ]
@@ -3381,6 +3395,29 @@
                   },
                   "children": []
                 }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "SmokeEmitter",
+                  "active": true,
+                  "components": {
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0.4050000011920929, 0.2749999761581421, -1.8499999046325684]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
               }
             ]
           }
@@ -3388,14 +3425,6 @@
       ],
       "idResource": "Graph|2023-02-25T23:17:55.331Z|44711",
       "type": "Graph"
-    }
-  },
-  "MeshObj|2023-02-28T00:48:37.687Z|37702": {
-    "ƒ.MeshObj": {
-      "idResource": "MeshObj|2023-02-28T00:48:37.687Z|37702",
-      "name": "smokeCloud",
-      "type": "MeshObj",
-      "url": "obj\\smokeCloud.obj"
     }
   },
   "Material|2023-02-28T00:51:59.120Z|85015": {
@@ -3412,9 +3441,17 @@
       }
     }
   },
-  "Graph|2023-02-28T00:53:28.192Z|47604": {
+  "MeshObj|2023-04-12T12:40:55.896Z|48242": {
+    "ƒ.MeshObj": {
+      "idResource": "MeshObj|2023-04-12T12:40:55.896Z|48242",
+      "name": "smoke",
+      "type": "MeshObj",
+      "url": "obj\\smoke.obj"
+    }
+  },
+  "Graph|2023-04-12T12:45:10.840Z|70362": {
     "ƒ.Graph": {
-      "name": "SmokeCloudGraph",
+      "name": "SmokeGraph",
       "active": true,
       "components": {
         "ComponentTransform": [
@@ -3434,7 +3471,7 @@
         "ComponentMesh": [
           {
             "ƒ.ComponentMesh": {
-              "idMesh": "MeshObj|2023-02-28T00:48:37.687Z|37702",
+              "idMesh": "MeshObj|2023-04-12T12:40:55.896Z|48242",
               "pivot": {
                 "translation": "[0, 0, 0]",
                 "rotation": "[0, 0, 0]",
@@ -3449,7 +3486,7 @@
         "ComponentMaterial": [
           {
             "ƒ.ComponentMaterial": {
-              "sortForAlpha": false,
+              "sortForAlpha": true,
               "clrPrimary": "[1, 1, 1, 1]",
               "clrSecondary": "[1, 1, 1, 1]",
               "pivot": {
@@ -3466,7 +3503,7 @@
         ]
       },
       "children": [],
-      "idResource": "Graph|2023-02-28T00:53:28.192Z|47604",
+      "idResource": "Graph|2023-04-12T12:45:10.840Z|70362",
       "type": "Graph"
     }
   }

@@ -10,6 +10,7 @@ namespace Raserei {
         protected carNode: ƒ.Node;
         protected main: ƒ.Node;
         protected body: ƒ.Node;
+        protected smokeEmitter: ƒ.Node;
 
         //REFERENCES
         protected initTransform: ƒ.Matrix4x4;
@@ -30,22 +31,24 @@ namespace Raserei {
         protected gaz: number = 100;
         protected currentSpeed: number = 0;
         protected gripFactor: number = 0.8;               // 0 = no grip, 1 = full grip
+        protected lastInputDrive: number;
 
         protected isPolice: boolean = false;
 
         constructor(_carMainNode: ƒ.Node) {
             this.initTransform = _carMainNode.mtxLocal;             //The Local Matrix of the Main RB-Object is used to determine all sorts of stuff. It is altered however, if we change the transform of its parents. This unfortunately is needed to easily place the car anywhere in the world. To counteract the transform of the parent object is stored to base the calculations on.
             this.initAngles = this.initTransform.getEulerAngles();
+            this.smokeEmitter = _carMainNode.getChildren()[0].getChildrenByName("SmokeEmitter")[0];
         }
 
-        public abstract update(_driving: boolean): void;
+        public abstract update(_driving: boolean, _f: number): void;
 
         public getSpeedPercent(): number {
             return this.currentSpeed / 0.025;
         }
 
-        protected updateDriving(_inputDrive: number): number {  //PROBLEM: MAN MUSS FESTSTELLEN OB SICH DER WAGEN NACH VORN ODER HINTEN BEWEGT allerdings hat es sich noch nicht bewegt... menno
-            let f: number = Math.min(ƒ.Loop.timeFrameGame / this.config.speedDivider, 3);   //factor that calculations are based on, to decouple them from the time used to generate the Frame. It is clipped to 3 to avoid unwanted behaviour when the Window is minimized during the game.
+        protected updateDriving(_inputDrive: number, _f: number): number {  //PROBLEM: MAN MUSS FESTSTELLEN OB SICH DER WAGEN NACH VORN ODER HINTEN BEWEGT allerdings hat es sich noch nicht bewegt... menno
+            _f = Math.min(_f / this.config.speedDivider, 3)
             let forward: number;
             let mtxLocal: ƒ.Matrix4x4 = this.main.mtxLocal;
 
@@ -55,14 +58,12 @@ namespace Raserei {
             forward = this.getForward(relativeZ);
             _inputDrive = this.evalInputDrive(_inputDrive, forward);
 
-            if(this.isPolice){
-                //console.log(forward);
-            }
+            this.handleGrip(forward, relativeZ, _f);
 
-            this.handleGrip(forward, relativeZ, f);
+            this.mainRB.applyForce(ƒ.Vector3.SCALE(relativeZ, _inputDrive * 150 * _f));
+            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * _f));
 
-            this.mainRB.applyForce(ƒ.Vector3.SCALE(relativeZ, _inputDrive * 150 * f));
-            this.updateGaz(this.getSpeedPercent() * (Math.abs(_inputDrive * 2) * f));
+            this.lastInputDrive = _inputDrive;
 
             if (forward > 0) {
                 return this.getSpeedPercent();
@@ -92,7 +93,7 @@ namespace Raserei {
         }
 
         protected setSpeed(): void {
-            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / averageDeltaTime; 
+            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / averageDeltaTime;
         }
 
         protected updateTilt(_drive: number, _turn: number): void {
@@ -121,7 +122,7 @@ namespace Raserei {
         }
 
         protected updateSmoke(): void {
-            this.world.addSmoke(this.pos);
+            this.world.addSmoke(this.smokeEmitter.mtxWorld.translation, 0.97 - (Math.min(Math.abs(this.lastInputDrive), 1) * 0.1));
         }
 
         protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3, _vInitRot: ƒ.Vector3): ƒ.Vector2 {
@@ -174,6 +175,5 @@ namespace Raserei {
             }
             return _inputDrive;
         }
-
     }
 }

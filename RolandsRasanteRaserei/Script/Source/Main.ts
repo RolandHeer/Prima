@@ -11,7 +11,8 @@ namespace Raserei {
     accelTurn: number;
     fuelConsumption: number;
     camDelay: number;
-    smoke: number;
+    maxSmokeAmmount: number;
+    smokeAge: number;
     maxCoinCluster: number;
     maxCans: number;
     speedometerHeight: number;
@@ -30,7 +31,6 @@ namespace Raserei {
   let policeCarNode: ƒ.Node;
 
   ///   GAME MODES   \\\
-  let lockMode: boolean = true;
   let state: number = 1;          //0=menue; 1=game running; 2=police got you; 3=no fuel
 
   ///     VALUES     \\\
@@ -118,21 +118,22 @@ namespace Raserei {
   }
 
   function update(_event: Event): void {
+    let f: number = ƒ.Loop.timeFrameGame;   //factor that calculations are based on, to decouple them from the time used to generate the Frame. It is clipped to 3 to avoid unwanted behaviour when the Window is minimized during the game.
     updateDeltaTime();
-    world.update();
+    world.update(f);
     if (state == 1) {
       if (!counting) {
-        car.update(true);
+        car.update(true, f);
       }
     }
     if (state != 0) {
       if (!counting) {
         if (state != 1) {
-          policeCar.update(false);
+          policeCar.update(false, f);
         } else {
-          policeCar.update(true);
+          policeCar.update(true, f);
         }
-        car.update(false);
+        car.update(false, f);
       }
     }
     if (state > 1) {
@@ -148,7 +149,7 @@ namespace Raserei {
     ƒ.AudioManager.default.update();
     renderScreen();
   }
-  
+
   function getHighscore(): number {
     const x = document.cookie;
     let tmp = x.split('; ').find((row) => row.startsWith("highscore" + '='))?.split('=')[1];
@@ -296,13 +297,11 @@ namespace Raserei {
 
   function enterPointerLock(): void {
     canvas.requestPointerLock();
-    lockMode = false;
   }
 
   function hndKeydown(_key: KeyboardEvent): void {
     switch (_key.code) {
       case "KeyM":
-        lockMode = true;
         document.exitPointerLock();
         break;
       case "KeyC":
@@ -313,8 +312,8 @@ namespace Raserei {
     }
   }
 
-  function hndKeyup(_key: KeyboardEvent): void{
-    switch (_key.code){
+  function hndKeyup(_key: KeyboardEvent): void {
+    switch (_key.code) {
       case "ShiftLeft":
         cam.reverse(false);
     }
@@ -335,13 +334,13 @@ namespace Raserei {
     policeCarNode = graph.getChildrenByName("Police")[0].getChildrenByName("Cars")[0].getChildren()[0];
     policeCarNode.addEventListener("gottcha", (_e: CustomEvent) =>
       console.log(_e.detail.message));
-    policeCar = new PoliceCar(config, policeCarNode, car);
+    policeCar = new PoliceCar(config, policeCarNode, car, world);
   }
 
   function setupCam(): void {
     camNode = graph.getChildrenByName("Car")[0].getChildrenByName("Camera")[0];
     viewport.camera = cmpCamera = camNode.getChildren()[0].getChildren()[0].getComponent(ƒ.ComponentCamera);
-    cam = new Cam(camNode, carNode.getChildren()[0].getChildrenByName("Body")[0],viewport);
+    cam = new Cam(camNode, carNode.getChildren()[0].getChildrenByName("Body")[0], viewport);
   }
 
   function setupAudio(): void {

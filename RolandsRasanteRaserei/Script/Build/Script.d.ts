@@ -20,6 +20,7 @@ declare namespace Raserei {
         protected carNode: ƒ.Node;
         protected main: ƒ.Node;
         protected body: ƒ.Node;
+        protected smokeEmitter: ƒ.Node;
         protected initTransform: ƒ.Matrix4x4;
         protected initAngles: ƒ.Vector3;
         protected centerRB: ƒ.ComponentRigidbody;
@@ -36,11 +37,12 @@ declare namespace Raserei {
         protected gaz: number;
         protected currentSpeed: number;
         protected gripFactor: number;
+        protected lastInputDrive: number;
         protected isPolice: boolean;
         constructor(_carMainNode: ƒ.Node);
-        abstract update(_driving: boolean): void;
+        abstract update(_driving: boolean, _f: number): void;
         getSpeedPercent(): number;
-        protected updateDriving(_inputDrive: number): number;
+        protected updateDriving(_inputDrive: number, _f: number): number;
         protected updateTurning(_drive: number, _turnInput: number): void;
         protected pinToGround(): void;
         protected updatePos(): void;
@@ -84,7 +86,8 @@ declare namespace Raserei {
         accelTurn: number;
         fuelConsumption: number;
         camDelay: number;
-        smoke: number;
+        maxSmokeAmmount: number;
+        smokeAge: number;
         maxCoinCluster: number;
         maxCans: number;
         speedometerHeight: number;
@@ -102,7 +105,7 @@ declare namespace Raserei {
         private coinSound;
         private canSound;
         constructor(_config: Config, _carNode: ƒ.Node, _world: World);
-        update(_playing: boolean): void;
+        update(_playing: boolean, _f: number): void;
         incScore(): void;
         payForGas(): void;
         fillTank(): void;
@@ -129,8 +132,8 @@ declare namespace Raserei {
         private counting;
         private sirenSoundComponent;
         gottchaEvent: CustomEvent;
-        constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar);
-        update(_playing: boolean): void;
+        constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar, _world: World);
+        update(_playing: boolean, _f: number): void;
         hasHim(): boolean;
         isCounting(): boolean;
         getCountdown(): number;
@@ -157,10 +160,17 @@ declare namespace Raserei {
     import ƒ = FudgeCore;
     class Smoke {
         private smokeNode;
+        private smokeCloudNode;
         static smokeCloudID: string;
         private smokeCloudInstance;
+        private rotation;
         private size;
-        constructor(_pos: ƒ.Vector3, _size: number, _smokeNode: ƒ.Node);
+        private riseDir;
+        private age;
+        private maxAge;
+        constructor(_pos: ƒ.Vector3, _smokeNode: ƒ.Node, _config: Config);
+        update(_f: number): boolean;
+        removeNode(): void;
         private addGraphToNode;
     }
 }
@@ -201,13 +211,14 @@ declare namespace Raserei {
         private playerCar;
         private gameState;
         constructor(_config: Config, _world: ƒ.Node, _gameState: GameState);
-        update(): void;
+        update(_f: number): void;
         addToDoomedCollectables(_graph: ƒ.GraphInstance): void;
         setPlayerCar(_car: PlayerCar): void;
-        addSmoke(_pos: ƒ.Vector3): void;
+        addSmoke(_pos: ƒ.Vector3, _probability: number): void;
+        private updateSmoke;
         private generateGraphCluster;
         private generateCans;
-        private spliceDoomed;
+        private spliceDoomedCollectables;
         private addGraphToNode;
     }
 }

@@ -13,19 +13,20 @@ namespace Raserei {
             }
         });
 
-        constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar) {
+        constructor(_config: Config, _carNode: ƒ.Node, _player: PlayerCar, _world: World) {
             super(_carNode);
             this.config = _config;
             this.player = _player;
             this.isPolice = true;
+            this.world = _world
 
             this.setupPoliceCar(_config, _carNode);
         }
 
-        public update(_playing: boolean): void {
+        public update(_playing: boolean, _f:number): void {
             this.distPlayer = this.mainRB.getPosition().getDistance(this.player.getPosition());
             let dir: ƒ.Vector2 = this.getDir();
-            this.updateTurning(this.updateDriving(dir.y), dir.x);
+            this.updateTurning(this.updateDriving(dir.y, _f), dir.x);
             this.pinToGround();
             this.updatePos();
             this.updateCountdown();
@@ -33,6 +34,7 @@ namespace Raserei {
                 this.engineSoundComponent.volume = Math.max(this.engineSoundComponent.volume - 0.01, 0);
                 this.sirenSoundComponent.volume = Math.max(this.sirenSoundComponent.volume - 0.01, 0);
             }
+            this.updateSmoke();
         }
 
         public hasHim(): boolean {

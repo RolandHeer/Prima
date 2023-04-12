@@ -30,8 +30,9 @@ namespace Raserei {
             this.generateCans(this.config.maxCans);
         }
 
-        public update(): void {
-            this.spliceDoomed();
+        public update(_f: number): void {
+            this.updateSmoke(_f);
+            this.spliceDoomedCollectables();
         }
 
         public addToDoomedCollectables(_graph: ƒ.GraphInstance): void {
@@ -50,9 +51,18 @@ namespace Raserei {
             this.playerCar = _car;
         }
 
-        public addSmoke(_pos: ƒ.Vector3): void {
-            if (Math.random() > 0.9 && this.smokeArray.length < this.config.smoke) {
-                this.smokeArray.push(new Smoke(_pos, 1, this.smoke))
+        public addSmoke(_pos: ƒ.Vector3, _probability: number): void {
+            if (Math.random() > _probability && this.smokeArray.length < this.config.maxSmokeAmmount) {
+                this.smokeArray.push(new Smoke(_pos, this.smoke, this.config))
+            }
+        }
+
+        private updateSmoke(_f: number): void {
+            for (let i: number = this.smokeArray.length - 1; i >= 0; i--) {
+                if (this.smokeArray[i].update(_f)) {
+                    this.smokeArray[i].removeNode();
+                    this.smokeArray.splice(i, 1);
+                }
             }
         }
 
@@ -94,7 +104,7 @@ namespace Raserei {
             }
         }
 
-        private spliceDoomed(): void {
+        private spliceDoomedCollectables(): void {
             let splice: boolean = true;
             if (this.doomedCollect.length > 0) {
                 if (this.doomedCollect[0].idSource == World.coinGraphID) {
