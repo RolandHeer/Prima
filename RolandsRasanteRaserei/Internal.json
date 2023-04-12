@@ -40,8 +40,20 @@
       "shader": "ShaderLitTextured",
       "coat": {
         "ƒ.CoatTextured": {
-          "color": "[1, 1, 1, 1]"
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2023-04-12T17:51:56.317Z|78828"
         }
+      }
+    }
+  },
+  "TextureImage|2023-04-12T17:51:56.317Z|78828": {
+    "ƒ.TextureImage": {
+      "url": "tex\\sky.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2023-04-12T17:51:56.317Z|78828",
+        "name": "tex\\sky.png",
+        "mipmap": "CRISP"
       }
     }
   },
@@ -1832,7 +1844,7 @@
                     "Component": {
                       "active": true
                     },
-                    "idMaterial": "Material|2022-05-19T06:34:50.571Z|25034"
+                    "idMaterial": "Material|2022-05-18T20:20:19.152Z|43828"
                   }
                 }
               ],
