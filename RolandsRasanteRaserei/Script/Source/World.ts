@@ -9,7 +9,8 @@ namespace Raserei {
         static canGraphID: string;
         private trees: ƒ.Node;
         static treeGraphID: string;
-        private smoke: Smoke[] = [];
+        private smoke: ƒ.Node;
+        private smokeArray: Smoke[] = [];
         private doomedCollect: ƒ.GraphInstance[] = [];
         private playerCar: PlayerCar;
         private gameState: GameState;
@@ -23,6 +24,7 @@ namespace Raserei {
             World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
             this.trees = _world.getChildrenByName("Plants")[0].getChildrenByName("Trees")[0];
             World.treeGraphID = "Graph|2022-07-18T02:17:48.525Z|91815"
+            this.smoke = _world.getChildrenByName("Smoke")[0];
             this.generateGraphCluster(World.treeGraphID, this.trees, 5, 5, 0.15, 0.8);
             this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
@@ -46,6 +48,12 @@ namespace Raserei {
 
         public setPlayerCar(_car: PlayerCar): void {
             this.playerCar = _car;
+        }
+
+        public addSmoke(_pos: ƒ.Vector3): void {
+            if (Math.random() > 0.9 && this.smokeArray.length < this.config.smoke) {
+                this.smokeArray.push(new Smoke(_pos, 1, this.smoke))
+            }
         }
 
         private generateGraphCluster(_graphID: string, _destNode: ƒ.Node, _clusterCount: number, _clusterSize: number, _spread: number, _randomScale: number): void {

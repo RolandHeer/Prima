@@ -1,5 +1,5 @@
 {
-    "averageCount": 100,
+    "averageDeltaTime": 100,
     "captureTime": 3999,
     "speedDivider": 40,
     "turnDivider": 18,
@@ -7,6 +7,7 @@
     "accelTurn": 200,
     "fuelConsumption": 0.1,
     "camDelay": 12,
+    "smoke": 15,
     "maxCoinCluster": 6,
     "maxCans": 2,
     "speedometerHeight": 0.3,

@@ -15,7 +15,7 @@ namespace Raserei{
             tempSmokeNode.addComponent(cmpTransform);
             this.addGraphToNode(tempSmokeNode, Smoke.smokeCloudID);
             tempSmokeNode.mtxLocal.translation = _pos;
-            this.smokeNode.addChild(tempSmokeNode)
+            this.smokeNode.addChild(tempSmokeNode);
         }
 
         private async addGraphToNode(_node: ƒ.Node, _id: string) {

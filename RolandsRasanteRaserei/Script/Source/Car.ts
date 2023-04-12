@@ -92,7 +92,7 @@ namespace Raserei {
         }
 
         protected setSpeed(): void {
-            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / averageDeltaTime; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
+            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / averageDeltaTime; 
         }
 
         protected updateTilt(_drive: number, _turn: number): void {
@@ -121,7 +121,7 @@ namespace Raserei {
         }
 
         protected updateSmoke(): void {
-            //this.world.addSmoke(this.pos);
+            this.world.addSmoke(this.pos);
         }
 
         protected getRelative2Dvector(_vDir: ƒ.Vector3, _vRot: ƒ.Vector3, _vInitRot: ƒ.Vector3): ƒ.Vector2 {
@@ -129,7 +129,7 @@ namespace Raserei {
             let vRot: ƒ.Vector3 = ƒ.Vector3.SCALE(_vRot, -1);
             let vInitRot: ƒ.Vector3 = ƒ.Vector3.SCALE(_vInitRot, -1);
             let vDir: ƒ.Vector3 = ƒ.Vector3.SCALE(_vDir, 1);
-            
+
             mtx.rotateX(vRot.x);
             mtx.rotateY(vRot.y);
             mtx.rotateZ(vRot.z);

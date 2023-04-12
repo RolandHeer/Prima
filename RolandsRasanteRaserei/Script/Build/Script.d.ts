@@ -76,7 +76,7 @@ declare namespace Script {
 }
 declare namespace Raserei {
     interface Config {
-        averageCount: number;
+        averageDeltaTime: number;
         captureTime: number;
         speedDivider: number;
         turnDivider: number;
@@ -84,6 +84,7 @@ declare namespace Raserei {
         accelTurn: number;
         fuelConsumption: number;
         camDelay: number;
+        smoke: number;
         maxCoinCluster: number;
         maxCans: number;
         speedometerHeight: number;
@@ -195,6 +196,7 @@ declare namespace Raserei {
         private trees;
         static treeGraphID: string;
         private smoke;
+        private smokeArray;
         private doomedCollect;
         private playerCar;
         private gameState;
@@ -202,6 +204,7 @@ declare namespace Raserei {
         update(): void;
         addToDoomedCollectables(_graph: ƒ.GraphInstance): void;
         setPlayerCar(_car: PlayerCar): void;
+        addSmoke(_pos: ƒ.Vector3): void;
         private generateGraphCluster;
         private generateCans;
         private spliceDoomed;

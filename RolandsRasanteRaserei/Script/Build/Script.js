@@ -115,7 +115,7 @@ var Raserei;
             this.setSpeed();
         }
         setSpeed() {
-            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / Raserei.averageDeltaTime; //falls loop Frame Time doch noch verwendet werden sollte hier durch tatsächliche Zeit teilen
+            this.currentSpeed = ƒ.Vector3.ZERO().getDistance(this.velocity) / Raserei.averageDeltaTime;
         }
         updateTilt(_drive, _turn) {
             if (_drive > 0) {
@@ -142,7 +142,7 @@ var Raserei;
             }
         }
         updateSmoke() {
-            //this.world.addSmoke(this.pos);
+            this.world.addSmoke(this.pos);
         }
         getRelative2Dvector(_vDir, _vRot, _vInitRot) {
             let mtx = new ƒ.Matrix4x4();
@@ -386,7 +386,7 @@ var Raserei;
     }
     function updateDeltaTime() {
         DeltaTimeArray.push(ƒ.Loop.timeFrameGame);
-        if (DeltaTimeArray.length > config.averageCount) {
+        if (DeltaTimeArray.length > config.averageDeltaTime) {
             DeltaTimeArray.splice(0, 1);
         }
         let tempAverage = 0;
@@ -946,7 +946,8 @@ var Raserei;
         static canGraphID;
         trees;
         static treeGraphID;
-        smoke = [];
+        smoke;
+        smokeArray = [];
         doomedCollect = [];
         playerCar;
         gameState;
@@ -959,6 +960,7 @@ var Raserei;
             World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
             this.trees = _world.getChildrenByName("Plants")[0].getChildrenByName("Trees")[0];
             World.treeGraphID = "Graph|2022-07-18T02:17:48.525Z|91815";
+            this.smoke = _world.getChildrenByName("Smoke")[0];
             this.generateGraphCluster(World.treeGraphID, this.trees, 5, 5, 0.15, 0.8);
             this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
@@ -979,6 +981,11 @@ var Raserei;
         }
         setPlayerCar(_car) {
             this.playerCar = _car;
+        }
+        addSmoke(_pos) {
+            if (Math.random() > 0.9 && this.smokeArray.length < this.config.smoke) {
+                this.smokeArray.push(new Raserei.Smoke(_pos, 1, this.smoke));
+            }
         }
         generateGraphCluster(_graphID, _destNode, _clusterCount, _clusterSize, _spread, _randomScale) {
             for (let j = 0; j < _clusterCount; j++) {

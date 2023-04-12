@@ -3,7 +3,7 @@ namespace Raserei {
   ƒ.Debug.info("Main Program Template running!");
 
   export interface Config {
-    averageCount: number;
+    averageDeltaTime: number;
     captureTime: number;
     speedDivider: number;
     turnDivider: number;
@@ -11,6 +11,7 @@ namespace Raserei {
     accelTurn: number;
     fuelConsumption: number;
     camDelay: number;
+    smoke: number;
     maxCoinCluster: number;
     maxCans: number;
     speedometerHeight: number;
@@ -170,7 +171,7 @@ namespace Raserei {
 
   function updateDeltaTime(): void {
     DeltaTimeArray.push(ƒ.Loop.timeFrameGame);
-    if (DeltaTimeArray.length > config.averageCount) {
+    if (DeltaTimeArray.length > config.averageDeltaTime) {
       DeltaTimeArray.splice(0, 1);
     }
     let tempAverage: number = 0;
