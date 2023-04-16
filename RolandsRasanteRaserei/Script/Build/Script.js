@@ -69,7 +69,7 @@ var Raserei;
         pos;
         gaz = 100;
         currentSpeed = 0;
-        gripFactor = 0.8; // 0 = no grip, 1 = full grip
+        gripFactor = 0.0; // 0 = no grip, 1 = full grip
         lastInputDrive;
         isPolice = false;
         constructor(_carMainNode) {
