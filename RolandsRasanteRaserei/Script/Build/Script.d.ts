@@ -200,6 +200,8 @@ declare namespace Raserei {
     class World {
         private config;
         private coins;
+        static wellGraphID: string;
+        private buildings;
         static coinGraphID: string;
         private cans;
         static canGraphID: string;
@@ -216,6 +218,7 @@ declare namespace Raserei {
         setPlayerCar(_car: PlayerCar): void;
         addSmoke(_pos: ƒ.Vector3, _probability: number): void;
         private updateSmoke;
+        private generateWells;
         private generateGraphCluster;
         private generateCans;
         private spliceDoomedCollectables;

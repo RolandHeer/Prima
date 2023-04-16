@@ -69,7 +69,7 @@ var Raserei;
         pos;
         gaz = 100;
         currentSpeed = 0;
-        gripFactor = 0.0; // 0 = no grip, 1 = full grip
+        gripFactor = 0.8; // 0 = no grip, 1 = full grip
         lastInputDrive;
         isPolice = false;
         constructor(_carMainNode) {
@@ -967,6 +967,8 @@ var Raserei;
     class World {
         config;
         coins;
+        static wellGraphID;
+        buildings;
         static coinGraphID;
         cans;
         static canGraphID;
@@ -980,6 +982,8 @@ var Raserei;
         constructor(_config, _world, _gameState) {
             this.config = _config;
             this.gameState = _gameState;
+            this.buildings = _world.getChildrenByName("buildings")[0];
+            World.wellGraphID = "Graph|2023-04-16T23:04:18.050Z|20649";
             this.coins = _world.getChildrenByName("Collectables")[0].getChildrenByName("Coins")[0];
             World.coinGraphID = "Graph|2022-06-11T00:20:48.515Z|71676";
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
@@ -987,6 +991,7 @@ var Raserei;
             this.trees = _world.getChildrenByName("Plants")[0].getChildrenByName("Trees")[0];
             World.treeGraphID = "Graph|2022-07-18T02:17:48.525Z|91815";
             this.smoke = _world.getChildrenByName("Smoke")[0];
+            this.generateWells(5);
             this.generateGraphCluster(World.treeGraphID, this.trees, 5, 5, 0.15, 0.8);
             this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
@@ -1020,6 +1025,19 @@ var Raserei;
                     this.smokeArray[i].removeNode();
                     this.smokeArray.splice(i, 1);
                 }
+            }
+        }
+        generateWells(_canCount) {
+            for (let i = 0; i < _canCount; i++) {
+                let tempPos = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1), 49.98);
+                let tempWellNode = new ƒ.Node("Well" + i);
+                let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
+                tempWellNode.addComponent(cmpTransform);
+                this.addGraphToNode(tempWellNode, World.wellGraphID);
+                tempWellNode.mtxLocal.translation = tempPos;
+                tempWellNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
+                tempWellNode.mtxLocal.rotateX(-90);
+                this.cans.addChild(tempWellNode);
             }
         }
         generateGraphCluster(_graphID, _destNode, _clusterCount, _clusterSize, _spread, _randomScale) {

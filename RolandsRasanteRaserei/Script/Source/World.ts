@@ -4,6 +4,8 @@ namespace Raserei {
     export class World {
         private config: Config;
         private coins: ƒ.Node;
+        static wellGraphID: string;
+        private buildings: ƒ.Node;
         static coinGraphID: string;
         private cans: ƒ.Node;
         static canGraphID: string;
@@ -18,6 +20,8 @@ namespace Raserei {
         constructor(_config: Config, _world: ƒ.Node, _gameState: GameState) {
             this.config = _config;
             this.gameState = _gameState
+            this.buildings = _world.getChildrenByName("buildings")[0];
+            World.wellGraphID = "Graph|2023-04-16T23:04:18.050Z|20649";
             this.coins = _world.getChildrenByName("Collectables")[0].getChildrenByName("Coins")[0];
             World.coinGraphID = "Graph|2022-06-11T00:20:48.515Z|71676";
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
@@ -25,6 +29,7 @@ namespace Raserei {
             this.trees = _world.getChildrenByName("Plants")[0].getChildrenByName("Trees")[0];
             World.treeGraphID = "Graph|2022-07-18T02:17:48.525Z|91815"
             this.smoke = _world.getChildrenByName("Smoke")[0];
+            this.generateWells(5);
             this.generateGraphCluster(World.treeGraphID, this.trees, 5, 5, 0.15, 0.8);
             this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
@@ -63,6 +68,20 @@ namespace Raserei {
                     this.smokeArray[i].removeNode();
                     this.smokeArray.splice(i, 1);
                 }
+            }
+        }
+
+        private generateWells(_canCount: number): void {
+            for (let i: number = 0; i < _canCount; i++) {
+                let tempPos: ƒ.Vector3 = ƒ.Vector3.NORMALIZATION(new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1), 49.98);
+                let tempWellNode: ƒ.Node = new ƒ.Node("Well" + i);
+                let cmpTransform: ƒ.ComponentTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
+                tempWellNode.addComponent(cmpTransform);
+                this.addGraphToNode(tempWellNode, World.wellGraphID);
+                tempWellNode.mtxLocal.translation = tempPos;
+                tempWellNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
+                tempWellNode.mtxLocal.rotateX(-90);
+                this.cans.addChild(tempWellNode);
             }
         }
 

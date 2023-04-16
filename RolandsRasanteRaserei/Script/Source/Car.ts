@@ -30,7 +30,7 @@ namespace Raserei {
         protected pos: ƒ.Vector3;
         protected gaz: number = 100;
         protected currentSpeed: number = 0;
-        protected gripFactor: number = 0.0;               // 0 = no grip, 1 = full grip
+        protected gripFactor: number = 0.8;               // 0 = no grip, 1 = full grip
         protected lastInputDrive: number;
 
         protected isPolice: boolean = false;
