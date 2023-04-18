@@ -160,7 +160,7 @@ var Raserei;
             return new ƒ.Vector2(mtx.translation.x, mtx.translation.z);
         }
         setupControls(_config) {
-            this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, 0 /* ƒ.CONTROL_TYPE.PROPORTIONAL */);
+            this.ctrlTurn = new ƒ.Control("cntrlTurn", _config.maxTurn, 0 /* PROPORTIONAL */);
             this.ctrlTurn.setDelay(_config.accelTurn);
         }
         getForward(_relativeZ) {
@@ -221,27 +221,27 @@ var Script;
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
             // Listen to this component being added to or removed from a node
-            this.addEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
-            this.addEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
-            this.addEventListener("nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */, this.hndEvent);
+            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
         }
         // Activate the functions of this component as response to events
         hndEvent = (_event) => {
             switch (_event.type) {
-                case "componentAdd" /* ƒ.EVENT.COMPONENT_ADD */:
+                case "componentAdd" /* COMPONENT_ADD */:
                     //ƒ.Debug.log(this.message, this.node);
                     break;
-                case "componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
+                case "componentRemove" /* COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
                     break;
-                case "renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */:
+                case "renderPrepare" /* RENDER_PREPARE */:
                     let v = this.rigid.getPosition();
                     this.rigid.applyForce(ƒ.Vector3.SCALE(v, -0.2));
                     break;
-                case "nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */:
+                case "nodeDeserialized" /* NODE_DESERIALIZED */:
                     this.rigid = this.node.getComponent(ƒ.ComponentRigidbody);
-                    this.node.addEventListener("renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */, this.hndEvent);
+                    this.node.addEventListener("renderPrepare" /* RENDER_PREPARE */, this.hndEvent);
                     // if deserialized the node is now fully reconstructed and access to all its components and children is possible
                     break;
             }
@@ -331,7 +331,7 @@ var Raserei;
         setupPolice();
         setupCam();
         setupAudio();
-        ƒ.Loop.addEventListener("loopFrame" /* ƒ.EVENT.LOOP_FRAME */, update);
+        ƒ.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         ƒ.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
@@ -667,8 +667,8 @@ var Raserei;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.carNode.addComponent(this.sphericalJoint);
-            this.mainRB.addEventListener("TriggerEnteredCollision" /* ƒ.EVENT_PHYSICS.TRIGGER_ENTER */, this.hndCollision);
-            this.bumperRB.addEventListener("TriggerEnteredCollision" /* ƒ.EVENT_PHYSICS.TRIGGER_ENTER */, this.hndCollision);
+            this.mainRB.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
+            this.bumperRB.addEventListener("TriggerEnteredCollision" /* TRIGGER_ENTER */, this.hndCollision);
             this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
             this.setupEngineSound();
             this.pos = ƒ.Vector3.SCALE(this.mainRB.getPosition(), 1);
@@ -773,7 +773,7 @@ var Raserei;
             this.centerRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.mainRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
             this.bumperRB.collisionGroup = ƒ.COLLISION_GROUP.GROUP_1;
-            this.mainRB.addEventListener("ColliderEnteredCollision" /* ƒ.EVENT_PHYSICS.COLLISION_ENTER */, this.hndCollision);
+            this.mainRB.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.hndCollision);
             this.engineSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[0];
             this.sirenSoundComponent = this.main.getChildrenByName("Audio")[0].getAllComponents()[1];
             this.pos = this.mainRB.getPosition();
@@ -802,27 +802,27 @@ var Script;
             if (ƒ.Project.mode == ƒ.MODE.EDITOR)
                 return;
             // Listen to this component being added to or removed from a node
-            this.addEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
-            this.addEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
-            this.addEventListener("nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */, this.hndEvent);
+            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
         }
         // Activate the functions of this component as response to events
         hndEvent = (_event) => {
             switch (_event.type) {
-                case "componentAdd" /* ƒ.EVENT.COMPONENT_ADD */:
+                case "componentAdd" /* COMPONENT_ADD */:
                     //ƒ.Debug.log(this.message, this.node);
                     break;
-                case "componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* ƒ.EVENT.COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* ƒ.EVENT.COMPONENT_REMOVE */, this.hndEvent);
+                case "componentRemove" /* COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
                     break;
-                case "renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */:
+                case "renderPrepare" /* RENDER_PREPARE */:
                     this.mtx.rotate(ƒ.Vector3.Y(this.rotationSpeed));
                     break;
-                case "nodeDeserialized" /* ƒ.EVENT.NODE_DESERIALIZED */:
+                case "nodeDeserialized" /* NODE_DESERIALIZED */:
                     this.mtx = this.node.getComponent(ƒ.ComponentMesh).mtxPivot;
                     this.mtx.rotate(ƒ.Vector3.Y(Math.random() * 360));
-                    this.node.addEventListener("renderPrepare" /* ƒ.EVENT.RENDER_PREPARE */, this.hndEvent);
+                    this.node.addEventListener("renderPrepare" /* RENDER_PREPARE */, this.hndEvent);
                     // if deserialized the node is now fully reconstructed and access to all its components and children is possible
                     break;
             }
@@ -973,7 +973,8 @@ var Raserei;
         cans;
         static canGraphID;
         trees;
-        static treeGraphID;
+        static treeGraphIDs = [];
+        static shroomGraphIDs = [];
         smoke;
         smokeArray = [];
         doomedCollect = [];
@@ -989,11 +990,12 @@ var Raserei;
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
             World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
             this.trees = _world.getChildrenByName("Plants")[0].getChildrenByName("Trees")[0];
-            World.treeGraphID = "Graph|2022-07-18T02:17:48.525Z|91815";
+            World.treeGraphIDs.push("Graph|2022-07-18T02:17:48.525Z|91815", "Graph|2023-04-18T21:00:06.441Z|77374");
+            World.shroomGraphIDs.push("Graph|2023-04-18T21:42:24.330Z|91738", "Graph|2023-04-18T21:42:27.898Z|43571");
             this.smoke = _world.getChildrenByName("Smoke")[0];
-            this.generateWells(5);
-            this.generateGraphCluster(World.treeGraphID, this.trees, 5, 5, 0.15, 0.8);
-            this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
+            this.generateWells(3);
+            this.generateGraphCluster("trees", this.trees, 5, 5, 0.15, 0.5);
+            this.generateGraphCluster("coins", this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
         }
         update(_f) {
@@ -1040,7 +1042,8 @@ var Raserei;
                 this.cans.addChild(tempWellNode);
             }
         }
-        generateGraphCluster(_graphID, _destNode, _clusterCount, _clusterSize, _spread, _randomScale) {
+        generateGraphCluster(_type, _destNode, _clusterCount, _clusterSize, _spread, _randomScale) {
+            let _graphID;
             for (let j = 0; j < _clusterCount; j++) {
                 let tempCluster = new ƒ.Node("Cluster" + j);
                 let pos = new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
@@ -1049,6 +1052,19 @@ var Raserei;
                     let tempNode = new ƒ.Node("Graph" + i);
                     let cmpTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
                     tempNode.addComponent(cmpTransform);
+                    switch (_type) {
+                        case "trees":
+                            _graphID = World.treeGraphIDs[Math.round(Math.random())];
+                            if (Math.random() > 0.3) {
+                                this.addGraphToNode(tempNode, World.shroomGraphIDs[Math.round(Math.random())]);
+                            }
+                            break;
+                        case "coins":
+                            _graphID = World.coinGraphID;
+                            break;
+                        default:
+                            console.log("there is no Graphtype called: " + _type);
+                    }
                     this.addGraphToNode(tempNode, _graphID);
                     tempNode.mtxLocal.translation = tempPos;
                     tempNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
