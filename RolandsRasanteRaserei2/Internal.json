@@ -211,7 +211,7 @@
       "type": "TextureImage",
       "Texture": {
         "idResource": "TextureImage|2022-07-18T01:16:06.181Z|51401",
-        "name": "newWorld",
+        "name": "WorldTex",
         "mipmap": "CRISP"
       }
     }
@@ -1631,7 +1631,7 @@
                           "Component": {
                             "active": true
                           },
-                          "idMaterial": "Material|2022-07-18T01:16:44.001Z|88599"
+                          "idMaterial": "Material|2023-04-18T16:43:43.023Z|93691"
                         }
                       }
                     ],
@@ -3617,6 +3617,21 @@
       ],
       "idResource": "Graph|2023-04-16T23:04:18.050Z|20649",
       "type": "Graph"
+    }
+  },
+  "Material|2023-04-18T16:43:43.023Z|93691": {
+    "ƒ.Material": {
+      "name": "worldMat",
+      "idResource": "Material|2023-04-18T16:43:43.023Z|93691",
+      "shader": "ShaderPhongTextured",
+      "coat": {
+        "ƒ.CoatRemissiveTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2022-07-18T01:16:06.181Z|51401",
+          "diffuse": 1,
+          "specular": 0
+        }
+      }
     }
   }
 }
