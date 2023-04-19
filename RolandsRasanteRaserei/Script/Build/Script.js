@@ -291,11 +291,13 @@ var Raserei;
     function init(_event) {
         window.addEventListener("keydown", startViewport);
         window.addEventListener("mousedown", startViewport);
+        window.addEventListener("touchend", startViewport);
     }
     function startViewport() {
         startInteractiveViewport();
         window.removeEventListener("keydown", startViewport);
-        window.removeEventListener("keydown", startViewport);
+        window.removeEventListener("mousedown", startViewport);
+        window.removeEventListener("touchend", startViewport);
     }
     async function startInteractiveViewport() {
         // load resources referenced in the link-tag
@@ -316,6 +318,9 @@ var Raserei;
         canvas.addEventListener("mousedown", enterPointerLock);
         window.addEventListener("keydown", hndKeydown);
         window.addEventListener("keyup", hndKeyup);
+        window.addEventListener("touchstart", hndTouch);
+        window.addEventListener("touchend", handleTouchEnd);
+        window.addEventListener("touchcancle", handleTouchEnd);
         viewport.draw();
         canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
         document.getElementById("Startscreen").style.display = "none";
@@ -532,6 +537,10 @@ var Raserei;
             case "ShiftLeft":
                 cam.reverse(false);
         }
+    }
+    function hndTouch() {
+    }
+    function handleTouchEnd() {
     }
     function initValues() {
         graph = viewport.getBranch();

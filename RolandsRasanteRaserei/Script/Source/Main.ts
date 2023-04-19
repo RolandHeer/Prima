@@ -68,12 +68,14 @@ namespace Raserei {
   function init(_event: Event): void {
     window.addEventListener("keydown", startViewport);
     window.addEventListener("mousedown", startViewport);
+    window.addEventListener("touchend", startViewport);
   }
 
   function startViewport(): void {
     startInteractiveViewport();
     window.removeEventListener("keydown", startViewport);
-    window.removeEventListener("keydown", startViewport);
+    window.removeEventListener("mousedown", startViewport);
+    window.removeEventListener("touchend", startViewport);
   }
 
   async function startInteractiveViewport(): Promise<void> {
@@ -92,9 +94,15 @@ namespace Raserei {
     canvas = document.querySelector("canvas");
     viewport = new FudgeCore.Viewport();
     viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
+
     canvas.addEventListener("mousedown", enterPointerLock);
     window.addEventListener("keydown", hndKeydown);
     window.addEventListener("keyup", hndKeyup);
+    
+    window.addEventListener("touchstart", hndTouch);
+    window.addEventListener("touchend", handleTouchEnd);
+    window.addEventListener("touchcancle", handleTouchEnd);
+    
     viewport.draw();
     canvas.dispatchEvent(new CustomEvent("interactiveViewportStarted", { bubbles: true, detail: viewport }));
     document.getElementById("Startscreen").style.display = "none";
@@ -321,6 +329,13 @@ namespace Raserei {
     }
   }
 
+  function hndTouch():void{
+
+  }
+
+  function handleTouchEnd():void{
+
+  }
 
   function initValues(): void {
     graph = viewport.getBranch();
