@@ -67,10 +67,12 @@ namespace Raserei {
 
   function init(_event: Event): void {
     window.addEventListener("keydown", startViewport);
+    window.addEventListener("mousedown", startViewport);
   }
 
   function startViewport(): void {
     startInteractiveViewport();
+    window.removeEventListener("keydown", startViewport);
     window.removeEventListener("keydown", startViewport);
   }
 

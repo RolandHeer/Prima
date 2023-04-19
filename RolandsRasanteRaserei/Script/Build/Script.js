@@ -290,9 +290,11 @@ var Raserei;
     document.addEventListener("interactiveViewportStarted", start);
     function init(_event) {
         window.addEventListener("keydown", startViewport);
+        window.addEventListener("mousedown", startViewport);
     }
     function startViewport() {
         startInteractiveViewport();
+        window.removeEventListener("keydown", startViewport);
         window.removeEventListener("keydown", startViewport);
     }
     async function startInteractiveViewport() {
