@@ -1723,22 +1723,7 @@
                         "name": "Trees",
                         "active": true,
                         "components": {},
-                        "children": [
-                          {
-                            "ƒ.GraphInstance": {
-                              "deserializeFromSource": true,
-                              "name": "shroom1Graph",
-                              "idSource": "Graph|2023-04-18T21:42:24.330Z|91738"
-                            }
-                          },
-                          {
-                            "ƒ.GraphInstance": {
-                              "deserializeFromSource": true,
-                              "name": "shroom2Graph",
-                              "idSource": "Graph|2023-04-18T21:42:27.898Z|43571"
-                            }
-                          }
-                        ]
+                        "children": []
                       }
                     }
                   ]
@@ -2392,7 +2377,7 @@
               "Component": {
                 "active": true
               },
-              "idMaterial": "Material|2022-07-18T01:16:44.001Z|88599"
+              "idMaterial": "Material|2023-04-18T16:43:43.023Z|93691"
             }
           }
         ],
@@ -3611,7 +3596,7 @@
                     "Component": {
                       "active": true
                     },
-                    "idMaterial": "Material|2022-07-18T01:16:44.001Z|88599"
+                    "idMaterial": "Material|2023-04-18T16:43:43.023Z|93691"
                   }
                 }
               ],
