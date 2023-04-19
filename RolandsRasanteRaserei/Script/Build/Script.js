@@ -253,6 +253,7 @@ var Raserei;
 (function (Raserei) {
     var ƒ = FudgeCore;
     ƒ.Debug.info("Main Program Template running!");
+    //export let mobile: boolean = false;
     /// GAME HIRARCHIE \\\
     let canvas;
     let crc2;
@@ -294,10 +295,12 @@ var Raserei;
         window.addEventListener("touchend", startViewport);
     }
     function startViewport() {
-        startInteractiveViewport();
         window.removeEventListener("keydown", startViewport);
         window.removeEventListener("mousedown", startViewport);
         window.removeEventListener("touchend", startViewport);
+        canvas = document.querySelector("canvas");
+        canvas.requestFullscreen();
+        startInteractiveViewport();
     }
     async function startInteractiveViewport() {
         // load resources referenced in the link-tag
@@ -312,7 +315,6 @@ var Raserei;
         }
         // setup the viewport
         let cmpCamera = new FudgeCore.ComponentCamera();
-        canvas = document.querySelector("canvas");
         viewport = new FudgeCore.Viewport();
         viewport.initialize("InteractiveViewport", graph, cmpCamera, canvas);
         canvas.addEventListener("mousedown", enterPointerLock);
