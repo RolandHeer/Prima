@@ -1071,7 +1071,7 @@ var Raserei;
                     tempNode.mtxLocal.rotateX(-90);
                     tempNode.mtxLocal.rotateY(Math.random() * 360);
                     if (_randomScale > 0) {
-                        let r = 0.5 + (Math.random() * _randomScale);
+                        let r = 0.8 + (Math.random() * _randomScale);
                         tempNode.mtxLocal.scale(new ƒ.Vector3(r, r, r));
                     }
                     tempCluster.addChild(tempNode);
