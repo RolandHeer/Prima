@@ -234,7 +234,7 @@
           "color": "[1, 1, 1, 1]",
           "idTexture": "TextureImage|2022-07-18T01:16:06.181Z|51401",
           "diffuse": 1,
-          "specular": 0
+          "specular": 1
         }
       }
     }
