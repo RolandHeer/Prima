@@ -206,7 +206,8 @@ declare namespace Raserei {
         private cans;
         static canGraphID: string;
         private trees;
-        static treeGraphID: string;
+        static treeGraphIDs: string[];
+        static shroomGraphIDs: string[];
         private smoke;
         private smokeArray;
         private doomedCollect;

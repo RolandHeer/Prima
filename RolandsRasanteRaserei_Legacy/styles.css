@@ -1,0 +1,53 @@
+@font-face {
+  font-family: 'AGENCYB';
+  src: url('./font/AGENCYB.TTF');
+}
+html, body {
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+ background: url("./Img/TitleScreen.png") no-repeat center center fixed;
+ -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  font-family: 'AGENCYB';
+  src: url('./font/AGENCYB.TTF');
+}
+
+.element {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+div{
+  width: 40%;
+  color: white;
+  filter: drop-shadow(0 0 10px black);
+  text-align: center;
+}
+h1{
+  translate: 0% 20%;
+  font-size: 900%;
+  margin: 0%;
+}
+h2{
+  translate: 0% -30%;
+  font-size: 1150%;
+  margin: 0%;
+}
+h3{
+  font-size: 500%;
+  margin: 0%;
+}
+p{
+  translate: 0% -30%;
+  font-size: 300%;
+}
+canvas.fullscreen { 
+  width: 100vw; 
+  height: 100vh; 
+}

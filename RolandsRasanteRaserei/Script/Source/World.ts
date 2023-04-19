@@ -10,7 +10,8 @@ namespace Raserei {
         private cans: ƒ.Node;
         static canGraphID: string;
         private trees: ƒ.Node;
-        static treeGraphID: string;
+        static treeGraphIDs: string[] = [];
+        static shroomGraphIDs: string[] = [];
         private smoke: ƒ.Node;
         private smokeArray: Smoke[] = [];
         private doomedCollect: ƒ.GraphInstance[] = [];
@@ -27,11 +28,12 @@ namespace Raserei {
             this.cans = _world.getChildrenByName("Collectables")[0].getChildrenByName("Cans")[0];
             World.canGraphID = "Graph|2022-06-10T22:51:14.617Z|07901";
             this.trees = _world.getChildrenByName("Plants")[0].getChildrenByName("Trees")[0];
-            World.treeGraphID = "Graph|2022-07-18T02:17:48.525Z|91815"
+            World.treeGraphIDs.push("Graph|2022-07-18T02:17:48.525Z|91815", "Graph|2023-04-18T21:00:06.441Z|77374");
+            World.shroomGraphIDs.push("Graph|2023-04-18T21:42:24.330Z|91738", "Graph|2023-04-18T21:42:27.898Z|43571");
             this.smoke = _world.getChildrenByName("Smoke")[0];
-            this.generateWells(5);
-            this.generateGraphCluster(World.treeGraphID, this.trees, 5, 5, 0.15, 0.8);
-            this.generateGraphCluster(World.coinGraphID, this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
+            this.generateWells(3);
+            this.generateGraphCluster("trees", this.trees, 5, 5, 0.15, 0.5);
+            this.generateGraphCluster("coins", this.coins, this.config.maxCoinCluster, 10, 0.1, 0);
             this.generateCans(this.config.maxCans);
         }
 
@@ -85,7 +87,9 @@ namespace Raserei {
             }
         }
 
-        private generateGraphCluster(_graphID: string, _destNode: ƒ.Node, _clusterCount: number, _clusterSize: number, _spread: number, _randomScale: number): void {
+        private generateGraphCluster(_type: string, _destNode: ƒ.Node, _clusterCount: number, _clusterSize: number, _spread: number, _randomScale: number): void {
+            let _graphID: string;
+
             for (let j: number = 0; j < _clusterCount; j++) {
                 let tempCluster: ƒ.Node = new ƒ.Node("Cluster" + j);
                 let pos: ƒ.Vector3 = new ƒ.Vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
@@ -94,13 +98,27 @@ namespace Raserei {
                     let tempNode: ƒ.Node = new ƒ.Node("Graph" + i);
                     let cmpTransform: ƒ.ComponentTransform = new ƒ.ComponentTransform(new ƒ.Matrix4x4());
                     tempNode.addComponent(cmpTransform);
+
+                    switch (_type) {
+                        case "trees":
+                            _graphID = World.treeGraphIDs[Math.round(Math.random())];
+                            if (Math.random() > 0.3) {
+                                this.addGraphToNode(tempNode, World.shroomGraphIDs[Math.round(Math.random())]);
+                            }
+                            break;
+                        case "coins":
+                            _graphID = World.coinGraphID;
+                            break;
+                        default:
+                            console.log("there is no Graphtype called: " + _type);
+                    }
                     this.addGraphToNode(tempNode, _graphID);
                     tempNode.mtxLocal.translation = tempPos;
                     tempNode.mtxLocal.lookAt(new ƒ.Vector3(0, 0, 0));
                     tempNode.mtxLocal.rotateX(-90);
                     tempNode.mtxLocal.rotateY(Math.random() * 360);
                     if (_randomScale > 0) {
-                        let r: number = 0.5 + (Math.random() * _randomScale);
+                        let r: number = 0.8 + (Math.random() * _randomScale);
                         tempNode.mtxLocal.scale(new ƒ.Vector3(r, r, r));
                     }
                     tempCluster.addChild(tempNode);
