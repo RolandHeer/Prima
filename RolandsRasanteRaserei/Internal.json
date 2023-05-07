@@ -51,7 +51,9 @@
         "ƒ.CoatRemissive": {
           "color": "[1, 1, 1, 1]",
           "diffuse": 1,
-          "specular": 0.2
+          "metallic": 0,
+          "specular": 0,
+          "intensity": 0.5
         }
       }
     }
@@ -92,8 +94,10 @@
       "coat": {
         "ƒ.CoatRemissive": {
           "color": "[1, 1, 1, 1]",
-          "diffuse": 2,
-          "specular": 3
+          "diffuse": 1.0999999999999999,
+          "metallic": 1,
+          "specular": 1,
+          "intensity": 1
         }
       }
     }
@@ -123,7 +127,9 @@
         "ƒ.CoatRemissive": {
           "color": "[1, 1, 1, 1]",
           "diffuse": 1,
-          "specular": 5
+          "metallic": 0,
+          "specular": 0,
+          "intensity": 0.5
         }
       }
     }
@@ -190,21 +196,6 @@
       "url": "obj\\world.obj"
     }
   },
-  "Material|2022-07-18T01:16:44.001Z|88599": {
-    "ƒ.Material": {
-      "name": "planetShader",
-      "idResource": "Material|2022-07-18T01:16:44.001Z|88599",
-      "shader": "ShaderGouraudTextured",
-      "coat": {
-        "ƒ.CoatRemissiveTextured": {
-          "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2022-07-18T01:16:06.181Z|51401",
-          "diffuse": 1,
-          "specular": 0
-        }
-      }
-    }
-  },
   "TextureImage|2022-07-18T01:16:06.181Z|51401": {
     "ƒ.TextureImage": {
       "url": "tex\\newWorld.png",
@@ -230,12 +221,37 @@
       "idResource": "Material|2023-04-18T16:43:43.023Z|93691",
       "shader": "ShaderPhongTextured",
       "coat": {
-        "ƒ.CoatRemissiveTextured": {
+        "ƒ.CoatRemissiveTexturedNormals": {
           "color": "[1, 1, 1, 1]",
           "idTexture": "TextureImage|2022-07-18T01:16:06.181Z|51401",
           "diffuse": 1,
-          "specular": 1
+          "specular": 0.5,
+          "metallic": 0,
+          "intensity": 0.5,
+          "idNormalMap": "TextureImage|2023-05-06T22:44:42.439Z|16001"
         }
+      }
+    }
+  },
+  "TextureImage|2023-05-07T12:44:30.617Z|33760": {
+    "ƒ.TextureImage": {
+      "url": "tex\\Wireframe.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2023-05-07T12:44:30.617Z|33760",
+        "name": "tex\\Wireframe.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "TextureImage|2023-05-06T22:44:42.439Z|16001": {
+    "ƒ.TextureImage": {
+      "url": "tex\\WorldNormal.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2023-05-06T22:44:42.439Z|16001",
+        "name": "tex\\WorldNormal.png",
+        "mipmap": "CRISP"
       }
     }
   },
@@ -2421,7 +2437,9 @@
         "ƒ.CoatRemissive": {
           "color": "[1, 1, 1, 1]",
           "diffuse": 1,
-          "specular": 0.2
+          "metallic": 0,
+          "specular": 0.2,
+          "intensity": 0.5
         }
       }
     }
@@ -3448,7 +3466,9 @@
         "ƒ.CoatRemissive": {
           "color": "[0.6980392156862745, 0.796078431372549, 0.803921568627451, 1]",
           "diffuse": 1,
-          "specular": 0
+          "metallic": 0,
+          "specular": 0,
+          "intensity": 0.5
         }
       }
     }

@@ -299,7 +299,7 @@ var Raserei;
         window.removeEventListener("mousedown", startViewport);
         window.removeEventListener("touchend", startViewport);
         canvas = document.querySelector("canvas");
-        canvas.requestFullscreen();
+        //canvas.requestFullscreen()
         startInteractiveViewport();
     }
     async function startInteractiveViewport() {
