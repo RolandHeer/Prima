@@ -1,15 +1,4 @@
 {
-  "TextureImage|2022-07-09T08:09:19.424Z|17248": {
-    "ƒ.TextureImage": {
-      "url": "tex\\Equirectangular-projection-topographic-world.jpg",
-      "type": "TextureImage",
-      "Texture": {
-        "idResource": "TextureImage|2022-07-09T08:09:19.424Z|17248",
-        "name": "tex\\Equirectangular-projection-topographic-world.jpg",
-        "mipmap": "CRISP"
-      }
-    }
-  },
   "MeshObj|2022-05-18T20:10:20.283Z|82311": {
     "ƒ.MeshObj": {
       "idResource": "MeshObj|2022-05-18T20:10:20.283Z|82311",
@@ -94,10 +83,10 @@
       "coat": {
         "ƒ.CoatRemissive": {
           "color": "[1, 1, 1, 1]",
-          "diffuse": 1.0999999999999999,
+          "diffuse": 0.9999999999999997,
           "metallic": 1,
           "specular": 1,
-          "intensity": 1
+          "intensity": 1.4999999999999996
         }
       }
     }
@@ -128,7 +117,7 @@
           "color": "[1, 1, 1, 1]",
           "diffuse": 1,
           "metallic": 0,
-          "specular": 0,
+          "specular": 6,
           "intensity": 0.5
         }
       }
@@ -233,17 +222,6 @@
       }
     }
   },
-  "TextureImage|2023-05-07T12:44:30.617Z|33760": {
-    "ƒ.TextureImage": {
-      "url": "tex\\Wireframe.png",
-      "type": "TextureImage",
-      "Texture": {
-        "idResource": "TextureImage|2023-05-07T12:44:30.617Z|33760",
-        "name": "tex\\Wireframe.png",
-        "mipmap": "CRISP"
-      }
-    }
-  },
   "TextureImage|2023-05-06T22:44:42.439Z|16001": {
     "ƒ.TextureImage": {
       "url": "tex\\WorldNormal.png",
@@ -251,6 +229,17 @@
       "Texture": {
         "idResource": "TextureImage|2023-05-06T22:44:42.439Z|16001",
         "name": "tex\\WorldNormal.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "TextureImage|2023-05-07T12:44:30.617Z|33760": {
+    "ƒ.TextureImage": {
+      "url": "tex\\Wireframe.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2023-05-07T12:44:30.617Z|33760",
+        "name": "tex\\Wireframe.png",
         "mipmap": "CRISP"
       }
     }
@@ -882,7 +871,7 @@
                                       "Component": {
                                         "active": true
                                       },
-                                      "idMaterial": "Material|2022-06-10T22:43:01.782Z|32989"
+                                      "idMaterial": "Material|2023-02-25T23:07:47.838Z|64643"
                                     }
                                   }
                                 ]
@@ -2135,7 +2124,7 @@
           {
             "ƒ.ComponentMaterial": {
               "sortForAlpha": false,
-              "clrPrimary": "[1, 0.7725490196078432, 0.1411764705882353, 1]",
+              "clrPrimary": "[1, 0.7294117647058823, 0.1411764705882353, 1]",
               "clrSecondary": "[1, 1, 1, 1]",
               "pivot": {
                 "translation": "[0, 0]",
@@ -2145,7 +2134,7 @@
               "Component": {
                 "active": true
               },
-              "idMaterial": "Material|2022-06-11T00:17:58.736Z|70342"
+              "idMaterial": "Material|2023-05-07T23:49:12.323Z|34868"
             }
           }
         ],
@@ -2437,9 +2426,9 @@
         "ƒ.CoatRemissive": {
           "color": "[1, 1, 1, 1]",
           "diffuse": 1,
-          "metallic": 0,
-          "specular": 0.2,
-          "intensity": 0.5
+          "metallic": 1,
+          "specular": 1.3,
+          "intensity": 0.7999999999999999
         }
       }
     }
@@ -3468,7 +3457,7 @@
           "diffuse": 1,
           "metallic": 0,
           "specular": 0,
-          "intensity": 0.5
+          "intensity": 0
         }
       }
     }
@@ -3875,6 +3864,22 @@
       "children": [],
       "idResource": "Graph|2023-04-18T21:42:27.898Z|43571",
       "type": "Graph"
+    }
+  },
+  "Material|2023-05-07T23:49:12.323Z|34868": {
+    "ƒ.Material": {
+      "name": "metalPhong",
+      "idResource": "Material|2023-05-07T23:49:12.323Z|34868",
+      "shader": "ShaderPhong",
+      "coat": {
+        "ƒ.CoatRemissive": {
+          "color": "[1, 1, 1, 1]",
+          "diffuse": 0.9999999999999997,
+          "metallic": 1,
+          "specular": 1,
+          "intensity": 1.4999999999999996
+        }
+      }
     }
   }
 }
