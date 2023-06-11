@@ -1492,7 +1492,7 @@
                                       "projection": "central",
                                       "fieldOfView": 25,
                                       "direction": 2,
-                                      "aspect": 1.6416309012875536,
+                                      "aspect": 1.6651090342679127,
                                       "pivot": {
                                         "translation": "[0, 0, 0]",
                                         "rotation": "[0, 0, 0]",
@@ -1501,6 +1501,17 @@
                                       "Component": {
                                         "active": true
                                       }
+                                    }
+                                  }
+                                ],
+                                "ComponentPostFX": [
+                                  {
+                                    "ƒ.ComponentPostFX": {
+                                      "mist": true,
+                                      "clrMist": "[0, 0, 0, 1]",
+                                      "ao": false,
+                                      "clrAO": "[0, 0, 0, 1]",
+                                      "bloom": false
                                     }
                                   }
                                 ]
@@ -1846,7 +1857,7 @@
                       "scaling": "[1, 1, 1]"
                     },
                     "Component": {
-                      "active": true
+                      "active": false
                     }
                   }
                 }
