@@ -260,6 +260,23 @@
       }
     }
   },
+  "Material|2023-06-12T22:45:45.485Z|42665": {
+    "ƒ.Material": {
+      "name": "ShaderGouraudTextured",
+      "idResource": "Material|2023-06-12T22:45:45.485Z|42665",
+      "shader": "ShaderGouraudTextured",
+      "coat": {
+        "ƒ.CoatRemissiveTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2023-04-12T17:51:56.317Z|78828",
+          "diffuse": 1.5000000000000004,
+          "specular": 0,
+          "metallic": 0,
+          "intensity": 0
+        }
+      }
+    }
+  },
   "Graph|2022-05-18T20:10:05.727Z|72077": {
     "ƒ.Graph": {
       "name": "Game",
@@ -1518,7 +1535,7 @@
                                       "projection": "central",
                                       "fieldOfView": 25,
                                       "direction": 2,
-                                      "aspect": 1.7476635514018692,
+                                      "aspect": 1.7215777262180973,
                                       "pivot": {
                                         "translation": "[0, 0, 0]",
                                         "rotation": "[0, 0, 0]",
@@ -1534,9 +1551,9 @@
                                   {
                                     "ƒ.ComponentPostFX": {
                                       "mist": true,
-                                      "clrMist": "[0.5450980392156862, 0.8274509803921568, 0.8745098039215686, 0.77]",
+                                      "clrMist": "[0.2627450980392157, 0.7529411764705882, 0.8745098039215686, 0.31]",
                                       "nearPlane": 90,
-                                      "farPlane": 120,
+                                      "farPlane": 110,
                                       "ao": false,
                                       "clrAO": "[0, 0, 0, 1]",
                                       "bloom": false
@@ -3945,23 +3962,6 @@
       "children": [],
       "idResource": "Graph|2023-04-18T21:42:27.898Z|43571",
       "type": "Graph"
-    }
-  },
-  "Material|2023-06-12T22:45:45.485Z|42665": {
-    "ƒ.Material": {
-      "name": "ShaderGouraudTextured",
-      "idResource": "Material|2023-06-12T22:45:45.485Z|42665",
-      "shader": "ShaderGouraudTextured",
-      "coat": {
-        "ƒ.CoatRemissiveTextured": {
-          "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2023-04-12T17:51:56.317Z|78828",
-          "diffuse": 1.5000000000000004,
-          "specular": 0,
-          "metallic": 0,
-          "intensity": 0
-        }
-      }
     }
   }
 }
