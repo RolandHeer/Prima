@@ -1492,7 +1492,7 @@
                                       "projection": "central",
                                       "fieldOfView": 25,
                                       "direction": 2,
-                                      "aspect": 1.6651090342679127,
+                                      "aspect": 1.7476635514018692,
                                       "pivot": {
                                         "translation": "[0, 0, 0]",
                                         "rotation": "[0, 0, 0]",
@@ -1509,6 +1509,8 @@
                                     "ƒ.ComponentPostFX": {
                                       "mist": true,
                                       "clrMist": "[0, 0, 0, 1]",
+                                      "nearPlane": 80,
+                                      "farPlane": 140,
                                       "ao": false,
                                       "clrAO": "[0, 0, 0, 1]",
                                       "bloom": false
