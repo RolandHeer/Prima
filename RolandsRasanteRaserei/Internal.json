@@ -1106,6 +1106,19 @@
                                       }
                                     }
                                   }
+                                ],
+                                "ComponentPostFX": [
+                                  {
+                                    "ƒ.ComponentPostFX": {
+                                      "mist": true,
+                                      "clrMist": "[1, 1, 1, 1]",
+                                      "nearPlane": 7,
+                                      "farPlane": 50,
+                                      "ao": false,
+                                      "clrAO": "[0, 0, 0, 1]",
+                                      "bloom": false
+                                    }
+                                  }
                                 ]
                               },
                               "children": []
@@ -1152,6 +1165,19 @@
                                       "Component": {
                                         "active": false
                                       }
+                                    }
+                                  }
+                                ],
+                                "ComponentPostFX": [
+                                  {
+                                    "ƒ.ComponentPostFX": {
+                                      "mist": true,
+                                      "clrMist": "[1, 1, 1, 1]",
+                                      "nearPlane": 7,
+                                      "farPlane": 50,
+                                      "ao": false,
+                                      "clrAO": "[0, 0, 0, 1]",
+                                      "bloom": false
                                     }
                                   }
                                 ]
@@ -1564,6 +1590,19 @@
                                       }
                                     }
                                   }
+                                ],
+                                "ComponentPostFX": [
+                                  {
+                                    "ƒ.ComponentPostFX": {
+                                      "mist": true,
+                                      "clrMist": "[1, 1, 1, 1]",
+                                      "nearPlane": 80,
+                                      "farPlane": 140,
+                                      "ao": false,
+                                      "clrAO": "[0, 0, 0, 1]",
+                                      "bloom": false
+                                    }
+                                  }
                                 ]
                               },
                               "children": []
@@ -1610,6 +1649,19 @@
                                       "Component": {
                                         "active": false
                                       }
+                                    }
+                                  }
+                                ],
+                                "ComponentPostFX": [
+                                  {
+                                    "ƒ.ComponentPostFX": {
+                                      "mist": true,
+                                      "clrMist": "[1, 1, 1, 1]",
+                                      "nearPlane": 80,
+                                      "farPlane": 140,
+                                      "ao": false,
+                                      "clrAO": "[0, 0, 0, 1]",
+                                      "bloom": false
                                     }
                                   }
                                 ]
@@ -3482,7 +3534,7 @@
       "shader": "ShaderGouraud",
       "coat": {
         "ƒ.CoatRemissive": {
-          "color": "[0.6980392156862745, 0.796078431372549, 0.803921568627451, 1]",
+          "color": "[0.6980392156862745, 0.796078431372549, 0.803921568627451, 0.39]",
           "diffuse": 1,
           "metallic": 0,
           "specular": 0,
