@@ -34,7 +34,8 @@ namespace Raserei {
             this.smokeCloudInstance.getComponent(ƒ.ComponentMesh).mtxPivot.rotate(ƒ.Vector3.SCALE(this.rotation, _f * 2));
             this.size += 0.01 * _f;
             this.age += _f;
-            //this.smokeCloudInstance.getComponent(ƒ.ComponentMaterial)                         //Hier Alphawert ändern 
+            let color: ƒ.Color = this.smokeCloudInstance.getComponent(ƒ.ComponentMaterial).clrPrimary;
+            color.setNormRGBA(1, 1, 1, 1 - Math.pow(this.age / this.maxAge, 8));
             if (this.age > this.maxAge) {
                 return true;
             }
