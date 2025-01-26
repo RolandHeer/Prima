@@ -1106,19 +1106,6 @@
                                       }
                                     }
                                   }
-                                ],
-                                "ComponentPostFX": [
-                                  {
-                                    "ƒ.ComponentPostFX": {
-                                      "mist": true,
-                                      "clrMist": "[0.2627450980392157, 0.7529411764705882, 0.8745098039215686, 0.24]",
-                                      "nearPlane": 7,
-                                      "farPlane": 30,
-                                      "ao": false,
-                                      "clrAO": "[0, 0, 0, 1]",
-                                      "bloom": false
-                                    }
-                                  }
                                 ]
                               },
                               "children": []
@@ -1165,19 +1152,6 @@
                                       "Component": {
                                         "active": false
                                       }
-                                    }
-                                  }
-                                ],
-                                "ComponentPostFX": [
-                                  {
-                                    "ƒ.ComponentPostFX": {
-                                      "mist": true,
-                                      "clrMist": "[0.2627450980392157, 0.7529411764705882, 0.8745098039215686, 0.24]",
-                                      "nearPlane": 7,
-                                      "farPlane": 30,
-                                      "ao": false,
-                                      "clrAO": "[0, 0, 0, 1]",
-                                      "bloom": false
                                     }
                                   }
                                 ]
@@ -1518,7 +1492,7 @@
                                       "projection": "central",
                                       "fieldOfView": 25,
                                       "direction": 2,
-                                      "aspect": 1.898753894080997,
+                                      "aspect": 1.666158536585366,
                                       "pivot": {
                                         "translation": "[0, 0, 0]",
                                         "rotation": "[0, 0, 0]",
@@ -1530,16 +1504,27 @@
                                     }
                                   }
                                 ],
-                                "ComponentPostFX": [
+                                "ComponentBloom": [
                                   {
-                                    "ƒ.ComponentPostFX": {
-                                      "mist": true,
-                                      "clrMist": "[0.2627450980392157, 0.7529411764705882, 0.8745098039215686, 0.31]",
-                                      "nearPlane": 90,
-                                      "farPlane": 110,
-                                      "ao": false,
-                                      "clrAO": "[0, 0, 0, 1]",
-                                      "bloom": false
+                                    "ƒ.ComponentBloom": {
+                                      "threshold": 0.6449999999999996,
+                                      "intensity": 0.13000000000000012,
+                                      "desaturateHighlights": 0.5000000000000001,
+                                      "Component": {
+                                        "active": false
+                                      }
+                                    }
+                                  }
+                                ],
+                                "ComponentMist": [
+                                  {
+                                    "ƒ.ComponentMist": {
+                                      "clrMist": "[0.7019607843137254, 1, 0.9490196078431372, 0.21]",
+                                      "nearPlane": 80,
+                                      "farPlane": 111,
+                                      "Component": {
+                                        "active": false
+                                      }
                                     }
                                   }
                                 ]
@@ -1590,19 +1575,6 @@
                                       }
                                     }
                                   }
-                                ],
-                                "ComponentPostFX": [
-                                  {
-                                    "ƒ.ComponentPostFX": {
-                                      "mist": true,
-                                      "clrMist": "[0.2627450980392157, 0.7529411764705882, 0.8745098039215686, 0.31]",
-                                      "nearPlane": 30,
-                                      "farPlane": 70,
-                                      "ao": false,
-                                      "clrAO": "[0, 0, 0, 1]",
-                                      "bloom": false
-                                    }
-                                  }
                                 ]
                               },
                               "children": []
@@ -1649,19 +1621,6 @@
                                       "Component": {
                                         "active": false
                                       }
-                                    }
-                                  }
-                                ],
-                                "ComponentPostFX": [
-                                  {
-                                    "ƒ.ComponentPostFX": {
-                                      "mist": true,
-                                      "clrMist": "[0.2627450980392157, 0.7529411764705882, 0.8745098039215686, 0.25]",
-                                      "nearPlane": 80,
-                                      "farPlane": 140,
-                                      "ao": false,
-                                      "clrAO": "[0, 0, 0, 1]",
-                                      "bloom": false
                                     }
                                   }
                                 ]
